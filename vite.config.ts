@@ -57,7 +57,9 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
-  server: {				// ← ← ← ← ← ←
-    host: '0.0.0.0'	// ← 新增内容 ←
+  server: {	
+    hmr: true,			// ← ← ← ← ← ←
+    host: '0.0.0.0',	// ← 新增内容 ←
+    port:5174
   }		
 })

@@ -5,8 +5,8 @@ interface LoginForm {
     password: string;
 }
 
-// 用户登录
-export const loginApi = (params: LoginForm) => http.post('/geeker/login', params);
+// 首页轮播图
+export const loginApi = (params: LoginForm) => http.get('/banner', params);
 
 // 获取菜单列表
 export const getAuthMenuListApi = () => http.get('/geeker/menu/list');

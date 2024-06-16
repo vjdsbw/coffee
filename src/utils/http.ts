@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
+import {luckinAppkey} from "@/config/const";
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
     noLoading?: boolean;
@@ -17,6 +18,7 @@ interface ResultData {
     code: number;
     msg: string;
     data?: any;
+    result?:any;
 }
 
 const config = {
@@ -79,6 +81,12 @@ class RequestHttp {
                 // if (config.headers && typeof config.headers.set === 'function' && user.token) {
                 //     config.headers.set('x-access-token', user.token);
                 // }
+                if(config.method === 'get'){
+                    config.params ={
+                        appkey:luckinAppkey,
+                        ...config.params
+                    }
+                }
                 return config;
             },
             (error: AxiosError) => {

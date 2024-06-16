@@ -288,21 +288,21 @@ const toGetAddress = () => {
     });
 };
 
-const toGetCoordinate = () => {
-    let address = state.value.form.address;
-    state.value.geocoder.getLocation(address, (status: any, result: any) => {
-        if (status === 'complete' && result.info === 'OK') {
-            initMap([result.geocodes[0].location.lng, result.geocodes[0].location.lat]);
-            state.value.form.lng = result.geocodes[0].location.lng;
-            state.value.form.lat = result.geocodes[0].location.lat;
-            state.value.form.address = result.geocodes[0].formattedAddress;
-        }
-    });
-    nextTick(() => {
-        removeMarker();
-        setMapMarker();
-    });
-};
+// const toGetCoordinate = () => {
+//     let address = state.value.form.address;
+//     state.value.geocoder.getLocation(address, (status: any, result: any) => {
+//         if (status === 'complete' && result.info === 'OK') {
+//             initMap([result.geocodes[0].location.lng, result.geocodes[0].location.lat]);
+//             state.value.form.lng = result.geocodes[0].location.lng;
+//             state.value.form.lat = result.geocodes[0].location.lat;
+//             state.value.form.address = result.geocodes[0].formattedAddress;
+//         }
+//     });
+//     nextTick(() => {
+//         removeMarker();
+//         setMapMarker();
+//     });
+// };
 
 onMounted(() => {
     //组件挂载
