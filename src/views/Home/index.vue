@@ -59,7 +59,7 @@ onMounted(() => {
 				热卖推荐
 			</div>
 		</div>
-		<van-grid :gutter="10" :column-num="2">
+		<van-grid  :column-num="2">
 			<van-grid-item v-for="item in productsList" :key="item.id">
 				<van-card :price="item.price" :title="item.name" tag="hot" :thumb="item.largeImg">
 				</van-card>
@@ -81,6 +81,7 @@ onMounted(() => {
 	display: flex;
 	flex-direction: column;
 	background: #f7f8fa;
+	overflow: auto;
 
 	.header {
 		display: flex;

@@ -9,7 +9,7 @@ import http from '@/utils/http';
 export const bannerApi = () => http.get('/banner');
 
 // 获取菜单列表
-export const productsApi = (params:{key: string,value: number}) => http.get('/typeProducts', params);
+export const productsApi = (params:{key: string,value: number| string}) => http.get('/typeProducts', params);
 
 // 获取按钮权限
 export const getAuthButtonListApi = () => http.get('/geeker/auth/buttons');

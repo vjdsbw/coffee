@@ -1,5 +1,4 @@
 <script setup lang="ts" name="layout">
-import { showToast } from 'vant';
 import homeActive from '@/assets/icons/home_active.png';
 import home from '@/assets/icons/home.png';
 import menuPActive from '@/assets/icons/menu_active.png';
@@ -8,43 +7,49 @@ import myActive from '@/assets/icons/my_active.png';
 import my from '@/assets/icons/my.png';
 import shopbagActive from '@/assets/icons/shopbag_active.png';
 import shopbag from '@/assets/icons/shopbag.png';
-
- const onChange = (index:number) => showToast(`标签 ${index}`);
+const active = ref('/home');
+const router = useRouter()
+const tabbarChange = (name:string) => {
+    router.push(name);
+    // if(name === '/home' ||name === '/category' ){
+    //     router.push(name);
+    // }else{
+    //     router.push('/login');
+    // }
+}
 </script>
 
-<template> 
+<template>
     <div>
-        <router-view></router-view> 
+        <router-view></router-view>
         <div style="height: 4rem;background-color: #f7f8fa"></div>
-        <van-tabbar route fixed @change="onChange">
-            <van-tabbar-item  to="/home">
+        <van-tabbar v-model="active" fixed @change="tabbarChange">
+            <van-tabbar-item name="/home">
                 <span>首页</span>
-				<template #icon="props">
-					<van-image :src="props.active ? homeActive:home" />
-				</template>
+                <template #icon="props">
+                    <van-image :src="props.active ? homeActive : home" />
+                </template>
             </van-tabbar-item>
-            <van-tabbar-item  to="/category" icon="cart-o">
+            <van-tabbar-item name="/category">
                 <span>菜单</span>
-				<template #icon="props">
-					<van-image :src="props.active ? menuPActive:menuP" />
-				</template>
+                <template #icon="props">
+                    <van-image :src="props.active ? menuPActive : menuP" />
+                </template>
             </van-tabbar-item>
-            <van-tabbar-item  to="/me" icon="user-o">
+            <van-tabbar-item name="/cart">
                 <span>购物车</span>
-				<template #icon="props">
-					<van-image :src="props.active ? shopbagActive:shopbag" />
-				</template>
+                <template #icon="props">
+                    <van-image :src="props.active ? shopbagActive : shopbag" />
+                </template>
             </van-tabbar-item>
-            <van-tabbar-item  to="/login" icon="user-o">
+            <van-tabbar-item name="/me">
                 <span>我的</span>
-				<template #icon="props">
-					<van-image :src="props.active ? myActive:my" />
-				</template>
+                <template #icon="props">
+                    <van-image :src="props.active ? myActive : my" />
+                </template>
             </van-tabbar-item>
         </van-tabbar>
     </div>
 </template>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>
