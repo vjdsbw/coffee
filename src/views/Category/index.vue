@@ -76,7 +76,8 @@ onMounted(() => {
 
 <route lang="json">{
   "meta": {
-    "layout": "index"
+    "layout": "index",
+    "authority":true
   }
 }</route>
 

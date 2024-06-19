@@ -1,5 +1,3 @@
-/** @format */
-
 import { defineStore } from 'pinia';
 import piniaPersistConfig from './piniaPersist';
 
