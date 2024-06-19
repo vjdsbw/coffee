@@ -15,6 +15,7 @@ enum ResultEnum {
 
 // 请求响应参数
 interface ResultData {
+	token?:any;
     code: number;
     msg: string;
     data?: any;

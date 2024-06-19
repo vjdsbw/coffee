@@ -2,6 +2,10 @@
 import homeActive from '@/assets/icons/home_active.png';
 import closeEye from '@/assets/icons/close_eye.png';
 import openEye from '@/assets/icons/open_eye.png';
+import { loginApi } from '@/api/login';
+import { Store } from '@/store';
+
+const { user } = Store();
 
 const loginForm = ref<{ phone: String, password: String, }>({ phone: "", password: "", });
 
@@ -17,8 +21,14 @@ const toFindPwd = () => {
 
 }
 
-const submitLogin = () => {
-
+const submitLogin = async () => {
+	let params = {
+		appkey: 'U2FsdGVkX19WSQ59Cg+Fj9jNZPxRC5y0xB1iV06BeNA=',
+		password: "qwer1234",
+		phone: "18726869503"
+	}
+	const { token } = await loginApi(params);
+	user.setToken(token);
 }
 
 
@@ -162,10 +172,12 @@ onMounted(() => {
 		display: flex;
 		justify-content: space-around;
 		align-items: center;
-		.van-button{
-			flex:1;
+
+		.van-button {
+			flex: 1;
 			margin: 0px 10px;
 		}
+
 		.register-button {
 			background-color: #fff;
 			color: #000;
