@@ -6,6 +6,7 @@ import { loginApi } from '@/api/login';
 import { Store } from '@/store';
 
 const { user } = Store();
+const router = useRouter()
 
 const loginForm = ref<{ phone: String, password: String, }>({ phone: "", password: "", });
 
@@ -29,6 +30,7 @@ const submitLogin = async () => {
 	}
 	const { token } = await loginApi(params);
 	user.setToken(token);
+	router.push('/home')
 }
 
 
