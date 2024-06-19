@@ -7,15 +7,20 @@ import myActive from '@/assets/icons/my_active.png';
 import my from '@/assets/icons/my.png';
 import shopbagActive from '@/assets/icons/shopbag_active.png';
 import shopbag from '@/assets/icons/shopbag.png';
+import { Store } from "@/store";
+
+const { user } = Store();
+
 const active = ref('/home');
 const router = useRouter()
 const tabbarChange = (name:string) => {
-    router.push(name);
-    // if(name === '/home' ||name === '/category' ){
-    //     router.push(name);
-    // }else{
-    //     router.push('/login');
-    // }
+    if(name === '/home' ||name === '/category' ){
+        router.push(name);
+    }else if((name === '/cart' ||name === '/me') && user.token){
+        router.push(name);
+    }else{
+        router.push('/login');
+    }
 }
 </script>
 
