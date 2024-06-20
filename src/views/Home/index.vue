@@ -1,7 +1,7 @@
 <script setup lang="ts" name="Home">
 import search from "@/assets/icons/search.png"
-import { bannerApi,productsApi } from "@/api/homeAPI"
-
+import { bannerApi, productsApi } from "@/api/homeAPI"
+// import axios from 'axios';
 
 const toSearch = () => {
 	console.log('search')
@@ -17,15 +17,15 @@ const getgetBanner = async () => {
 	}
 }
 
-const getProducts = async ()=>{
-	let params ={
+const getProducts = async () => {
+	let params = {
 		key: "isHot",
 		value: 1
 	}
 	const { code, result } = await productsApi(params);
 	if (code === 500) {
 		productsList.value = result;
-		console.log(productsList.value ,'productsList')
+		console.log(productsList.value, 'productsList')
 	}
 }
 
@@ -33,6 +33,36 @@ const getProducts = async ()=>{
 onMounted(() => {
 	getgetBanner()
 	getProducts()
+	// axios({
+	// 	url: 'https://restapi.amap.com/v3/ip',
+	// 	method: 'get',
+	// 	params: {
+	// 		output: "json",
+	// 		key: '30fc01fb08aee9ede2fc1c338428ff22'
+	// 	}
+	// })  
+
+	// if (navigator.geolocation) {
+	// 	navigator.geolocation.getCurrentPosition(function (position) {
+	// 		var latitude = position.coords.latitude;
+	// 		var longitude = position.coords.longitude;
+	// 		axios({
+	// 			url: 'https://restapi.amap.com/v3/geocode/regeo',
+	// 			method: 'get',
+	// 			params: {
+	// 				output: "json",
+	// 				key: '30fc01fb08aee9ede2fc1c338428ff22',
+	// 				location: longitude+','+latitude,
+	// 				radius:1000,
+	// 				extensions: 'all',
+	// 				poitype:'咖啡'
+	// 			}
+	// 		})
+	// 		// console.log("Latitude: " + latitude + " Longitude: " + longitude);
+	// 	});
+	// } else {
+	// 	console.log("Geolocation is not supported by this browser.");
+	// }
 })
 
 </script>
@@ -59,7 +89,7 @@ onMounted(() => {
 				热卖推荐
 			</div>
 		</div>
-		<van-grid  :column-num="2">
+		<van-grid :column-num="2">
 			<van-grid-item v-for="item in productsList" :key="item.id">
 				<van-card :price="item.price" :title="item.name" tag="hot" :thumb="item.largeImg">
 				</van-card>

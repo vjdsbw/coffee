@@ -9,13 +9,8 @@ const props = defineProps({
     }
 });
 
-// /**实际生产中不要用 此处仅测试 具体实际使用方法看官网*/
-// (window as any)._AMapSecurityConfig = {
-//     securityJsCode: 'd768faa4dd1f2644977c989b3aee226e' // 应用生成的秘钥
-// };
-
-const searchValue: any = ref('');
 const AMap: any = ref();
+
 const state: any = ref({
     map: null,
     placeSearch: null,
@@ -34,7 +29,7 @@ const initMap = (latlng: any[]) => {
     AMapLoader.load({
         key: 'a0e0ebabac17b0282d882728bd676a8d',
         version: '2.0',
-        plugins: ['AMap.ToolBar', 'AMap.ControlBar', 'AMap.AutoComplete', 'AMap.PlaceSearch', 'AMap.Geocoder', 'AMap.Marker', 'AMap.Geolocation'] // 地图插件 根据需求从高德开放平台添加
+        plugins: ['AMap.ToolBar', 'AMap.ControlBar', 'AMap.AutoComplete', 'AMap.PlaceSearch', 'AMap.Geocoder', 'AMap.Marker', 'AMap.Geolocation', 'AMap.CitySearch'] // 地图插件 根据需求从高德开放平台添加
     })
         .then((Map: any) => {
             AMap.value = Map;
@@ -67,7 +62,7 @@ const initMap = (latlng: any[]) => {
             state.value.placeSearch = new Map.PlaceSearch({
                 map: state.value.map
             });
-            let geolocation = new Map.Geolocation({
+            const geolocation = new Map.Geolocation({
                 enableHighAccuracy: true, //是否使用高精度定位，默认:true
                 timeout: 10000, //超过10秒后停止定位，默认：无穷大
                 maximumAge: 0, //定位结果缓存0毫秒，默认：0
@@ -80,22 +75,30 @@ const initMap = (latlng: any[]) => {
                 panToLocation: true, //定位成功后将定位到的位置作为地图中心点，默认：true
                 zoomToAccuracy: true //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
             });
+            geolocation.getCurrentPosition((status: string, result: any) => {
+                if (status === 'complete') {
+                    const { lng, lat } = result.position;
+                    console.log('Latitude:', lat);
+                    console.log('Longitude:', lng);
+                } else {
+                    console.log('Geolocation failed:', result.message);
+                }
+            });
             state.value.map.on('click', clickMap);
-            state.value.map.addControl(toolBar);
-            state.value.map.addControl(controlBar); // 添加右上角的放大缩小
-            if (latlng.length === 0) {
-                state.value.map.addControl(geolocation);
-                geolocation.getCurrentPosition();
-            }
+            state.value.map.addControl(toolBar);// 放大缩小
+            state.value.map.addControl(controlBar); //旋转
+            state.value.map.addControl(geolocation);
         })
         .catch(err => {
             console.error(err, '加载错误提示'); //加载错误提示
         })
         .finally(() => {
+            console.log("state.value.", state.value)
             AMap.value.convertFrom(props.latLng, 'gps', (status: String, result: any) => {
                 if (status === 'complete' && result.info === 'ok') {
                     state.value.form.lng = result.locations[0].lng;
                     state.value.form.lat = result.locations[0].lat;
+
                     nextTick(() => {
                         removeMarker();
                         setMapMarker();
@@ -114,136 +117,6 @@ const clickMap = (e: any) => {
     regeocoder();
     removeMarker(); // 先删除地图上标记点
     setMapMarker(); // 在添加新的标记点
-};
-
-// 关键字搜索
-const seachAddress = () => {
-    if (searchValue.value === '') return alert('请输入地址');
-    //清除地图上的覆盖物
-    state.value.map.clearMap();
-    state.value.map.plugin('AMap.PlaceSearch', () => {
-        let placeSearch = new AMap.value.PlaceSearch({
-            city: '010', // city 指定搜索所在城市，支持传入格式有：城市名、citycode和adcode
-            map: state.value.map,
-            // type: "", //数据类别
-            // pageSize: 10, //每页结果数,默认10
-            // pageIndex: 1, //请求页码，默认1
-            extensions: 'base' //返回信息详略，默认为base（基本信息）
-        });
-        placeSearch.search(searchValue.value, (status: String, result: any) => {
-            if (status === 'complete' && result.info === 'ok') {
-                console.log(result, '//查询成功时，result即对应匹配的POI信息');
-                let pois = result.poiList.pois; // 查询成功时，result即对应匹配的POI信息
-                pois.forEach((item: any) => {
-                    state.value.map.add(
-                        // 将创建的点标记添加到已有的地图实例：
-                        new AMap.value.Marker({
-                            position: item.location, // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
-                            title: item.name
-                        })
-                    );
-                });
-                state.value.map.setFitView();
-                AMap.value.Event.addListener(placeSearch, 'markerClick', (result: any) => {
-                    //经纬度
-                    state.value.form.lng = result.event.lnglat.lng;
-                    state.value.form.lat = result.event.lnglat.lat;
-                    toGetAddress();
-                });
-            }
-        });
-    });
-};
-
-// 筛选查询
-const searchCoord = (data: any) => {
-    if (data) {
-        //清除地图上的覆盖物
-        state.value.map.clearMap();
-        state.value.map.setCenter([data.records[0].longitude, data.records[0].latitude]);
-        state.value.map.setZoom(11);
-        let marker = [];
-        for (let index = 0; index < data.records.length; index++) {
-            let poi = data.records[index];
-            // 其他坐标转J02坐标
-            let gps = [poi.longitude, poi.latitude];
-            AMap.value.convertFrom(gps, 'gps', (status: any, result: any) => {
-                if (result.info === 'ok') {
-                    poi.longitude = result.locations[0].lng;
-                    poi.latitude = result.locations[0].lat;
-                }
-            });
-            marker[index] = new AMap.value.Marker({
-                position: [poi.longitude, poi.latitude],
-                title: poi.locationName
-            });
-            // 将创建的点标记添加到已有的地图实例：
-            state.value.map.add(marker[index]);
-            let content = [];
-            if (poi.personInCharge) {
-                content.push('负责人: ' + poi.personInCharge + '');
-            }
-            marker[index].content = content;
-            marker[index].title = poi.locationName;
-            marker[index].on('click', showInfoWindow);
-            state.value.map.off('click', clickMap);
-        }
-    }
-};
-
-// 自定义窗体
-const showInfoWindow = (e: any) => {
-    //实例化信息窗体
-    let title = e.target.title,
-        content = e.target.content;
-    let infoWindow = new AMap.value.InfoWindow({
-        isCustom: true, //使用自定义窗体
-        content: createInfoWindow(title, content.join('<br/>')),
-        closeWhenClickMap: true,
-        offset: new AMap.value.Pixel(16, -45)
-    });
-    infoWindow.open(state.value.map, e.target.getPosition());
-};
-
-//构建自定义信息窗体
-const createInfoWindow = (title: any, content: any) => {
-    let info = document.createElement('div');
-    info.className = 'custom-info input-card content-window-card';
-
-    //可以通过下面的方式修改自定义窗体的宽高
-    info.style.width = '400px';
-    // 定义顶部标题
-    let top = document.createElement('div');
-    let titleD = document.createElement('div');
-    top.className = 'info-top';
-    titleD.innerHTML = title;
-    top.appendChild(titleD);
-    info.appendChild(top);
-
-    // 定义中部内容
-    let middle = document.createElement('div');
-    middle.className = 'info-middle';
-    middle.style.backgroundColor = 'white';
-    middle.innerHTML = content;
-    info.appendChild(middle);
-
-    // 定义底部内容
-    let bottom = document.createElement('div');
-    bottom.className = 'info-bottom';
-    bottom.style.position = 'relative';
-    bottom.style.top = '0px';
-    bottom.style.margin = '0 auto';
-    // let sharp = document.createElement("img");
-    // sharp.src = "https://webapi.amap.com/images/sharp.png";
-    // bottom.appendChild(sharp);
-    info.appendChild(bottom);
-    return info;
-};
-
-// 下拉选中查询
-const select = (e: any) => {
-    state.value.placeSearch.setCity(e.poi.adcode);
-    state.value.placeSearch.search(e.poi.name); //关键字查询查询
 };
 
 // 设置标记
@@ -288,22 +161,6 @@ const toGetAddress = () => {
     });
 };
 
-// const toGetCoordinate = () => {
-//     let address = state.value.form.address;
-//     state.value.geocoder.getLocation(address, (status: any, result: any) => {
-//         if (status === 'complete' && result.info === 'OK') {
-//             initMap([result.geocodes[0].location.lng, result.geocodes[0].location.lat]);
-//             state.value.form.lng = result.geocodes[0].location.lng;
-//             state.value.form.lat = result.geocodes[0].location.lat;
-//             state.value.form.address = result.geocodes[0].formattedAddress;
-//         }
-//     });
-//     nextTick(() => {
-//         removeMarker();
-//         setMapMarker();
-//     });
-// };
-
 onMounted(() => {
     //组件挂载
     initMap(props.latLng); //经度lng, 纬度lat
@@ -312,20 +169,21 @@ onMounted(() => {
 
 <template>
     <div class="home_div">
-        <div id="search">
-            <input v-model="searchValue" @keyup.enter="seachAddress" id="tipinput" placeholder="请输入要搜索的位置" style="width: 200px; margin: -1px 2px 0 12px" />
-            <button @click="seachAddress">查询</button>
-        </div>
-        <div id="container" style="height: 100vh; width: 100%"></div>
+        <div id="container"></div>
     </div>
 </template>
 
-<style scope>
+<style scope lang="scss">
 .home_div {
-    height: 100%;
+    height: 50vh;
     width: 100%;
     padding: 0px;
     margin: 0px;
+
+    #container {
+        height: 100%;
+        width: 100%;
+    }
 
 }
 
@@ -336,10 +194,6 @@ onMounted(() => {
 
 html,
 body,
-#container {
-    height: 100%;
-    width: 100%;
-}
 
 .content-window-card {
     position: relative;
