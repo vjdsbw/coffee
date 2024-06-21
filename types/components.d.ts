@@ -7,15 +7,19 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    List: typeof import('./../src/components/List.vue')['default']
     MapContainer: typeof import('./../src/components/MapContainer.vue')['default']
     MapvueAmap: typeof import('./../src/components/MapvueAmap.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     VanButton: typeof import('vant/es')['Button']
     VanCard: typeof import('vant/es')['Card']
+    VanCell: typeof import('vant/es')['Cell']
     VanGrid: typeof import('vant/es')['Grid']
     VanGridItem: typeof import('vant/es')['GridItem']
     VanImage: typeof import('vant/es')['Image']
+    VanList: typeof import('vant/es')['List']
+    VanPullRefresh: typeof import('vant/es')['PullRefresh']
     VanSidebar: typeof import('vant/es')['Sidebar']
     VanSidebarItem: typeof import('vant/es')['SidebarItem']
     VanSwipe: typeof import('vant/es')['Swipe']

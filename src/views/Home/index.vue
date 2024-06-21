@@ -1,6 +1,7 @@
 <script setup lang="ts" name="Home">
 import search from "@/assets/icons/search.png"
 import { bannerApi, productsApi } from "@/api/homeAPI"
+import dayjs from 'dayjs'
 // import axios from 'axios';
 
 const toSearch = () => {
@@ -65,13 +66,14 @@ onMounted(() => {
 	// }
 })
 
+
 </script>
 
 <template>
 	<div class="home-box">
 		<div class="header">
 			<div class="left">
-				<div>下午好</div>
+				<div>{{dayjs().hour() > 12 ? '下午好' : '上午好'}}</div>
 				<div class="name">LUCKIN</div>
 			</div>
 			<div class="right" @click="toSearch">

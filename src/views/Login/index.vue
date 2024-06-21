@@ -12,8 +12,6 @@ const loginForm = ref<{ phone: String, password: String, }>({ phone: "", passwor
 
 const seePwd = ref<Boolean>(false)
 
-const showRegister = ref<Boolean>(false)
-
 const toBack = () => {
 
 }
@@ -68,10 +66,9 @@ onMounted(() => {
 		</div>
 		<div class="handle">
 			<van-button color="#0c34ba" type="primary" @click="submitLogin">登录</van-button>
-			<van-button class="register-button" style="border: 1px solid #e8e8e8;" type="primary"
-				@click="showRegister = true">注册</van-button>
 		</div>
 	</div>
+
 </template>
 
 <route lang="json">{
