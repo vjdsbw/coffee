@@ -43,12 +43,10 @@ const scrollToCategory = (sectionIndex, categoryIndex) => {
     const headerOffset = 60; // 固定头部的高度
     const categoryElement = document.getElementById(`section-${sectionIndex}-category-${categoryIndex}`);
     const elementPosition = categoryElement.getBoundingClientRect().top;
-    const offsetPosition = elementPosition + window.scrollY - headerOffset;
-   
+    const offsetPosition = elementPosition + window.scrollY - headerOffset;  
     if (categoryElement) {
-        console.log(offsetPosition,"XXXXXXXXXXXXXXX");
         categoryElement.scrollIntoView({ behavior: "smooth", top: offsetPosition, });
-        activeCategories.value[sectionIndex] = categoryIndex; // 设置当前分类为激活
+        activeCategories.value = categoryIndex; // 设置当前分类为激活
     }
 };
 
@@ -68,7 +66,7 @@ const onScroll = () => {
             categoryElements.forEach((category, cIndex) => {
                 const categoryRect = category.getBoundingClientRect();
                 if (categoryRect.top <= 100 && categoryRect.bottom >= 100) {
-                    activeCategories.value[index] = cIndex;
+                    activeCategories.value = cIndex;
                 }
             });
         }
@@ -107,7 +105,7 @@ onUnmounted(() => {
                     <div>{{ section.title }}</div>
                     <div class="categories">
                         <span v-for="(category, cIndex) in section.categories" :key="category.title"
-                            :class="{ 'active': activeCategories[index] === cIndex }"
+                            :class="{ 'active': activeCategories === cIndex && index == activeSection }"
                             @click="scrollToCategory(index, cIndex)">
                             {{ category.title }}
                         </span>
