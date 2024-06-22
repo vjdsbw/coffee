@@ -1,4 +1,4 @@
-<script lang="ts" setup name="error">
+<script lang="ts" setup name="All">
 const route = useRoute();
 </script>
 

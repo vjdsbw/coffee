@@ -2,10 +2,27 @@
 
 <template>
   <router-view v-slot="{ Component, route }">
-    <transition name="slide">
-      <component :is="Component" :key="route" />
+    <transition name="MainFade" mode="out-in">
+      <keep-alive>
+        <component :is="Component" :key="route.path" />
+      </keep-alive>
     </transition>
   </router-view>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+/* 渐变设置 */
+// .MainFade-enter-from, .MainFade-leave-to {
+//   transform: translateX(20px);
+//   opacity: 0;
+// }
+// .MainFade-enter-to, .MainFade-leave-from {
+//   opacity: 1;
+// }
+// .MainFade-enter-active {
+//   transition: all 0.7s ease;
+// }
+// .MainFade-leave-active {
+//    transition: all 0.3s cubic-bezier(1, 0.6, 0.6, 1);
+// }
+</style>

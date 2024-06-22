@@ -1,5 +1,4 @@
 <script setup lang="ts" name="Me">
-import right from "@/assets/icons/right.png";
 import { findMyApi } from '@/api/login';
 import { Store } from "@/store";
 
