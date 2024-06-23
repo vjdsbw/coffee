@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts"  name="List">
 
 const sections = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(item => {
     return {
@@ -84,31 +84,40 @@ onUnmounted(() => {
 
 
 <template>
-    <div class="box">
-        <!-- 左侧 Sidebar -->
-        <van-sidebar v-model="activeSection">
-            <van-sidebar-item v-for="(section, index) in sections" :key="section.title" :title="section.title"
-                @click="scrollToSection(index)"></van-sidebar-item>
-        </van-sidebar>
+    <div class="list-box">
+        <div class="box-top"> 
+            <van-image round src="../src/assets/category/category-top.png"></van-image>
+        </div>
+        <div class="box-content">
+            <!-- 左侧 Sidebar -->
+            <van-sidebar v-model="activeSection">
+                <van-sidebar-item v-for="(section, index) in sections" :key="section.title" :title="section.title"
+                    @click="scrollToSection(index)"></van-sidebar-item>
+            </van-sidebar>
 
-        <!-- 右侧 Content -->
-        <div class="content" ref="contentRef">
-            <div class="content-section" v-for="(section, index) in sections" :key="index" :id="'sidebarSelct' + index">
-                <div class="content-section-header">
-                    <div class="content-section-header-title">{{ section.title }}</div>
-                    <div class="content-section-header-categories">
-                        <div v-for="(item, idx) in section.categories"
-                            :class="{ 'active': activeCategories === idx && index == activeSection }">{{ item.title }}
+            <!-- 右侧 Content -->
+            <div class="content" ref="contentRef">
+                <div class="content-section" v-for="(section, index) in sections" :key="index"
+                    :id="'sidebarSelct' + index">
+                    <div class="content-section-header">
+                        <div class="content-section-header-title">{{ section.title }}</div>
+                        <div class="content-section-header-categories">
+                            <div v-for="(item, idx) in section.categories"
+                                :class="{ 'active': activeCategories === idx && index == activeSection }">{{ item.title
+                                }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-section-box" v-for="(item, idx) in section.categories" :key="idx">
+                        <div class="content-section-box-title">{{ item.title }}</div>
+                        <div class="content-section-box-card" v-for="(itm, ind) in item.items" :key="ind">{{ itm }}
                         </div>
                     </div>
                 </div>
-
-                <div class="content-section-box" v-for="(item, idx) in section.categories" :key="idx">
-                    <div class="content-section-box-title">{{ item.title }}</div>
-                    <div class="content-section-box-card" v-for="(itm, ind) in item.items" :key="ind">{{ itm }}</div>
-                </div>
             </div>
         </div>
+
     </div>
 </template>
 
@@ -120,9 +129,29 @@ onUnmounted(() => {
 }</route>
 
 <style scoped lang="scss">
-.box {
-    display: flex;
+.list-box {
 
+    .box-top {
+        min-height: 2.4rem;
+        padding: .2rem .2rem 0;
+        background: #f3f3f3;
+        position: relative;
+        z-index: 3;
+
+        &::before {
+            content: "";
+            display: block;
+            background: #333999;
+            height: 3.44rem;
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+        }
+    }
+
+    .box-content {
+    display: flex;
     .van-sidebar {
         width: 6rem;
         height: 100vh;
@@ -136,7 +165,6 @@ onUnmounted(() => {
             }
         }
     }
-
     .content {
         height: 100vh;
         overflow: scroll;
@@ -189,4 +217,8 @@ onUnmounted(() => {
         }
     }
 }
+
+}
+
+
 </style>

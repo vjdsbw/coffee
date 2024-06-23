@@ -1,19 +1,35 @@
 <script setup lang="ts" name="LuckLogin">
 import luckinlogo from "@/assets/luckinlogo.png";
 // import { showDialog } from 'vant';
-
+import axios from 'axios';
 const loginForm = ref<{ phone: String; password: String }>({
   phone: "",
   password: "",
 });
+
+const phoneShow = ref<boolean>(false)
+
+const getCode = () => {
+  if (!loginForm.value.password) return phoneShow.value = true;
+  axios({
+    url: "http://localhost:8081/coffee/api/notify/v1/send_code",
+    method: 'get',
+    params: {
+      mobile: loginForm.value.phone,
+      type: loginForm.value.phone,
+    }
+  }).then((res) => {
+    console.log(res, "xxxxxxxxxxxxxxxxx")
+  })
+
+}
+
 
 const submitLogin = async () => {
   //   if(!loginForm.value.password) return showDialog({
   //   message: '请填写短信验证码',
   // })
   show.value = true;
-
-
 }
 const show = ref(false);
 </script>
@@ -29,14 +45,17 @@ const show = ref(false);
       </div>
       <div class="item">
         <input placeholder-class="placeholder" type="text" placeholder="请输入验证码" v-model="loginForm.password" />
-        <van-button type="primary">获取验证码</van-button>
+        <van-button type="primary" @click="getCode">获取验证码</van-button>
       </div>
     </div>
     <div class="handle">
       <van-button type="primary" @click="submitLogin">确定</van-button>
     </div>
-    <van-dialog v-model:show="show"  >
+    <van-dialog v-model:show="show">
       <div class="dialog-content">请填写短信验证码</div>
+    </van-dialog>
+    <van-dialog v-model:show="phoneShow">
+      <div class="dialog-content">请填写手机号</div>
     </van-dialog>
   </div>
 </template>
@@ -121,7 +140,8 @@ const show = ref(false);
       border-radius: 999px;
     }
   }
-  .dialog-content{
+
+  .dialog-content {
     height: 150px;
     line-height: 150px;
     text-align: center;
