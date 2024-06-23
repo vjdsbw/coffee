@@ -1,6 +1,6 @@
 <script setup lang="ts" name="LuckLogin">
 import luckinlogo from "@/assets/luckinlogo.png";
-import { showDialog } from 'vant';
+// import { showDialog } from 'vant';
 
 const loginForm = ref<{ phone: String; password: String }>({
   phone: "",
@@ -12,6 +12,7 @@ const submitLogin = async () => {
   //   message: '请填写短信验证码',
   // })
   show.value = true;
+
 
 }
 const show = ref(false);
@@ -51,7 +52,7 @@ const show = ref(false);
 .lucklogin-box {
   position: fixed;
   width: 100%;
-  // height: 100vh;
+  height: 100vh;
   background-color: #f5f5f5;
 
   .top-img {

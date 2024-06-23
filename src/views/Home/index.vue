@@ -43,27 +43,28 @@ onMounted(() => {
 	// 	}
 	// })  
 
-	// if (navigator.geolocation) {
-	// 	navigator.geolocation.getCurrentPosition(function (position) {
-	// 		var latitude = position.coords.latitude;
-	// 		var longitude = position.coords.longitude;
-	// 		axios({
-	// 			url: 'https://restapi.amap.com/v3/geocode/regeo',
-	// 			method: 'get',
-	// 			params: {
-	// 				output: "json",
-	// 				key: '30fc01fb08aee9ede2fc1c338428ff22',
-	// 				location: longitude+','+latitude,
-	// 				radius:1000,
-	// 				extensions: 'all',
-	// 				poitype:'咖啡'
-	// 			}
-	// 		})
-	// 		// console.log("Latitude: " + latitude + " Longitude: " + longitude);
-	// 	});
-	// } else {
-	// 	console.log("Geolocation is not supported by this browser.");
-	// }
+	if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition(function (position) {
+			console.log(position,"xxxxxxxxxxxxxx")
+			// var latitude = position.coords.latitude;
+			// var longitude = position.coords.longitude;
+			// axios({
+			// 	url: 'https://restapi.amap.com/v3/geocode/regeo',
+			// 	method: 'get',
+			// 	params: {
+			// 		output: "json",
+			// 		key: '30fc01fb08aee9ede2fc1c338428ff22',
+			// 		location: longitude+','+latitude,
+			// 		radius:1000,
+			// 		extensions: 'all',
+			// 		poitype:'咖啡'
+			// 	}
+			// })
+			// console.log("Latitude: " + latitude + " Longitude: " + longitude);
+		});
+	} else {
+		console.log("Geolocation is not supported by this browser.");
+	}
 })
 
 
