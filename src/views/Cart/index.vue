@@ -1,7 +1,7 @@
 <script setup lang="ts" name="Cart">
 import shopbagBg from "@/assets/icons/shopbag_bg.png";
-import { findAllShopcartApi } from "@/api/homeAPI";
-import { Store } from "@/store";
+import {findAllShopcartApi} from "@/api/homeAPI";
+import {Store} from "@/store";
 
 const { user } = Store();
 
@@ -52,7 +52,11 @@ const allCartPrice = computed(() => {
 	return num;
 });
 
-const isSubmit = () => { };
+const isSubmit = () => {
+  console.log(checked.value)
+  if (checked.value.length === 0) return
+  router.push('/cart/confirm')
+};
 
 onMounted(() => {
 	getFindAllShop();
@@ -61,7 +65,8 @@ onMounted(() => {
 
 <template>
 	<div class="cart-box">
-		<van-nav-bar title="标题" left-text="返回" :right-text="isDel ? '完成' : '编辑'" left-arrow @click-left="onClickLeft"
+    <van-nav-bar :right-text="isDel ? '完成' : '编辑'" left-arrow left-text="返回" title="购物车"
+                 @click-left="onClickLeft"
 			@click-right="isDel = !isDel" />
 		<van-image :src="shopbagBg"></van-image>
 		<div class="cart-box-list">
@@ -76,12 +81,12 @@ onMounted(() => {
 							<div class="name-cn">
 								{{ item.name }}
 							</div>
-							<div class="type">
-								{{ item.rule }}
-							</div>
 						</div>
 						<div class="name-us">
-							{{ item.enname }}
+              <div class="type">
+                <span>{{ item.rule }} </span>
+                <span>{{ item.enname }} </span>
+              </div>
 						</div>
 						<div class="bottom">
 							<div class="price">￥{{ item.price }}</div>
@@ -132,7 +137,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .cart-box {
 	background-color: #f7f7f7;
-	height: 100vh;
+  height: 91vh;
 
 	.van-image {
 		width: 100%;
@@ -156,9 +161,13 @@ onMounted(() => {
 			.cover {
 				margin-right: 0.62rem;
 
+        :deep(.van-image__img) {
+          border-radius: 10px !important;
+        }
+
 				.van-image {
-					width: 5.31rem;
-					height: 5.62rem;
+          width: 4.31rem;
+          height: 4.62rem;
 				}
 			}
 
@@ -169,7 +178,7 @@ onMounted(() => {
 			}
 
 			.info {
-				height: 5.62rem;
+        height: 5rem;
 				display: flex;
 				flex-direction: column;
 				justify-content: space-between;
@@ -181,19 +190,24 @@ onMounted(() => {
 
 					.name-cn {
 						font-size: 0.93rem;
+            color: #333;
 					}
 
-					.type {
-						font-size: 0.65rem;
-						color: dimgray;
-						margin-left: 0.78rem;
-					}
+
 				}
 
 				.name-us {
 					font-size: 0.62rem;
 					color: dimgray;
-					margin-bottom: 1.4rem;
+
+          .type {
+            font-size: 0.65rem;
+            color: dimgray;
+
+            span {
+              margin-right: 5px;
+            }
+          }
 				}
 			}
 
@@ -203,7 +217,7 @@ onMounted(() => {
 				justify-content: space-between;
 
 				.price {
-					color: #0055ff;
+          color: #f05821;
 					font-size: 0.78rem;
 					font-weight: bold;
 				}

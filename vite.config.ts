@@ -1,9 +1,9 @@
-import { defineConfig } from 'vite'
+import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { resolve } from 'path'
+import {resolve} from 'path'
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
-import { VantResolver } from '@vant/auto-import-resolver';
+import {VantResolver} from '@vant/auto-import-resolver';
 import Pages from 'vite-plugin-pages'
 import Layouts from 'vite-plugin-vue-layouts'
 import VueSetupExtend from 'vite-plugin-vue-setup-extend'
@@ -57,9 +57,12 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
-  server: {	
+  css: {
+    devSourcemap: true,
+  },
+  server: {
     hmr: true,			// ← ← ← ← ← ←
     host: '0.0.0.0',	// ← 新增内容 ←
     port:5174
-  }		
+  }
 })
