@@ -1,4 +1,4 @@
-<script setup lang="ts"  name="List">
+<script setup lang="ts" name="List">
 
 const sections = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(item => {
     return {
@@ -41,15 +41,16 @@ const onScroll = () => {
     console.log(sectionElements, 'content-section')
     sectionElements.forEach((section, index) => {
         const rect = section.getBoundingClientRect();
-        if (rect.top < 0 && rect.bottom > 0) {
+        if (rect.top < 160 && rect.bottom > 0) {
             activeSection.value = index;
-            const categoryElements = section.querySelectorAll(".content-section-header-categories");
-            categoryElements.forEach((category, cIndex) => {
-                const categoryRect = category.getBoundingClientRect();
-                if (categoryRect.top <= 100 && categoryRect.bottom >= 100) {
-                    activeCategories.value = cIndex;
-                }
-            });
+            console.log(index,'index')
+            // const categoryElements = section.querySelectorAll(".content-section-header-categories");
+            // categoryElements.forEach((category, cIndex) => {
+            //     const categoryRect = category.getBoundingClientRect();
+            //     if (categoryRect.top <= 100 && categoryRect.bottom >= 100) {
+            //         activeCategories.value = cIndex;
+            //     }
+            // });
         }
 
         // if (rect.top <= 100 && rect.bottom >= 100) {
@@ -85,8 +86,11 @@ onUnmounted(() => {
 
 <template>
     <div class="list-box">
-        <div class="box-top"> 
+        <div class="box-top">
             <van-image round src="../src/assets/category/category-top.png"></van-image>
+        </div>
+        <div class="box-top-address">
+
         </div>
         <div class="box-content">
             <!-- 左侧 Sidebar -->
@@ -130,6 +134,7 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .list-box {
+    position: relative;
 
     .box-top {
         min-height: 2.4rem;
@@ -142,7 +147,7 @@ onUnmounted(() => {
             content: "";
             display: block;
             background: #333999;
-            height: 3.44rem;
+            height: 10rem;
             position: absolute;
             top: 0;
             right: 0;
@@ -151,74 +156,76 @@ onUnmounted(() => {
     }
 
     .box-content {
-    display: flex;
-    .van-sidebar {
-        width: 6rem;
-        height: 100vh;
+        height: 70vh ;
         overflow: scroll;
+        display: flex;
 
-        .van-sidebar-item--select {
-            background-color: #9dc4e3;
+        .van-sidebar {
+            width: 6rem;
+            height: 100vh;
+            overflow: scroll;
 
-            &::before {
-                height: 90%;
+            .van-sidebar-item--select {
+                background-color: #9dc4e3;
+
+                &::before {
+                    height: 90%;
+                }
             }
         }
-    }
-    .content {
-        height: 100vh;
-        overflow: scroll;
-        flex: 1;
 
-        .content-section {
-            margin: 0px 0px 10px 0px;
-            padding: 5px;
-            border: 1px solid #9dc4e3;
+        .content {
+            height: 100vh;
+            overflow: scroll;
+            flex: 1;
 
-            .content-section-header {
-                position: sticky;
-                top: 0;
-                background: #fff;
-                padding: 10px;
-                z-index: 1;
-                border-bottom: 1px solid #ddd;
-                font-size: 10px;
+            .content-section {
+                margin: 0px 0px 10px 0px;
+                padding: 5px;
+                border: 1px solid #9dc4e3;
 
-                .content-section-header-title {
-                    font-size: 1rem;
+                .content-section-header {
+                    position: sticky;
+                    top: 0;
+                    background: #fff;
+                    padding: 10px;
+                    z-index: 1;
+                    border-bottom: 1px solid #ddd;
+                    font-size: 10px;
+
+                    .content-section-header-title {
+                        font-size: 1rem;
+                    }
+
+                    .content-section-header-categories {
+                        display: flex;
+                        justify-content: space-between;
+                        font-size: 0.8rem;
+                        margin-top: 5px;
+                        color: #9dc4e3;
+
+                        .active {
+                            color: red;
+                        }
+                    }
                 }
 
-                .content-section-header-categories {
-                    display: flex;
-                    justify-content: space-between;
-                    font-size: 0.8rem;
-                    margin-top: 5px;
-                    color: #9dc4e3;
+                .content-section-box {
+                    .content-section-box-title {
+                        font-size: 1rem;
+                    }
 
-                    .active {
-                        color: red;
+                    .content-section-box-card {
+                        width: 100%;
+                        height: 150px;
+                        text-align: center;
+                        margin: 5px 0px;
+                        background-color: beige;
                     }
                 }
             }
-
-            .content-section-box {
-                .content-section-box-title {
-                    font-size: 1rem;
-                }
-
-                .content-section-box-card {
-                    width: 100%;
-                    height: 150px;
-                    text-align: center;
-                    margin: 5px 0px;
-                    background-color: beige;
-                }
-            }
         }
     }
-}
 
 }
-
-
 </style>

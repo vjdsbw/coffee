@@ -7,10 +7,12 @@ const loginForm = ref<{ phone: String; password: String }>({
   password: "",
 });
 
-const phoneShow = ref<boolean>(false)
-
+const phoneShow = ref<boolean>(false);
+const showDATA = ref<boolean>(false);
+const dataCode = ref<string>('');
+const count = ref<number>(60);
 const getCode = () => {
-  if (!loginForm.value.password) return phoneShow.value = true;
+  if (!loginForm.value.phone) return phoneShow.value = true;
   axios({
     url: "http://localhost:8081/coffee/api/notify/v1/send_code",
     method: 'get',
@@ -18,10 +20,24 @@ const getCode = () => {
       mobile: loginForm.value.phone,
       type: loginForm.value.phone,
     }
-  }).then((res) => {
-    console.log(res, "xxxxxxxxxxxxxxxxx")
+  }).then((res:any) => {
+    console.log(res,'xxxxxxxxxxxxxx')
+    if(res.data.code ==  200){
+      dataCode.value = res.data.data;
+      console.log(dataCode.value,"dataCode.value")
+    }
   })
+  contCom()
+}
 
+const contCom = ()=>{
+ const inter = setInterval(()=>{
+    count.value = count.value -1;
+    if(count.value == 0){
+      clearInterval(inter);
+    }
+  },1000);
+  return ()=>clearInterval(inter);
 }
 
 
@@ -29,9 +45,11 @@ const submitLogin = async () => {
   //   if(!loginForm.value.password) return showDialog({
   //   message: '请填写短信验证码',
   // })
-  show.value = true;
+  // show.value = true;
+  showDATA.value = true;
 }
 const show = ref(false);
+
 </script>
 
 <template>
@@ -45,18 +63,23 @@ const show = ref(false);
       </div>
       <div class="item">
         <input placeholder-class="placeholder" type="text" placeholder="请输入验证码" v-model="loginForm.password" />
-        <van-button type="primary" @click="getCode">获取验证码</van-button>
+        <van-button type="primary" @click="getCode">获取验证码({{ count }})</van-button>
       </div>
     </div>
     <div class="handle">
       <van-button type="primary" @click="submitLogin">确定</van-button>
     </div>
+
     <van-dialog v-model:show="show">
       <div class="dialog-content">请填写短信验证码</div>
     </van-dialog>
     <van-dialog v-model:show="phoneShow">
       <div class="dialog-content">请填写手机号</div>
     </van-dialog>
+    <van-dialog v-model:show="showDATA">
+      <div v-if="dataCode.length > 0" class="dialog-content">UID:{{dataCode}}</div>
+      <div v-else class="dialog-content">验证码错误</div>
+    </van-dialog >
   </div>
 </template>
 
@@ -140,11 +163,15 @@ const show = ref(false);
       border-radius: 999px;
     }
   }
+  .handlee{
+    margin-top: 25px;
+    text-align: center;
+  }
 
   .dialog-content {
-    height: 150px;
-    line-height: 150px;
+    padding: 20px 20px;
     text-align: center;
+    color: black;
   }
 }
 </style>
