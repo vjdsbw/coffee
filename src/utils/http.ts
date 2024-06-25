@@ -19,7 +19,6 @@ interface ResultData {
     code: number;
     msg: string;
     data?: any;
-    result?:any;
 }
 
 const config = {
@@ -66,7 +65,8 @@ const config = {
 //             break;
 //         default:
 //             Message('请求失败', { type: 'error' });
-//     }
+//     }  http://59.110.5.165:8081/coffee/store/nearest?lat=%2032.0889&lon=118.7908
+//        http://59.110.5.165:8081/coffee/store/nearest?lat=32.0889&lon=118.7908
 // };
 
 class RequestHttp {
@@ -82,12 +82,12 @@ class RequestHttp {
                 // if (config.headers && typeof config.headers.set === 'function' && user.token) {
                 //     config.headers.set('x-access-token', user.token);
                 // }
-                if(config.method === 'get'){
-                    config.params ={
-                        appkey:luckinAppkey,
-                        ...config.params
-                    }
-                }
+                // if(config.method === 'get'){
+                //     config.params ={
+                //         appkey:luckinAppkey,
+                //         ...config.params
+                //     }
+                // }
                 return config;
             },
             (error: AxiosError) => {

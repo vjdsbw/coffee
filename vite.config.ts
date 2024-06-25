@@ -63,6 +63,13 @@ export default defineConfig({
   server: {
     hmr: true,			// ← ← ← ← ← ←
     host: '0.0.0.0',	// ← 新增内容 ←
-    port:5174
+    port:5173,
+    proxy: {
+      '^/api': {
+        target: 'http://59.110.5.165:8081/coffee',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
   }
 })

@@ -1,9 +1,20 @@
-import http from '@/utils/http';
+import http from "@/utils/http";
+import qs from "qs";
 
-interface Address {
-    lat:string;
-    lon : string;
+namespace Store {
+  export interface Address {
+    lat: number;
+    lon: number;
+  }
+
+  export interface id {
+    storeId: number;
+  }
 }
 
-// 登录
-export const loginApi = (params: Address) => http.get('/store/nearest',params);
+// 登录  /store/detail
+export const loginApi = (params: Store.Address) => http.get("/store/nearest", params);
+
+export const nearestApi = (params: Store.Address) => http.get("/store/nearest", params);
+
+export const shopDetailApi = (params: Store.id) => http.get("/store/detail", params);

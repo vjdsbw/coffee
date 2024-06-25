@@ -14,14 +14,13 @@ const count = ref<number>(60);
 const getCode = () => {
   if (!loginForm.value.phone) return phoneShow.value = true;
   axios({
-    url: "http://localhost:8081/coffee/api/notify/v1/send_code",
+    url: "http://59.110.5.165:8081/coffee/api/notify/v1/send_code",
     method: 'get',
     params: {
       mobile: loginForm.value.phone,
       type: loginForm.value.phone,
     }
   }).then((res:any) => {
-    console.log(res,'xxxxxxxxxxxxxx')
     if(res.data.code ==  200){
       dataCode.value = res.data.data;
       console.log(dataCode.value,"dataCode.value")

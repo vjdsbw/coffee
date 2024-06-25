@@ -1,5 +1,5 @@
 <script setup lang="ts" name="List">
-
+import {nearestApi } from '@/api/storeApi'
 const sections = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(item => {
     return {
         title: `Section${item}`,
@@ -80,6 +80,8 @@ const scrollend = () => {
     scrollSider.value = 'right';
 }
 
+const addressInfo = ref<any>({}) //地址信息
+
 onMounted(async () => {
     // await nextTick();
     const contentElement = contentRef.value;
@@ -87,6 +89,16 @@ onMounted(async () => {
         contentElement.addEventListener("scroll", onScroll);
         contentElement.addEventListener("scrollend", scrollend);
     }
+
+    if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition(async (position)=> {
+            const { latitude, longitude } = position.coords;
+            const { data } = await nearestApi({lat:latitude,lon:longitude})
+            addressInfo.value = data;
+		});
+	} else {
+		console.log("Geolocation is not supported by this browser.");
+	}
 });
 
 onUnmounted(() => {
@@ -108,8 +120,8 @@ onUnmounted(() => {
             <div class="address-icon">
                 <div><van-icon name="location-o" /></div>
                 <div class="address-text">
-                    <p>广东省广州市海珠区</p>
-                    <p>据您26m</p>
+                    <p>{{ addressInfo.name}}</p>
+                    <p>据您{{ addressInfo.distance }}</p>
                 </div>
             </div>
             <div class="address-switch">
