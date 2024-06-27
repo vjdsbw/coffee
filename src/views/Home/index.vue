@@ -1,5 +1,7 @@
 <script setup lang="ts" name="List">
+import categoryTop from "@/assets/category/category-top.png";
 import { nearestApi, productMenuApi } from '@/api/storeApi'
+import AMapLoader from '@amap/amap-jsapi-loader'; // 地图map
 
 const router = useRouter()
 const activeSection = ref(0);
@@ -77,7 +79,7 @@ const chooseShop = () => {
 	})
 }
 
-const productDetail = (productId:number) => {
+const productDetail = (productId: number) => {
 	router.push({
 		name: "Home-category",
 		state: {
@@ -86,20 +88,29 @@ const productDetail = (productId:number) => {
 	})
 }
 
+const success = async (pos: any) => {
+	const { latitude, longitude } = pos.coords;
+	const { data } = await nearestApi({ lat: latitude, lon: longitude })
+	addressInfo.value = { ...data, lat: latitude, lon: longitude };
+	getMenus(data.storeId)
+}
+
+const error = (err: any) => {
+	console.warn(`ERROR(${err.code}): ${err.message}`);
+}
+
 onMounted(async () => {
-	// await nextTick();
+
 	const contentElement = contentRef.value;
 	if (contentElement) {
 		contentElement.addEventListener("scroll", onScroll);
 		contentElement.addEventListener("scrollend", scrollend);
 	}
-
 	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(async (position) => {
-			const { latitude, longitude } = position.coords;
-			const { data } = await nearestApi({ lat: latitude, lon: longitude })
-			addressInfo.value = { ...data, lat: latitude, lon: longitude };
-			getMenus(data.storeId)
+		navigator.geolocation.getCurrentPosition(success, error, {
+			enableHighAccuracy: true,
+			timeout: 5000,
+			maximumAge: 0
 		});
 	} else {
 		console.log("Geolocation is not supported by this browser.");
@@ -119,7 +130,7 @@ onUnmounted(() => {
 <template>
 	<div class="list-box">
 		<div class="box-top">
-			<van-image round src="../src/assets/category/category-top.png"></van-image>
+			<van-image round :src="categoryTop"></van-image>
 		</div>
 		<div class="box-top-address">
 			<div class="address-icon">
@@ -151,13 +162,13 @@ onUnmounted(() => {
 					<van-card v-for="product in item.productList" :key="product.productId" :price="product.price"
 						:desc="product.enName" :title="product.name" :thumb="product.picUrl" origin-price="10.00">
 						<template #footer>
-							<van-icon name="add" size="1.5rem" color="#6d86c4" @click="productDetail(product.productId)" />
+							<van-icon name="add" size="1.5rem" color="#6d86c4"
+								@click="productDetail(product.productId)" />
 						</template>
 					</van-card>
 				</div>
 			</div>
 		</div>
-
 	</div>
 </template>
 
@@ -174,7 +185,7 @@ onUnmounted(() => {
 	background-color: #f3f3f3;
 
 	.box-top {
-		min-height: 2.4rem;
+		height: 9.04rem;
 		padding: .2rem .2rem 0;
 		background: #f3f3f3;
 		position: relative;

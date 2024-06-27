@@ -2,7 +2,6 @@
 import homeActive from '@/assets/icons/home_active.png';
 import closeEye from '@/assets/icons/close_eye.png';
 import openEye from '@/assets/icons/open_eye.png';
-import { loginApi } from '@/api/login';
 import { Store } from '@/store';
 
 const { user } = Store();
@@ -21,14 +20,8 @@ const toFindPwd = () => {
 }
 
 const submitLogin = async () => {
-	let params = {
-		appkey: 'U2FsdGVkX19WSQ59Cg+Fj9jNZPxRC5y0xB1iV06BeNA=',
-		password: "qwer1234",
-		phone: "18726869503"
-	}
-	const { token } = await loginApi(params);
-	user.setToken(token);
-	router.push('/home')
+
+
 }
 
 

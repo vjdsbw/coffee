@@ -176,13 +176,13 @@ onMounted(() => {
 
 <template>
     <div class="home_div">
-        <div id="container" style="height: 100vh; width: 100%"></div>
+        <div id="container" style="height: 100%; width: 100%"></div>
     </div>
 </template>
 
 <style scope lang="scss">
 .home_div {
-    height: 50vh;
+    height: 100%;
     width: 100%;
     padding: 0px;
     margin: 0px;
