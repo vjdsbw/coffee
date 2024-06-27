@@ -1,5 +1,22 @@
 <script setup lang="ts" name="ShopDetail">
 import detail from "@/assets/category/detail.png";
+
+import { shopDetailApi } from '@/api/storeApi'
+
+const router = useRouter()
+const info = ref<any>({})
+
+const getShopDetail = async () => {
+    const { data } = await shopDetailApi({ storeId : history.state.id })
+    info.value = {...data,workTime:data.workTime.split(/\r?\n/)}
+}
+
+onMounted(() => {
+    if (history.state.id) {
+        getShopDetail()
+    }
+})
+
 </script>
 
 <template>
@@ -8,24 +25,20 @@ import detail from "@/assets/category/detail.png";
         <div class="shop-detail-content">
             <van-image :src="detail" />
             <div class="info-detail">
-                <div class="name"><span>垠坤创意中央店(No.3013)</span></div>
+                <div class="name"><span>{{info.name}}{{ info.number }}</span></div>
                 <div class="detail">
                     <div class="title">营业时间：</div>
                     <div class="openTime">
-                        <span>工作日 07:30-19:00 </span>
-                        <span>周六 08:00-17:30 </span>
-                        <span>周日 08:00-17:30 </span>
+                        <span v-for="t in info.workTime" :key="t">{{ t }} </span>
                     </div>
                 </div>
                 <div class="detail">
                     <div class="title">门店地址：</div>
-                    <div class="address">
-                        鼓楼区中央路302号垠坤创意中央24号楼底商
-                    </div>
+                    <div class="address">{{ info.address }}</div>
                 </div>
             </div>
         </div>
-        <van-button type="primary">去喝一杯</van-button>
+        <van-button type="primary" @click="router.push('/home')">去喝一杯</van-button>
     </div>
 </template>
 

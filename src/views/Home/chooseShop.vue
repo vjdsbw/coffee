@@ -1,4 +1,30 @@
-<script setup lang="ts" name="ChooseShop"></script>
+<script setup lang="ts" name="ChooseShop">
+import { shopListApi } from '@/api/storeApi'
+
+const router = useRouter()
+const list = ref<any>()
+
+const getShopList = async () => {
+    const { data } = await shopListApi({ lat: history.state.lat, lon: history.state.lon })
+    list.value = data
+}
+
+const shopDetail = (storeId:number)=> {
+    router.push({
+        name:"Home-shopDetail",
+        state: {
+            id:storeId
+        }
+    })
+}
+
+onMounted(() => {
+    if (history.state.lat && history.state.lon) {
+        getShopList()
+    }
+})
+
+</script>
 
 <template>
     <div class="choose-shop-box">
@@ -14,25 +40,26 @@
             </template>
         </van-search>
         <div class="shop-list">
-            <div class="shop-list-item" v-for="item in 10" :key="item">
+            <div class="shop-list-item" v-for="item in list" :key="item.storeId">
                 <div class="shop-list-item-top">
                     <div>
                         <van-tag size="large" color="#6d86c4" type="primary">瑞幸咖啡</van-tag>
-                        <span>无锡国家工业设计园店(No.13372)</span>
+                        <span>{{ item.name }}{{ item.number }}</span>
                     </div>
-                    <div>28m</div>
+                    <div>{{ item.distance }}</div>
                 </div>
                 <div class="shop-list-item-bottom">
                     <div class="shop-time">
                         <van-icon name="underway-o" />
-                        <span>07:30-18:00</span>
+                        <span v-show="item">{{ item.isShopClosed === '1' ? '休息中' : item.workTime }}</span>
+                        <van-tag type="primary" v-show="item.isShopClosed" color="#c1c1c1">打烊</van-tag>
                     </div>
                     <div class="shop-address">
                         <div>
                             <van-icon name="location-o" />
-                            <span>玄武区中央路 284号金谷创客一层 107 号</span>
+                            <span>{{ item.address }}</span>
                         </div>
-                        <div class="shop-address-detail">查看详情</div>
+                        <div class="shop-address-detail" @click="shopDetail(item.storeId)">查看详情</div>
                     </div>
                 </div>
             </div>
@@ -132,9 +159,12 @@
 
                     span {
                         font-size: 0.9rem;
-                        line-height: 0.5rem;
                         color: #666;
                         vertical-align: middle;
+                    }
+
+                    .van-tag {
+                        margin-left: .3rem;
                     }
                 }
 
@@ -142,6 +172,18 @@
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
+
+                    &>div {
+                        display: flex;
+                        align-items: center;
+
+                        span {
+                            font-size: 0.8rem;
+                            color: #666;
+                            vertical-align: middle;
+                            width: 17rem;
+                        }
+                    }
 
                     .shop-address-detail {
                         font-size: 1rem;
@@ -153,14 +195,6 @@
                         margin-right: 0.5rem;
                         vertical-align: middle;
                     }
-
-                    span {
-                        font-size: 0.9rem;
-                        line-height: 0.5rem;
-                        color: #666;
-                        vertical-align: middle;
-                    }
-
                 }
             }
         }

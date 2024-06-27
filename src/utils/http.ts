@@ -74,7 +74,6 @@ class RequestHttp {
     public constructor(config: AxiosRequestConfig) {
         // instantiation
         this.service = axios.create(config);
-        console.log(config, 'service');
         //请求拦截器 token校验(JWT) : 接受服务器返回的 token,存储到 vuex/pinia/本地储存当中
         this.service.interceptors.request.use(
             (config: CustomAxiosRequestConfig) => {

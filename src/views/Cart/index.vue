@@ -1,6 +1,5 @@
 <script setup lang="ts" name="Cart">
 import shopbagBg from "@/assets/icons/shopbag_bg.png";
-import {findAllShopcartApi} from "@/api/homeAPI";
 import {Store} from "@/store";
 
 const { user } = Store();
@@ -22,12 +21,7 @@ const isCheckAll = ref(false);
 const isIndeterminate = ref(true);
 
 const getFindAllShop = async () => {
-	const { code, result } = await findAllShopcartApi({
-		tokenString: user.token,
-	});
-	if (code === 5000) {
-		cartList.value = result;
-	}
+
 };
 
 const checkAllChange = (val: boolean) => {

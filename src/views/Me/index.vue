@@ -1,30 +1,18 @@
 <script setup lang="ts" name="Me">
-import {findMyApi} from '@/api/login';
-import {Store} from "@/store";
 
-const {user} = Store();
 const myInfo = ref<any>({})
 const router = useRouter()
 const list = [
-  {title: "我的订单信息", path: "/orderInfo"},
-  {title: "我的咖啡信息", path: "/coffeeInfo"},
-  // {title: "个人资料", path: "/info"},
-  // {title: "我的订单", path: "/order"},
-  // {title: "我的收藏", path: "/collect"},
-  // {title: "地址管理", path: "/address"},
-  // {title: "安全中心", path: "/safe"}
+  {title: "我的订单信息", path: "/me/orderInfo"},
+  {title: "我的咖啡信息", path: "/me/coffeeInfo"},
 ]
 
 const getUserInfo = async () => {
-  const {result} = await findMyApi({
-    tokenString: user.token,
-  });
-  myInfo.value = result[0]
+  console.log(myInfo)
 }
 
 const toMyDetail = (str: string) => {
-  console.log(str)
-  router.push('/me' + str)
+  router.push(str)
 }
 
 onMounted(() => {
@@ -39,7 +27,7 @@ onMounted(() => {
         <van-image round src="../src/assets/me/userPic.png"></van-image>
         <div class="right">
           <div class="content">
-            {{ myInfo.desc ? myInfo.desc : '这家伙很懒，什么都没有留下！' }}
+            这家伙很懒，什么都没有留下！
           </div>
         </div>
       </div>
