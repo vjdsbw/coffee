@@ -81,6 +81,7 @@
     "watchPostEffect": true,
     "watchSyncEffect": true,
     "showDialog": true,
-    "showToast": true
+    "showToast": true,
+    "showConfirmDialog": true
   }
 }

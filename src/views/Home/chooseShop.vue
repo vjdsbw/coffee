@@ -1,7 +1,11 @@
 <script setup lang="ts" name="ChooseShop">
 import { shopListApi } from '@/api/storeApi'
+import { Store } from "@/store";
 
-const router = useRouter()
+const router = useRouter();
+
+const { global } = Store();
+
 const list = ref<any>()
 
 const getShopList = async () => {
@@ -9,13 +13,18 @@ const getShopList = async () => {
     list.value = data
 }
 
-const shopDetail = (storeId:number)=> {
+const shopDetail = (storeId: number) => {
     router.push({
-        name:"Home-shopDetail",
+        name: "Home-shopDetail",
         state: {
-            id:storeId
+            id: storeId
         }
     })
+}
+
+const choosed = (info: any) => {
+    global.setShop(info)
+    router.push({ name: "Home" })
 }
 
 onMounted(() => {
@@ -42,7 +51,7 @@ onMounted(() => {
         <div class="shop-list">
             <div class="shop-list-item" v-for="item in list" :key="item.storeId">
                 <div class="shop-list-item-top">
-                    <div>
+                    <div @click="choosed(item)">
                         <van-tag size="large" color="#6d86c4" type="primary">瑞幸咖啡</van-tag>
                         <span>{{ item.name }}{{ item.number }}</span>
                     </div>

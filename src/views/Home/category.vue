@@ -1,15 +1,83 @@
 <script setup lang="ts" name="Category">
-import { productDetailApi } from "@/api/productApi";
+import { productDetailApi, productPriceCalApi, addCartApi } from "@/api/productApi";
+import { Store } from "@/store";
+
+const router = useRouter()
+const { global } = Store();
 
 const productInfo = ref<any>({});
 
+const priceDes = ref<{ price: string, totalPriceDes: string }>({
+    price: '',
+    totalPriceDes: ''
+})
+
+const productNumber = ref<number>(1)
+
+const priceCal = ref<{
+    storeId: number;
+    productId: string;
+    selectedAttrList: { attrCode: string, itemCode: string }[]
+}>({
+    storeId: 0,
+    productId: '',
+    selectedAttrList: []
+})
+
 const getProductDetail = async () => {
-    const { data } = await productDetailApi({ productId: history.state.id });
+    const { data } = await productDetailApi({ productId: history.state.pId });
     productInfo.value = data;
+    data.saleAttrGroupValue.forEach((item: any) => {
+        let obj = { attrCode: item.attrCode, itemCode: '' }
+        item.subAttrList.forEach((itm: any) => {
+            if (itm.isDefault) {
+                obj.itemCode = itm.itemCode
+            }
+        })
+        priceCal.value.selectedAttrList.push(obj)
+    })
+    getProductPrice()
 };
 
+const selectSub = (typeItem: any, attrItem: any) => {
+    //设置选择的商品
+    productInfo.value.saleAttrGroupValue.forEach((item: any) => {
+        if (item.attrCode === typeItem.attrCode) {
+            item.subAttrList.forEach((itm: any) => {
+                itm.isDefault = false;
+                if (itm.itemCode === attrItem.itemCode) {
+                    itm.isDefault = true;
+                }
+            })
+        }
+    })
+    //修改priceCal值
+    const idx = priceCal.value.selectedAttrList.findIndex(element => element.attrCode === typeItem.attrCode);
+    if (idx !== -1) priceCal.value.selectedAttrList[idx].itemCode = attrItem.itemCode;
+    getProductPrice()
+}
+
+const getProductPrice = async () => {
+    const { data } = await productPriceCalApi(priceCal.value)
+    priceDes.value = data
+}
+
+const addCateGory = async () => {
+    const { code } = await addCartApi({ ...priceCal.value, price: priceDes.value.price, amount: productNumber.value })
+    if (code === 0) {
+        router.push({ name: "Home" });
+        showToast({
+            message: '商品添加成功',
+            icon: 'success',
+        });
+    }
+}
+
 onMounted(() => {
-    if (history.state.id) {
+    const shop = global.shopGet
+    if (history.state.pId && shop.storeId) {
+        priceCal.value.productId = history.state.pId
+        priceCal.value.storeId = shop.storeId
         getProductDetail();
     }
 });
@@ -30,14 +98,15 @@ onMounted(() => {
             <div @click="$router.back()"></div>
         </div>
         <div class="detail name">
-            <p>{{ productInfo.name }}</p>
-            <p>{{ productInfo.enName }}</p>
+            <p>{{ productInfo.name }} </p>
+            <p>{{ productInfo.enName }} </p>
         </div>
         <div class="detail select">
             <div class="choose" v-for="item in productInfo.saleAttrGroupValue" :key="item.attrCode">
                 <div class="choose-analogy">{{ item.attrName }}</div>
                 <div class="choose-gener">
-                    <span v-for="itm in item.subAttrList" :key="itm.itemCode" :class="{ selected: itm.isDefault }">
+                    <span v-for="itm in item.subAttrList" :key="itm.itemCode"
+                        :class="{ selected: itm.isDefault, 'tag': itm.tag }" @click="selectSub(item, itm)">
                         {{ itm.itemName }}
                     </span>
                 </div>
@@ -47,9 +116,20 @@ onMounted(() => {
             <div class="desc-label">商品描述</div>
             <div class="desc-container" v-html="productInfo.htmlDesc"></div>
         </div>
-        <div class="detail-desc-container">
+        <div class="detail-desc-container price-contant">
             <div class="desc-label">价格说明</div>
             <div class="desc-explain">{{ productInfo.priceDesc }}</div>
+        </div>
+        <div class="footer-container">
+            <div class="price-number">
+                <div>￥{{ priceDes.price }}</div>
+                <div> <van-stepper v-model="productNumber" theme="round" button-size="22" disable-input /> </div>
+            </div>
+            <div class="total-des">{{ priceDes.totalPriceDes }}</div>
+            <div class="footer-btn">
+                <van-button round plain type="success" color="#6d86c4">立即购买</van-button>
+                <van-button round type="success" color="#6d86c4" @click="addCateGory">加入购物车</van-button>
+            </div>
         </div>
     </div>
 </template>
@@ -178,22 +258,24 @@ onMounted(() => {
                     color: #6d86c4;
                     border-color: #6d86c4;
                     background: #f7f9ff;
+                }
 
+                .tag {
                     &::after {
                         position: absolute;
-                        top: -.16rem;
-                        right: 0;
+                        top: -0.6rem;
+                        right: -2px;
                         content: "推荐";
                         box-sizing: border-box;
-                        padding: 0 .06rem;
-                        font-size: .17rem;
+                        padding: 0 0.06rem;
+                        font-size: 0.7rem;
                         text-align: center;
                         background: #fff;
                         color: #f05821;
-                        border: .01rem solid #f05821;
-                        height: .68rem;
-                        line-height: .68rem;
-                        border-radius: .06rem;
+                        border: 0.01rem solid #f05821;
+                        height: 0.68rem;
+                        line-height: 0.68rem;
+                        border-radius: 0.06rem;
                     }
                 }
             }
@@ -223,6 +305,50 @@ onMounted(() => {
         .desc-explain {
             font-size: .7rem;
             color: #999;
+        }
+    }
+
+    .price-contant {
+        margin-bottom: 12.5rem;
+    }
+
+    .footer-container {
+        position: fixed;
+        width: 100%;
+        height: 13rem;
+        bottom: 0rem;
+        border-radius: .9rem;
+        background-color: #fff;
+
+        .price-number {
+            padding: 1rem 1.5rem 0rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            &>div:nth-child(1) {
+                font-family: PingFangSC-Medium;
+                font-size: 1.5rem;
+                color: #333;
+            }
+        }
+
+        .total-des {
+            padding: 0rem 1.5rem;
+            font-family: PingFangSC-Regular;
+            font-size: .9rem;
+            color: #65666b;
+        }
+
+        .footer-btn {
+            display: flex;
+            padding: 1rem 1.5rem 0rem 1.5rem;
+            justify-content: space-between;
+            align-items: center;
+
+            .van-button {
+                width: 10rem;
+            }
         }
     }
 }

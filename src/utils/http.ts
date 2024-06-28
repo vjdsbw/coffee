@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
-import {luckinAppkey} from "@/config/const";
+import { Store } from "@/store";
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
     noLoading?: boolean;
@@ -77,7 +77,7 @@ class RequestHttp {
         //请求拦截器 token校验(JWT) : 接受服务器返回的 token,存储到 vuex/pinia/本地储存当中
         this.service.interceptors.request.use(
             (config: CustomAxiosRequestConfig) => {
-                // const { user } = Store();
+                const { user } = Store();
                 // if (config.headers && typeof config.headers.set === 'function' && user.token) {
                 //     config.headers.set('x-access-token', user.token);
                 // }
@@ -87,6 +87,8 @@ class RequestHttp {
                 //         ...config.params
                 //     }
                 // }
+                config.headers.set('code', user.token);
+                console.log(config,'config',user.token)
                 return config;
             },
             (error: AxiosError) => {

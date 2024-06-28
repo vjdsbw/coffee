@@ -1,24 +1,47 @@
 import { defineStore } from 'pinia';
 
 interface GlobalState {
-    tabBarActive: string;
+    shop: {
+        address: string;
+        distance: string;
+        isShopClosed: string
+        name: string;
+        number: string;
+        storeId: number | null;
+        workTime: string;
+    },
+    latAndLon:{
+        lat:number | null;
+        lon:number | null
+    }
 }
 
-type ObjToKeyValArray<T> = {
-    [K in keyof T]: [T[K], K];
-}[keyof T];
 
 export const useGlobalStore = defineStore({
     id: 'global',
     // 修改默认值之后，需清除 localStorage 数据
     state: (): GlobalState => ({
-        tabBarActive:"/home",
+        shop: {
+            address:'',
+            distance: '',
+            isShopClosed: '',
+            name:'',
+            number: '',
+            storeId: null,
+            workTime: '',
+        },
+        latAndLon:{
+            lat:null,
+            lon:null
+        }
     }),
-    getters: {},
+    getters: {
+        shopGet: state => state.shop,
+    },
     actions: {
         // Set GlobalState
-        setGlobalState(...args: ObjToKeyValArray<GlobalState>) {
-            this.$patch({ [args[1]]: args[0] });
-        }
+        setShop(info: GlobalState['shop']) {
+            this.shop = info;
+        },
     },
 });

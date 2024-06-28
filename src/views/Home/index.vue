@@ -1,9 +1,12 @@
-<script setup lang="ts" name="List">
+<script setup lang="ts" name="Home">
 import categoryTop from "@/assets/category/category-top.png";
 import { nearestApi, productMenuApi } from '@/api/storeApi'
-import AMapLoader from '@amap/amap-jsapi-loader'; // 地图map
+import { Store } from "@/store";
 
-const router = useRouter()
+const router = useRouter();
+
+const { global } = Store();
+
 const activeSection = ref(0);
 const contentRef = ref<HTMLElement | null>(null);
 const scrollSider = ref<string>('left')
@@ -40,41 +43,22 @@ const scrollend = () => {
 	scrollSider.value = 'right';
 }
 
-const addressInfo = ref<{
-	address: string;
-	distance: string;
-	isShopClosed: string
-	name: string;
-	number: string;
-	storeId: number | null;
-	workTime: string;
-	lat: number | null;
-	lon: number | null;
-}>({
-	address: '',
-	distance: '',
-	isShopClosed: '',
-	name: '',
-	number: '',
-	storeId: null,
-	workTime: '',
-	lat: null,
-	lon: null,
-})
+const address = ref<{lat: number | null;lon: number | null;}>({lat: null,lon: null,})
 
 const menuList = ref<any>({})
 
 const getMenus = async (id: number) => {
 	const { data } = await productMenuApi({ storeId: id })
-	menuList.value = data
+	menuList.value = data;
+	history.state.choosedShop = {};
 }
 
 const chooseShop = () => {
 	router.push({
 		name: "Home-chooseShop",
 		state: {
-			lat: addressInfo.value.lat,
-			lon: addressInfo.value.lon,
+			lat: address.value.lat,
+			lon: address.value.lon,
 		}
 	})
 }
@@ -83,29 +67,37 @@ const productDetail = (productId: number) => {
 	router.push({
 		name: "Home-category",
 		state: {
-			id: productId,
+			pId: productId,
 		}
 	})
 }
 
 const success = async (pos: any) => {
 	const { latitude, longitude } = pos.coords;
+	address.value = { lat: latitude, lon: longitude };
 	const { data } = await nearestApi({ lat: latitude, lon: longitude })
-	addressInfo.value = { ...data, lat: latitude, lon: longitude };
-	getMenus(data.storeId)
+	const shop = global.shopGet
+	if (shop.storeId) {
+		getMenus(shop.storeId)
+	} else {
+		getMenus(data.storeId)
+		global.setShop(data)
+	}
 }
 
 const error = (err: any) => {
-	console.warn(`ERROR(${err.code}): ${err.message}`);
+	console.warn(`ERROR(${err.code}): ${err.message}`, 'xxxxxxxxxxxxxx');
 }
 
 onMounted(async () => {
 
 	const contentElement = contentRef.value;
+	
 	if (contentElement) {
 		contentElement.addEventListener("scroll", onScroll);
 		contentElement.addEventListener("scrollend", scrollend);
 	}
+	// success({coords:{latitude:'32.086826',longitude:'118.795996' } })
 	if (navigator.geolocation) {
 		navigator.geolocation.getCurrentPosition(success, error, {
 			enableHighAccuracy: true,
@@ -136,8 +128,8 @@ onUnmounted(() => {
 			<div class="address-icon">
 				<div><van-icon name="location-o" /></div>
 				<div class="address-text">
-					<p>{{ addressInfo.name }}</p>
-					<p>据您{{ addressInfo.distance }}jsaygcasc</p>
+					<p>{{ global.shop.name }}</p>
+					<p>据您{{ global.shop.distance }}</p>
 				</div>
 			</div>
 			<div class="address-switch" @click="chooseShop">
@@ -160,7 +152,8 @@ onUnmounted(() => {
 						<div>{{ item.desc }}</div>
 					</div>
 					<van-card v-for="product in item.productList" :key="product.productId" :price="product.price"
-						:desc="product.enName" :title="product.name" :thumb="product.picUrl" origin-price="10.00">
+						:desc="product.enName" :title="product.name" :thumb="product.picUrl"
+						:origin-price="product.price">
 						<template #footer>
 							<van-icon name="add" size="1.5rem" color="#6d86c4"
 								@click="productDetail(product.productId)" />

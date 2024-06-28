@@ -1,8 +1,9 @@
 <script setup lang="ts" name="Cart">
 import shopbagBg from "@/assets/icons/shopbag_bg.png";
-import {Store} from "@/store";
+import { cartListApi, removeProductApi, updateProductAmountApi } from "@/api/productApi";
+import { Store } from "@/store";
 
-const { user } = Store();
+const { global } = Store();
 
 const router = useRouter()
 
@@ -21,11 +22,16 @@ const isCheckAll = ref(false);
 const isIndeterminate = ref(true);
 
 const getFindAllShop = async () => {
+	const shop = global.shopGet
+	if (shop.storeId) {
+		const { data } = await cartListApi({ storeId: shop.storeId });
+		cartList.value = data
+	}
 
 };
 
 const checkAllChange = (val: boolean) => {
-	checked.value = val ? cartList.value.map((item) => item.sid) : [];
+	checked.value = val ? cartList.value.map((item) => item.id) : [];
 	isIndeterminate.value = false;
 };
 
@@ -39,17 +45,57 @@ const checkedResultChange = (value: string[]) => {
 const allCartPrice = computed(() => {
 	let num = 0;
 	cartList.value.map((item) => {
-		if (checked.value.includes(item.sid)) {
-			num += Number(item.count) * Number(item.price);
+		if (checked.value.includes(item.id)) {
+			num += Number(item.amount) * Number(item.price);
 		}
 	});
 	return num;
 });
 
+const amountChange = async (value: number, detail: { name: string }) => {
+	if (value === 0) {
+		showConfirmDialog({
+			title: '再想想',
+			message: '确定移除选择的商品',
+		}).then(async () => {
+			const { code } = await removeProductApi({ id: detail.name })
+			if (code === 0) {
+				showToast('删除成功');
+				getFindAllShop();
+			}
+		}).catch(() => { });
+	} 
+	else {
+		const { code } = await updateProductAmountApi({ id: detail.name, num: value })
+		if (code === 0) {
+			showToast('修改成功')
+		}
+	}
+}
+
+const delAllCard = async () => {
+	Promise.all(checked.value.map(item => removeProductApi({ id: item }))).then(res => {
+		const flag = res.every(item => item.code === 0)
+		if (flag) {
+			showToast('删除成功');
+			getFindAllShop();
+		}
+	})
+}
+
 const isSubmit = () => {
-  console.log(checked.value)
-  if (checked.value.length === 0) return
-  router.push('/cart/confirm')
+	if (isDel.value) {
+		if (checked.value.length === 0) return showToast('选择删除的商品');
+		showConfirmDialog({
+			title: '再想想',
+			message: '确定移除选择的商品',
+		}).then(() => {
+			delAllCard()
+		}).catch(() => { });
+	} else {
+		if (checked.value.length === 0) return showToast('选择商品');
+		router.push('/cart/confirm')
+	}
 };
 
 onMounted(() => {
@@ -59,40 +105,40 @@ onMounted(() => {
 
 <template>
 	<div class="cart-box">
-    <van-nav-bar :right-text="isDel ? '完成' : '编辑'" left-arrow left-text="返回" title="购物车"
-                 @click-left="onClickLeft"
-			@click-right="isDel = !isDel" />
+		<van-nav-bar v-if="cartList.length === 0" left-arrow left-text="返回" title="购物车" @click-left="onClickLeft" />
+		<van-nav-bar v-else :right-text="isDel ? '完成' : '编辑'" left-arrow left-text="返回" title="购物车"
+			@click-left="onClickLeft" @click-right="isDel = !isDel" />
 		<van-image :src="shopbagBg"></van-image>
 		<div class="cart-box-list">
 			<van-checkbox-group v-model="checked" ref="checkboxGroup" @change="checkedResultChange">
-				<div class="cart-item" v-for="item in cartList" :key="item.sid">
-					<van-checkbox :name="item.sid"></van-checkbox>
+				<div class="cart-item" v-for="item in cartList" :key="item.id">
+					<van-checkbox :name="item.id"></van-checkbox>
 					<div class="cover">
-						<van-image :src="item.large_img"></van-image>
+						<van-image :src="item.productPicUrl"></van-image>
 					</div>
 					<div class="info">
 						<div class="top">
 							<div class="name-cn">
-								{{ item.name }}
+								{{ item.productName }}
 							</div>
 						</div>
 						<div class="name-us">
-              <div class="type">
-                <span>{{ item.rule }} </span>
-                <span>{{ item.enname }} </span>
-              </div>
+							<div class="type">
+								<span>{{ item.saleAttrNames }} </span>
+							</div>
 						</div>
 						<div class="bottom">
 							<div class="price">￥{{ item.price }}</div>
 							<div class="countHandle">
-								<van-stepper v-model="item.count" theme="round" button-size="22" disable-input />
+								<van-stepper v-model="item.amount" min="0" :name="item.id" theme="round"
+									button-size="22" disable-input @change="amountChange" />
 							</div>
 						</div>
 					</div>
 				</div>
 			</van-checkbox-group>
 		</div>
-		<div class="cart-box-nav">
+		<div class="cart-box-nav" v-show="cartList.length > 0">
 			<div class="allCheckbox">
 				<van-checkbox :indeterminate="isIndeterminate" v-model="isCheckAll" @change="checkAllChange">
 					全选
@@ -124,14 +170,14 @@ onMounted(() => {
 <route lang="json">{
 	"meta": {
 		"layout": "index",
-		"authority":true
+		"authority": true
 	}
 }</route>
 
 <style scoped lang="scss">
 .cart-box {
 	background-color: #f7f7f7;
-  height: 91vh;
+	height: 91vh;
 
 	.van-image {
 		width: 100%;
@@ -155,13 +201,13 @@ onMounted(() => {
 			.cover {
 				margin-right: 0.62rem;
 
-        :deep(.van-image__img) {
-          border-radius: 10px !important;
-        }
+				:deep(.van-image__img) {
+					border-radius: 10px !important;
+				}
 
 				.van-image {
-          width: 4.31rem;
-          height: 4.62rem;
+					width: 4.31rem;
+					height: 4.62rem;
 				}
 			}
 
@@ -172,7 +218,7 @@ onMounted(() => {
 			}
 
 			.info {
-        height: 5rem;
+				height: 5rem;
 				display: flex;
 				flex-direction: column;
 				justify-content: space-between;
@@ -184,7 +230,7 @@ onMounted(() => {
 
 					.name-cn {
 						font-size: 0.93rem;
-            color: #333;
+						color: #333;
 					}
 
 
@@ -194,14 +240,14 @@ onMounted(() => {
 					font-size: 0.62rem;
 					color: dimgray;
 
-          .type {
-            font-size: 0.65rem;
-            color: dimgray;
+					.type {
+						font-size: 0.65rem;
+						color: dimgray;
 
-            span {
-              margin-right: 5px;
-            }
-          }
+						span {
+							margin-right: 5px;
+						}
+					}
 				}
 			}
 
@@ -211,7 +257,7 @@ onMounted(() => {
 				justify-content: space-between;
 
 				.price {
-          color: #f05821;
+					color: #f05821;
 					font-size: 0.78rem;
 					font-weight: bold;
 				}

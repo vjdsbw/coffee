@@ -9,7 +9,7 @@ export const useUserStore = defineStore({
     id: 'user', // id必填，且需要唯一
     state: (): UserState => {
         return {
-            token: '',
+            token: 'abcdefg',
         };
     },
     actions: {
