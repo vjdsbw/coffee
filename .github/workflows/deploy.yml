@@ -27,4 +27,3 @@ jobs:
         REMOTE_PORT: 22
         SOURCE: dist/
         TARGET: ${{ secrets.REMOTE_TARGET }}
-        ARGS: '-rltgoDzvO --delete'
