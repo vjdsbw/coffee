@@ -1,31 +1,29 @@
 name: Deploy to GitHub Pages
-
 on:
   push:
     branches:
       - main # 当推送到 main 分支时触发
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '20' # 指定 Node.js 版本
-
     - name: Install dependencies
       run: npm install
-
     - name: Build project
       run: npm run build
 
-    # - name: Deploy to GitHub Pages
-    #   uses: peaceiris/actions-gh-pages@v3
-    #   with:
-    #     github_token: ${{ secrets.GITHUB_TOKEN }}
-    #     publish_dir: ./dist # 构建输出的目录
+    - name: Deploy to Server
+      uses: easingthemes/ssh-deploy@v2.1.2
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+        ARGS: '-rltgoDzvO --delete'
+        SOURCE: 'dist/'
+        REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+        REMOTE_USER: ${{ secrets.REMOTE_USER }}
+        TARGET: ${{ secrets.REMOTE_TARGET }}

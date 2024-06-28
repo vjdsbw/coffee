@@ -137,7 +137,7 @@ onUnmounted(() => {
 				<div><van-icon name="location-o" /></div>
 				<div class="address-text">
 					<p>{{ addressInfo.name }}</p>
-					<p>据您{{ addressInfo.distance }}</p>
+					<p>据您{{ addressInfo.distance }}xxxxxxxxxxxxxx</p>
 				</div>
 			</div>
 			<div class="address-switch" @click="chooseShop">
