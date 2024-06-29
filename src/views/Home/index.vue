@@ -1,8 +1,9 @@
 <script setup lang="ts" name="Home">
 import categoryTop from "@/assets/category/category-top.png";
 import { nearestApi, productMenuApi } from '@/api/storeApi'
+import { purchasablePriceApi } from '@/api/productApi'
 import { Store } from "@/store";
-
+import axios from 'axios'
 const router = useRouter();
 
 const { global } = Store();
@@ -43,8 +44,6 @@ const scrollend = () => {
 	scrollSider.value = 'right';
 }
 
-const address = ref<{lat: number | null;lon: number | null;}>({lat: null,lon: null,})
-
 const menuList = ref<any>({})
 
 const getMenus = async (id: number) => {
@@ -54,16 +53,11 @@ const getMenus = async (id: number) => {
 }
 
 const chooseShop = () => {
-	router.push({
-		name: "Home-chooseShop",
-		state: {
-			lat: address.value.lat,
-			lon: address.value.lon,
-		}
-	})
+	router.push({ name: "Home-chooseShop" })
 }
 
-const productDetail = (productId: number) => {
+const productDetail = (productId: number, price: number) => {
+	if (global.totalGet.totalPrice + price > limitPrice.value) return showToast('卷款余额不足')
 	router.push({
 		name: "Home-category",
 		state: {
@@ -74,7 +68,7 @@ const productDetail = (productId: number) => {
 
 const success = async (pos: any) => {
 	const { latitude, longitude } = pos.coords;
-	address.value = { lat: latitude, lon: longitude };
+	global.setLatAndLon({ lat: latitude, lon: longitude })
 	const { data } = await nearestApi({ lat: latitude, lon: longitude })
 	const shop = global.shopGet
 	if (shop.storeId) {
@@ -89,15 +83,25 @@ const error = (err: any) => {
 	console.warn(`ERROR(${err.code}): ${err.message}`, 'xxxxxxxxxxxxxx');
 }
 
+
+const limitPrice = ref<number>(0)
+
+const getLimitPrice = async () => {
+	const { data } = await purchasablePriceApi()
+	limitPrice.value = data
+	global.setLimitPrice(data)
+}
+
 onMounted(async () => {
 
 	const contentElement = contentRef.value;
-	
+
 	if (contentElement) {
 		contentElement.addEventListener("scroll", onScroll);
 		contentElement.addEventListener("scrollend", scrollend);
 	}
-	success({coords:{latitude:'32.086826',longitude:'118.795996' } })
+	getLimitPrice()
+	success({ coords: { latitude: '32.086826', longitude: '118.795996' } })
 	// if (navigator.geolocation) {
 	// 	navigator.geolocation.getCurrentPosition(success, error, {
 	// 		enableHighAccuracy: true,
@@ -107,6 +111,7 @@ onMounted(async () => {
 	// } else {
 	// 	console.log("Geolocation is not supported by this browser.");
 	// }
+
 });
 
 onUnmounted(() => {
@@ -124,7 +129,7 @@ onUnmounted(() => {
 		<div class="box-top">
 			<van-image round :src="categoryTop"></van-image>
 		</div>
-		<div class="box-top-address">
+		<div class="box-top-address" @click="chooseShop">
 			<div class="address-icon">
 				<div><van-icon name="location-o" /></div>
 				<div class="address-text">
@@ -132,7 +137,7 @@ onUnmounted(() => {
 					<p>据您{{ global.shop.distance }}</p>
 				</div>
 			</div>
-			<div class="address-switch" @click="chooseShop">
+			<div class="address-switch" >
 				<span class="actived">选择</span>
 			</div>
 		</div>
@@ -155,8 +160,9 @@ onUnmounted(() => {
 						:desc="product.enName" :title="product.name" :thumb="product.picUrl"
 						:origin-price="product.price">
 						<template #footer>
-							<van-icon name="add" size="1.5rem" color="#6d86c4"
-								@click="productDetail(product.productId)" />
+							<van-icon v-if="product.price < limitPrice" name="add" size="1.5rem" color="#6d86c4"
+								@click="productDetail(product.productId, product.price)" />
+							<van-icon v-else name="add" size="1.5rem" color="#bdbec3" />
 						</template>
 					</van-card>
 				</div>
@@ -275,10 +281,26 @@ onUnmounted(() => {
 			overflow: scroll;
 
 			.van-sidebar-item--select {
-				background-color: #9dc4e3;
+				// background-color: #9dc4e3;
 
 				&::before {
-					height: 90%;
+					height: 55%;
+					width: 1.5rem;
+					border-radius: 50%;
+					left: -0.8rem;
+				}
+
+				&::after {
+					content: "";
+					bottom: -9%;
+					position: absolute;
+					display: block;
+					height: 18%;
+					width: .7rem;
+					border-radius: 50%;
+					right: 0.3rem;
+					background-color: #1989fa;
+					transform: translateY(-50%);
 				}
 			}
 		}

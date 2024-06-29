@@ -7,10 +7,16 @@ const router = useRouter();
 const { global } = Store();
 
 const list = ref<any>()
+const searchAddress = ref<string>('')
 
 const getShopList = async () => {
-    const { data } = await shopListApi({ lat: history.state.lat, lon: history.state.lon })
-    list.value = data
+    const address = global.latAndLonGet
+    if (address.lat && address.lon) {
+        const { data } = await shopListApi({ lat: address.lat, lon: address.lon, keyword: searchAddress.value })
+        list.value = data
+    } else {
+        showToast('当前定位失败')
+    }
 }
 
 const shopDetail = (storeId: number) => {
@@ -28,9 +34,7 @@ const choosed = (info: any) => {
 }
 
 onMounted(() => {
-    if (history.state.lat && history.state.lon) {
-        getShopList()
-    }
+    getShopList()
 })
 
 </script>
@@ -38,9 +42,10 @@ onMounted(() => {
 <template>
     <div class="choose-shop-box">
         <div class="choose-shop-btn">
-            <van-button plain type="primary">门店自提</van-button>
+            <van-button plain type="primary" @click="getShopList">门店自提</van-button>
         </div>
-        <van-search show-action placeholder="输入地址寻找周边门店">
+        <van-search show-action placeholder="输入地址寻找周边门店" v-model="searchAddress" @search="getShopList"
+            @click-left-icon="getShopList">
             <template #label>
                 <div>南京</div>
             </template>
@@ -61,7 +66,7 @@ onMounted(() => {
                     <div class="shop-time">
                         <van-icon name="underway-o" />
                         <span v-show="item">{{ item.isShopClosed === '1' ? '休息中' : item.workTime }}</span>
-                        <van-tag type="primary" v-show="item.isShopClosed" color="#c1c1c1">打烊</van-tag>
+                        <van-tag type="primary" v-show="item.isShopClosed === '1'" color="#c1c1c1">打烊</van-tag>
                     </div>
                     <div class="shop-address">
                         <div>

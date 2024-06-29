@@ -7,21 +7,25 @@ import myActive from '@/assets/icons/my_active.png';
 import my from '@/assets/icons/my.png';
 import shopbagActive from '@/assets/icons/shopbag_active.png';
 import shopbag from '@/assets/icons/shopbag.png';
+import { Store } from '@/store'
 
+const { global } = Store()
+
+const badegNum = computed(() => global.totalGet.totalNum)
 </script>
 
 <template>
     <div>
         <router-view></router-view>
         <div style="height: 4rem;background-color: #f7f8fa"></div>
-        <van-tabbar  fixed  route>
+        <van-tabbar fixed route>
             <van-tabbar-item name="home" to="/home">
                 <span>首页</span>
-                <template #icon="props" >
+                <template #icon="props">
                     <van-image :src="props.active ? homeActive : home" />
                 </template>
             </van-tabbar-item>
-            <van-tabbar-item name="cart" to="/cart">
+            <van-tabbar-item name="cart" to="/cart" :badge="badegNum !== 0 ? badegNum : ''" :dot="false">
                 <span>购物车</span>
                 <template #icon="props">
                     <van-image :src="props.active ? shopbagActive : shopbag" />

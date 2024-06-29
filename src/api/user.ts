@@ -1,4 +1,4 @@
-import http from "@/utils/http.ts";
+import http from "@/utils/http";
 
 export namespace userType {
     export interface shortCode {

@@ -2,6 +2,7 @@
 import { productDetailApi, productPriceCalApi, addCartApi } from "@/api/productApi";
 import { Store } from "@/store";
 
+
 const router = useRouter()
 const { global } = Store();
 
@@ -63,8 +64,9 @@ const getProductPrice = async () => {
 }
 
 const addCateGory = async () => {
-    const { code } = await addCartApi({ ...priceCal.value, price: priceDes.value.price, amount: productNumber.value })
+    const { code, data } = await addCartApi({ ...priceCal.value, price: priceDes.value.price, amount: productNumber.value })
     if (code === 0) {
+        global.setTotal(data)
         router.push({ name: "Home" });
         showToast({
             message: '商品添加成功',

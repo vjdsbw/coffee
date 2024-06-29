@@ -88,7 +88,6 @@ class RequestHttp {
                 //     }
                 // }
                 config.headers.set('code', 'E96eR2hxZRC');
-                console.log(config,'config',user.token)
                 return config;
             },
             (error: AxiosError) => {

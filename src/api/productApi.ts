@@ -30,6 +30,7 @@ namespace Product {
     id: string,
     num: number
   }
+
 }
 
 // 查询商品详情
@@ -49,3 +50,6 @@ export const removeProductApi = (params: Product.removeId) => http.post("/api/pr
 
 //修改购物车商品数量
 export const updateProductAmountApi = (params: Product.updateAmount) => http.post("/api/product/shoppingCart/updateAmount", params);
+
+//可购买的最高价格 
+export const purchasablePriceApi = () => http.get("/api/product/purchasablePrice");

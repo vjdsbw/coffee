@@ -1,9 +1,10 @@
 <script setup lang="ts" name="Cart">
 import shopbagBg from "@/assets/icons/shopbag_bg.png";
 import { cartListApi, removeProductApi, updateProductAmountApi } from "@/api/productApi";
+import { preCreateOrderApi } from "@/api/orderApi";
 import { Store } from "@/store";
 
-const { global } = Store();
+const { global, order } = Store();
 
 const router = useRouter()
 
@@ -26,6 +27,7 @@ const getFindAllShop = async () => {
 	if (shop.storeId) {
 		const { data } = await cartListApi({ storeId: shop.storeId });
 		cartList.value = data
+		global.setTotal({ totalNum: allCartNum.value, totalPrice: allCartTotalPrice.value })
 	}
 
 };
@@ -52,6 +54,18 @@ const allCartPrice = computed(() => {
 	return num;
 });
 
+const allCartNum = computed(() => {
+	let num = 0;
+	cartList.value.forEach((item) => num += Number(item.amount));
+	return num;
+});
+
+const allCartTotalPrice = computed(() => {
+	let num = 0;
+	cartList.value.forEach((item) => num += Number(item.amount) * Number(item.price));
+	return num;
+});
+
 const amountChange = async (value: number, detail: { name: string }) => {
 	if (value === 0) {
 		showConfirmDialog({
@@ -64,8 +78,9 @@ const amountChange = async (value: number, detail: { name: string }) => {
 				getFindAllShop();
 			}
 		}).catch(() => { });
-	} 
+	}
 	else {
+		global.setTotal({ totalNum: allCartNum.value, totalPrice: allCartTotalPrice.value })
 		const { code } = await updateProductAmountApi({ id: detail.name, num: value })
 		if (code === 0) {
 			showToast('修改成功')
@@ -83,6 +98,27 @@ const delAllCard = async () => {
 	})
 }
 
+const preOrderCreated = async () => {
+	const shop = global.shopGet
+	let list: any = []
+	//过滤出选择的商品
+	checked.value.forEach(item => {
+		const idx = cartList.value.findIndex((itm) => itm.id === item)
+		if (idx !== -1) {
+			list.push(cartList.value[idx])
+		}
+	})
+	let params = {
+		productList: list,
+		storeId: shop.storeId!,
+		uid: 'string',
+	}
+	const { data } = await preCreateOrderApi(params);
+	console.log(data, "preCreateOrderApi")
+	order.savePlaceInfo(list)
+	router.push('/cart/confirm')
+}
+
 const isSubmit = () => {
 	if (isDel.value) {
 		if (checked.value.length === 0) return showToast('选择删除的商品');
@@ -94,12 +130,14 @@ const isSubmit = () => {
 		}).catch(() => { });
 	} else {
 		if (checked.value.length === 0) return showToast('选择商品');
-		router.push('/cart/confirm')
+		// if (allCartPrice.value > global.limitPriceGet) return showToast('超出用卷价格');
+		preOrderCreated()
 	}
 };
 
 onMounted(() => {
 	getFindAllShop();
+	
 });
 </script>
 
@@ -109,7 +147,7 @@ onMounted(() => {
 		<van-nav-bar v-else :right-text="isDel ? '完成' : '编辑'" left-arrow left-text="返回" title="购物车"
 			@click-left="onClickLeft" @click-right="isDel = !isDel" />
 		<van-image :src="shopbagBg"></van-image>
-		<div class="cart-box-list">
+		<div class="cart-box-list" v-show="cartList.length > 0">
 			<van-checkbox-group v-model="checked" ref="checkboxGroup" @change="checkedResultChange">
 				<div class="cart-item" v-for="item in cartList" :key="item.id">
 					<van-checkbox :name="item.id"></van-checkbox>
@@ -119,7 +157,8 @@ onMounted(() => {
 					<div class="info">
 						<div class="top">
 							<div class="name-cn">
-								{{ item.productName }}
+								{{ item.productName }} <span v-show="item.showAttrNames">({{ item.showAttrNames
+									}})</span>
 							</div>
 						</div>
 						<div class="name-us">
@@ -188,6 +227,8 @@ onMounted(() => {
 		background-color: #f7f7f7;
 		display: flex;
 		flex-direction: column;
+		height: calc(100vh - 13rem);
+		overflow-y: scroll;
 
 		.cart-item {
 			background-color: #fff;

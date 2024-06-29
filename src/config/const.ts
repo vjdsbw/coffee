@@ -14,7 +14,7 @@ export const DEFAULT_PRIMARY: string = "#009688";
 export const routerWithList: string[] = ["/home",'/category','/login'];
 
 // 高德地图 key
-export const AMAP_MAP_KEY: string = "";
+export const AMAP_MAP_KEY: string = "a0e0ebabac17b0282d882728bd676a8d";
 
 // 百度地图 key
 export const BAIDU_MAP_KEY: string = "";
