@@ -87,7 +87,7 @@ class RequestHttp {
                 //         ...config.params
                 //     }
                 // }
-                config.headers.set('code', user.token);
+                config.headers.set('code', 'E96eR2hxZRC');
                 console.log(config,'config',user.token)
                 return config;
             },

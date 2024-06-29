@@ -97,16 +97,16 @@ onMounted(async () => {
 		contentElement.addEventListener("scroll", onScroll);
 		contentElement.addEventListener("scrollend", scrollend);
 	}
-	// success({coords:{latitude:'32.086826',longitude:'118.795996' } })
-	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(success, error, {
-			enableHighAccuracy: true,
-			timeout: 5000,
-			maximumAge: 0
-		});
-	} else {
-		console.log("Geolocation is not supported by this browser.");
-	}
+	success({coords:{latitude:'32.086826',longitude:'118.795996' } })
+	// if (navigator.geolocation) {
+	// 	navigator.geolocation.getCurrentPosition(success, error, {
+	// 		enableHighAccuracy: true,
+	// 		timeout: 5000,
+	// 		maximumAge: 0
+	// 	});
+	// } else {
+	// 	console.log("Geolocation is not supported by this browser.");
+	// }
 });
 
 onUnmounted(() => {
