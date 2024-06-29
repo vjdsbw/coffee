@@ -1,17 +1,35 @@
 <script lang="ts" setup>
-const router = useRouter()
+import {getCouponListApi} from "@/api/user.ts";
 
+const router = useRouter()
+const show = ref(false)
+const list = ref<any>([])
 const onClickLeft = () => history.back()
 const onClickRight = () => {
   console.log('12121')
   router.push('/me/coffeeuseless')
 }
 
-const show = ref(false)
+
 const titleClick = () => {
   show.value = !show.value
 }
 
+const CoffeeCouponDetails = (item: any) => {
+  router.push({path: '/me/coffeecoupondetails', state: item})
+}
+onMounted(() => {
+  getCouponListApi().then(res => {
+    console.log('获取卡券', res)
+    if (res.code === 0) {
+      list.value = res.data
+    }
+
+    if (res.code === 500) {
+      showToast(res.msg);
+    }
+  })
+})
 </script>
 
 <template>
@@ -31,12 +49,12 @@ const titleClick = () => {
       </template>
     </van-nav-bar>
     <div class="wallet-content">
-      <div v-for="(item, index) in 10" class="wallet-item">
-        <div class="wallet-item-top"> A{{ index }}满减¥20券</div>
+      <div v-for="(item, index) in list" class="wallet-item" @click=" CoffeeCouponDetails(item) ">
+        <div class="wallet-item-top"> {{ item?.coffeeStockTitle }}</div>
         <div class="wallet-item-bottom">
           <div class="wallet-item-text">
-            <div>¥20</div>
-            <div>尚余{{ index }} 杯</div>
+            <div>¥{{ item?.discountDegree }}</div>
+            <div>尚余{{ item?.discountDegree }} 杯</div>
           </div>
           <div class="wallet-item-img">
             <van-image
@@ -89,11 +107,11 @@ const titleClick = () => {
     justify-content: space-evenly;
 
     .wallet-item {
-      width: 45%;
-      height: 100px;
+      width: 50%;
+      height: 120px;
       margin: 5px 0;
       background: url("@/assets/me/coffeeBg.png") no-repeat;
-      background-size: 100% 100%;
+      background-size: 100% 110%;
       display: flex;
       flex-direction: column;
       justify-content: space-evenly;
@@ -102,7 +120,12 @@ const titleClick = () => {
       .wallet-item-top {
         color: #000;
         padding-left: 10%;
+        font-size: 0.8rem;
 
+        & > span {
+          font-weight: 500;
+          font-size: 1.3rem;
+        }
       }
 
       .wallet-item-bottom {
@@ -114,6 +137,13 @@ const titleClick = () => {
       .wallet-item-text {
         color: #000;
 
+        & > div:first-child {
+          font-size: 1.5rem;
+        }
+
+        & > div:last-child {
+          color: #ccc;
+        }
       }
     }
   }

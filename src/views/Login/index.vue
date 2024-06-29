@@ -1,180 +1,216 @@
-<script setup lang="ts" name="Lohin">
+<script lang="ts" name="Login" setup>
 import homeActive from '@/assets/icons/home_active.png';
-import closeEye from '@/assets/icons/close_eye.png';
-import openEye from '@/assets/icons/open_eye.png';
-import { Store } from '@/store';
+import {Store} from '@/store';
+import {getPublicKeyApi, loginApi} from "@/api/storeApi.ts";
 
-const { user } = Store();
+const {user} = Store();
 const router = useRouter()
 
-const loginForm = ref<{ phone: String, password: String, }>({ phone: "", password: "", });
+interface loginForm {
+  accountId: string,
+  enPwd: string,
+}
 
-const seePwd = ref<Boolean>(false)
+
+const loginForm = ref<loginForm>({accountId: "18940995107", enPwd: "123456",});
+let publicKey = ref('')
+
 
 const toBack = () => {
 
 }
 
-const toFindPwd = () => {
-
-}
 
 const submitLogin = async () => {
+  // let pwd = encryptWithRSA(publicKey.value, loginForm.value.enPwd)
+  // if (pwd) {
+  //   loginForm.value.enPwd = pwd
+  // }
+  console.log(loginForm.value, "加密后")
+  let res = await loginApi(loginForm.value)
+  user.setToken(res.data)
+  await router.push('/')
+  if (res.code === 200) {
 
+  } else {
+    console.log(res, '登录')
+  }
 
 }
 
 
-onMounted(() => {
+const onSubmit = (values: any) => {
+  console.log('submit', values);
+  submitLogin()
+};
 
+onMounted(() => {
+  // 获取公钥
+  getPublicKeyApi().then(res => {
+    publicKey.value = res.msg
+    if (res.code === 200) {
+    }
+  })
 })
 
 </script>
 
 <template>
-	<div class="login-box">
-		<div class="top">
-			<div class="left">
-				<van-image :src="homeActive" />
-				<div>Lucking Coffee</div>
-			</div>
-			<div class="right" @click="toBack">先逛一逛</div>
-		</div>
-		<div class="welcome">欢迎回来！</div>
-		<div class="e-welcome">Please login to your accounts</div>
-		<div class="form">
-			<div class="item">
-				<div class="label">手机号</div>
-				<input placeholder-class="placeholder" type="text" placeholder="11位手机号" v-model="loginForm.phone">
-			</div>
-			<div class="item">
-				<div class="label">密码</div>
-				<input placeholder-class="placeholder" :type="seePwd ? 'password' : 'text'" placeholder="密码必须有字母开头"
-					v-model="loginForm.password">
-				<van-image :src="seePwd ? closeEye : openEye" @click="seePwd = !seePwd"></van-image>
-			</div>
-			<div class="forgetPwd" @click="toFindPwd">
-				忘记密码？
-			</div>
-		</div>
-		<div class="handle">
-			<van-button color="#0c34ba" type="primary" @click="submitLogin">登录</van-button>
-		</div>
-	</div>
+  <div class="login-box">
+    <div class="top">
+      <div class="left">
+        <van-image :src="homeActive"/>
+        <div>Lucking Coffee</div>
+      </div>
+      <div class="right" @click="toBack">先逛一逛</div>
+    </div>
+    <div class="form">
+      <div class="welcome">欢迎回来！</div>
+      <van-form @submit="onSubmit">
+        <van-cell-group inset>
+          <van-field
+              v-model="loginForm.accountId"
+              :rules="[{ required: false, message: '请填写用户名' }]"
+              label="用户名"
+              name="accountId"
+              placeholder="用户名"
+          />
+          <van-field
+              v-model="loginForm.enPwd"
+              :rules="[{ required: false, message: '请填写密码' }]"
+              label="密码"
+              name="enPwd"
+              placeholder="密码"
+              type="password"
+          />
+        </van-cell-group>
+        <div style="margin: 16px;">
+          <van-button block native-type="submit" round type="primary">
+            登录
+          </van-button>
+        </div>
+      </van-form>
+
+    </div>
+  </div>
+
 
 </template>
 
 <route lang="json">{
-	"meta": {
-		"layout": false
-	}
-}</route>
+"meta": {
+"layout": false
+}
+}
+</route>
 
 <style scoped lang="scss">
 .login-box {
-	.top {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		height: 2.5rem;
-		border-bottom: 1px solid #f8f8f8;
-		padding: 0 0.7rem;
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 2.5rem;
+    border-bottom: 1px solid #f8f8f8;
+    padding: 0 0.7rem;
 
-		.left {
-			.van-image {
-				width: 1.7rem;
-				height: 1.7rem;
-			}
+    .left {
+      .van-image {
+        width: 1.7rem;
+        height: 1.7rem;
+      }
 
-			display: flex;
-			align-items: center;
+      display: flex;
+      align-items: center;
 
-			div {
-				font-size: 0.78rem;
-				font-weight: bold;
-				color: #565656;
-				margin-left: 0.6rem;
-			}
-		}
+      div {
+        font-size: 0.78rem;
+        font-weight: bold;
+        color: #565656;
+        margin-left: 0.6rem;
+      }
+    }
 
-		.right {
-			color: #0000ff;
-			font-weight: bold;
-			font-size: 0.78rem;
-		}
-	}
+    .right {
+      color: #0000ff;
+      font-weight: bold;
+      font-size: 0.78rem;
+    }
+  }
 
-	.welcome {
-		font-size: 1.5rem;
-		font-weight: bold;
-		color: #565656;
-		margin-top: 7.1rem;
-		margin-left: 0.7rem;
-	}
 
-	.e-welcome {
-		color: #565656;
-		font-size: 0.93rem;
-		margin-top: 1.56rem;
-		margin-left: 0.78rem;
-	}
+  .e-welcome {
+    color: #565656;
+    font-size: 0.93rem;
+    margin-top: 1.56rem;
+    margin-left: 0.78rem;
+  }
 
-	.form {
-		margin: 2.5rem 1.0rem 5rem 1.0rem;
-		position: relative;
+  .form {
+    margin: 2.5rem 1.0rem 5rem 1.0rem;
+    position: relative;
 
-		.item {
-			display: flex;
-			border-bottom: 1px solid #e8e8e8;
-			height: 3.12rem;
-			align-items: center;
+    .welcome {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #565656;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-			.label {
-				width: 4.6875rem;
-				color: #565656;
-				font-size: 1rem;
-			}
+    .item {
+      display: flex;
+      border-bottom: 1px solid #e8e8e8;
+      height: 3.12rem;
+      align-items: center;
 
-			input {
-				border: none;
-			}
+      .label {
+        width: 4.6875rem;
+        color: #565656;
+        font-size: 1rem;
+      }
 
-			.van-image {
-				width: 1.25rem;
-				height: 1.25rem;
-				position: absolute;
-				right: 0.6rem;
-			}
+      input {
+        border: none;
+      }
 
-			.placeholder {
-				font-size: 0.75rem;
-			}
-		}
+      .van-image {
+        width: 1.25rem;
+        height: 1.25rem;
+        position: absolute;
+        right: 0.6rem;
+      }
 
-		.forgetPwd {
-			position: absolute;
-			bottom: -1.87rem;
-			right: 0;
-			color: #565656;
-			font-size: 0.875rem;
-		}
-	}
+      .placeholder {
+        font-size: 0.75rem;
+      }
+    }
 
-	.handle {
-		display: flex;
-		justify-content: space-around;
-		align-items: center;
+    .forgetPwd {
+      position: absolute;
+      bottom: -1.87rem;
+      right: 0;
+      color: #565656;
+      font-size: 0.875rem;
+    }
+  }
 
-		.van-button {
-			flex: 1;
-			margin: 0px 10px;
-		}
+  .handle {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
 
-		.register-button {
-			background-color: #fff;
-			color: #000;
-			border: 1px solid #e8e8e8;
-		}
-	}
+    .van-button {
+      flex: 1;
+      margin: 0px 10px;
+    }
+
+    .register-button {
+      background-color: #fff;
+      color: #000;
+      border: 1px solid #e8e8e8;
+    }
+  }
 }
 </style>

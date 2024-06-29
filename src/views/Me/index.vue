@@ -1,5 +1,7 @@
 <script setup lang="ts" name="Me">
 
+import {generateShortCodeApi} from "@/api/user.ts";
+
 const myInfo = ref<any>({})
 const router = useRouter()
 const list = [
@@ -15,6 +17,12 @@ const toMyDetail = (str: string) => {
   router.push(str)
 }
 
+const getShortUrl = () => {
+  generateShortCodeApi({couponId: '', uid: ''}).then(res => {
+    console.log(res)
+  })
+
+}
 onMounted(() => {
   getUserInfo()
 })

@@ -1,5 +1,5 @@
-import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
-import { Store } from "@/store";
+import axios, {AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig} from 'axios';
+import {Store} from "@/store";
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
     noLoading?: boolean;
@@ -78,9 +78,9 @@ class RequestHttp {
         this.service.interceptors.request.use(
             (config: CustomAxiosRequestConfig) => {
                 const { user } = Store();
-                // if (config.headers && typeof config.headers.set === 'function' && user.token) {
-                //     config.headers.set('x-access-token', user.token);
-                // }
+                if (config.headers && typeof config.headers.set === 'function' && user.token) {
+                    config.headers.set('access_token', user.token);
+                }
                 // if(config.method === 'get'){
                 //     config.params ={
                 //         appkey:luckinAppkey,

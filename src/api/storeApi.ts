@@ -1,27 +1,39 @@
 import http from "@/utils/http";
 
-namespace Store {
-  export interface Address {
-    lat: number;
-    lon: number;
-  }
+export namespace StoreApi {
+    // 门店列表
+    export interface storeAddressList {
+        lat: string;
+        lon: string;
+        code?: string;
+        keyword?: string;
+    }
 
-  export interface id {
-    storeId: number;
-  }
+    // 用户名，密码
+    export interface userInfo {
+        accountId: string
+        enPwd: string
+    }
+
+    // 查询菜单参数
+    export interface menuList {
+        storeId: number;
+        code?: string;
+    }
 }
-
+//获取rsa公钥
+export const getPublicKeyApi = () => http.get("/console/user/getKey");
 // 登录 
-export const loginApi = (params: Store.Address) => http.get("/api/store/nearest", params);
+export const loginApi = (params: StoreApi.userInfo) => http.post("/console/user/login", params);
 
 //查询最近门店
-export const nearestApi = (params: Store.Address) => http.get("/api/store/nearest", params);
+export const nearestApi = (params: StoreApi.storeAddressList) => http.get("/api/store/nearest", params);
 
 //查询门店详情
-export const shopDetailApi = (params: Store.id) => http.get("/api/store/detail", params);
+export const shopDetailApi = (params: StoreApi.menuList) => http.get("/api/store/detail", params);
 
 //查询门店列表
-export const shopListApi =(params: Store.Address)=>http.get("/api/store/list",params)
+export const shopListApi = (params: StoreApi.storeAddressList) => http.get("/api/store/list", params)
 
 //查询菜单
-export const productMenuApi =(params: Store.id)=>http.get("/api/product/menuList",params)
+export const productMenuApi = (params: StoreApi.menuList) => http.get("/api/product/menuList", params)

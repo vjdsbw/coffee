@@ -1,13 +1,24 @@
 <script lang="ts" setup>
 
+import {getOrderListApi} from "@/api/user.ts";
+
 const router = useRouter()
 const active = ref(0)
-
+const list = ref<any>([])
 const onClickLeft = () => history.back()
 
 const tabClick = (e: { name: string | number, title: string, event: MouseEvent, disabled: boolean }) => {
   console.log(e)
 }
+
+onMounted(() => {
+  getOrderListApi().then(res => {
+    if (res.code === 0) {
+      list.value = res.data
+    }
+    console.log(list.value, '订单列表')
+  })
+})
 </script>
 
 <template>
