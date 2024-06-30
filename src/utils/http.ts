@@ -1,5 +1,5 @@
-import axios, {AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig} from 'axios';
-import {Store} from "@/store";
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import { Store } from "@/store";
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
     noLoading?: boolean;
@@ -15,7 +15,7 @@ enum ResultEnum {
 
 // 请求响应参数
 interface ResultData {
-	token?:any;
+    token?: any;
     code: number;
     msg: string;
     data?: any;
@@ -31,43 +31,21 @@ const config = {
 };
 
 //校验网络请求状态码
-// const checkStatus = (status: number) => {
-//     switch (status) {
-//         case 400:
-//             Message('请求失败！请您稍后重试', { type: 'error' });
-//             break;
-//         case 401:
-//             Message('登录失效！请您重新登录', { type: 'error' });
-//             break;
-//         case 403:
-//             Message('当前账号无权限访问！', { type: 'error' });
-//             break;
-//         case 404:
-//             Message('你所访问的资源不存在！', { type: 'error' });
-//             break;
-//         case 405:
-//             Message('请求方式错误！请您稍后重试', { type: 'error' });
-//             break;
-//         case 408:
-//             Message('请求超时！请您稍后重试', { type: 'error' });
-//             break;
-//         case 500:
-//             Message('服务异常！', { type: 'error' });
-//             break;
-//         case 502:
-//             Message('网关错误！', { type: 'error' });
-//             break;
-//         case 503:
-//             Message('服务不可用！', { type: 'error' });
-//             break;
-//         case 504:
-//             Message('网关超时！', { type: 'error' });
-//             break;
-//         default:
-//             Message('请求失败', { type: 'error' });
-//     }  http://59.110.5.165:8081/coffee/store/nearest?lat=%2032.0889&lon=118.7908
-//        http://59.110.5.165:8081/coffee/store/nearest?lat=32.0889&lon=118.7908
-// };
+const checkCode = (status: number, msg: string) => {
+    switch (status) {
+        case 400: showToast('请求失败！请您稍后重试'); break;
+        case 401: showToast('登录失效！请您重新登录'); break;
+        case 403: showToast('当前账号无权限访问'); break;
+        case 404: showToast('你所访问的资源不存在'); break;
+        case 405: showToast('请求方式错误！请您稍后重试'); break;
+        case 408: showToast('请求超时！请您稍后重试'); break;
+        case 500: showToast(msg); break;
+        case 502: showToast('网关错误！'); break;
+        case 503: showToast('服务不可用！'); break;
+        case 504: showToast('网关超时！'); break;
+        default: break;
+    }
+};
 
 class RequestHttp {
     service: AxiosInstance;
@@ -81,12 +59,6 @@ class RequestHttp {
                 if (config.headers && typeof config.headers.set === 'function' && user.token) {
                     config.headers.set('access_token', user.token);
                 }
-                // if(config.method === 'get'){
-                //     config.params ={
-                //         appkey:luckinAppkey,
-                //         ...config.params
-                //     }
-                // }
                 config.headers.set('code', 'E96eR2hxZRC');
                 return config;
             },
@@ -99,6 +71,7 @@ class RequestHttp {
         this.service.interceptors.response.use(
             (response: AxiosResponse) => {
                 const { data } = response;
+                checkCode(data.code, data.msg)
                 // const { user } = Store();
                 // // 登陆失效
                 // if (data.code === ResultEnum.OVERDUE) {
