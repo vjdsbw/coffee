@@ -12,7 +12,7 @@ const loginForm = ref<{ phone: string; code: string }>({
 
 
 const showDialog = ref<boolean>(false);
-const uidCode = ref<string>('f5cc0f26-726d-449f-bd95-fb81f4edfaec1719727574981');
+const uidCode = ref<string>('');
 const countDown = ref<number>(60);
 
 const copyIcon = ref<boolean>(false)
