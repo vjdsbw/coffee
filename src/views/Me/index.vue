@@ -7,6 +7,7 @@ const router = useRouter()
 const list = [
   {title: "我的订单信息", path: "/me/orderInfo"},
   {title: "我的咖啡信息", path: "/me/coffeeInfo"},
+  {title: "咖啡卡卷", path: "/me/cardRollBinding"},
 ]
 
 const getUserInfo = async () => {

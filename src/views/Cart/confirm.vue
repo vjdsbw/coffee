@@ -15,13 +15,13 @@ const checked = ref(false);
 const onClickLeft = () => history.back()
 
 const onSubmit = async () => {
-  let param ={
+  let param = {
     productList: placeInfo,
-		storeId: shop.storeId!,
-		uid: 'string',
+    storeId: shop.storeId!,
+    uid: 'string',
   }
-  const {data} = await createOrderApi(param)
-  router.push('/order/pay')
+  const { data } = await createOrderApi(param)
+  router.push({ name: 'Cart-paymentDetails' })
 }
 
 // 地图初始化
@@ -66,8 +66,8 @@ onMounted(() => {
             <div class="map-title">
               <van-icon name="location-o" />
               <div class="map-title-right">
-                <div class="map-title-address">{{shop.name}}</div>
-                <div class="map-title-km">距离你{{shop.distance}}</div>
+                <div class="map-title-address">{{ shop.name }}</div>
+                <div class="map-title-km">距离你{{ shop.distance }}</div>
               </div>
             </div>
           </template>
@@ -123,7 +123,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <van-submit-bar :price="3050" button-text="提交订单" @submit="onSubmit" />
+    <van-submit-bar :price="3050" button-text="确认订单" @submit="onSubmit" />
 
   </div>
 </template>

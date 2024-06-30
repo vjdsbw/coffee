@@ -1,53 +1,69 @@
 <script setup lang="ts" name="LuckLogin">
 import luckinlogo from "@/assets/luckinlogo.png";
-// import { showDialog } from 'vant';
-import axios from 'axios';
-const loginForm = ref<{ phone: String; password: String }>({
+import copy from '@/assets/icons/copy.svg'
+import copySuccess from '@/assets/icons/copy-success.svg'
+import { sendCodeApi, rxLoginApi } from '@/api/user';
+import Clipboard from 'clipboard';
+
+const loginForm = ref<{ phone: string; code: string }>({
   phone: "",
-  password: "",
+  code: "",
 });
 
-const phoneShow = ref<boolean>(false);
-const showDATA = ref<boolean>(false);
-const dataCode = ref<string>('');
-const count = ref<number>(60);
-const getCode = () => {
-  if (!loginForm.value.phone) return phoneShow.value = true;
-  axios({
-    url: "http://59.110.5.165:8081/coffee/api/notify/v1/send_code",
-    method: 'get',
-    params: {
-      mobile: loginForm.value.phone,
-      type: loginForm.value.phone,
-    }
-  }).then((res:any) => {
-    if(res.data.code ==  200){
-      dataCode.value = res.data.data;
-      console.log(dataCode.value,"dataCode.value")
-    }
-  })
-  contCom()
+
+const showDialog = ref<boolean>(false);
+const uidCode = ref<string>('f5cc0f26-726d-449f-bd95-fb81f4edfaec1719727574981');
+const countDown = ref<number>(60);
+
+const copyIcon = ref<boolean>(false)
+
+const getCode = async () => {
+  countDown.value = 59
+  if (!loginForm.value.phone) return showToast('请填写手机号')
+  let params = {
+    mobile: loginForm.value.phone,
+    type: loginForm.value.phone,
+  }
+  const { data } = await sendCodeApi(params)
+  uidCode.value = data;
+  startCountDown()
 }
 
-const contCom = ()=>{
- const inter = setInterval(()=>{
-    count.value = count.value -1;
-    if(count.value == 0){
+const startCountDown = () => {
+  const inter = setInterval(() => {
+    countDown.value--;
+    if (countDown.value == 0) {
       clearInterval(inter);
     }
-  },1000);
-  return ()=>clearInterval(inter);
+  }, 1000);
+  return () => clearInterval(inter);
 }
-
 
 const submitLogin = async () => {
-  //   if(!loginForm.value.password) return showDialog({
-  //   message: '请填写短信验证码',
-  // })
-  // show.value = true;
-  showDATA.value = true;
+  if (!loginForm.value.code) return showToast('请填写短信验证码')
+  let params = {
+    mobile: loginForm.value.phone,
+    uid: uidCode.value,
+    validateCode: loginForm.value.code
+  }
+  const { code, data } = await rxLoginApi(params)
+  if (code === 200) {
+    showDialog.value = true;
+    uidCode.value = data.uid;
+    copyIcon.value = false;
+  }
 }
-const show = ref(false);
+
+
+const onCopy = () => {
+  const clipboard = new Clipboard('.copy', {
+    text: () => uidCode.value
+  })
+  clipboard.on('success', () => copyIcon.value = true)
+  clipboard.on('error', () => showToast('复制失败'))
+}
+
+
 
 </script>
 
@@ -61,24 +77,26 @@ const show = ref(false);
         <input placeholder-class="placeholder" type="text" placeholder="请输入手机号" v-model="loginForm.phone" />
       </div>
       <div class="item">
-        <input placeholder-class="placeholder" type="text" placeholder="请输入验证码" v-model="loginForm.password" />
-        <van-button type="primary" @click="getCode">获取验证码({{ count }})</van-button>
+        <input placeholder-class="placeholder" type="text" placeholder="请输入验证码" v-model="loginForm.code" />
+        <van-button type="primary" @click="getCode" :disabled="countDown !== 60 && countDown !== 0">
+          <span v-show="countDown > 0">获取验证码({{ countDown }})</span>
+          <span v-show="countDown === 0">重新获取验证码</span>
+        </van-button>
       </div>
     </div>
     <div class="handle">
       <van-button type="primary" @click="submitLogin">确定</van-button>
     </div>
 
-    <van-dialog v-model:show="show">
-      <div class="dialog-content">请填写短信验证码</div>
+    <van-dialog v-model:show="showDialog">
+      <div class="dialog-content">
+        <div>
+          <span>uid:</span>
+          <span>{{ uidCode }} </span>
+        </div>
+        <van-icon class="copy" :name="copyIcon ? copySuccess : copy" @click="onCopy" />
+      </div>
     </van-dialog>
-    <van-dialog v-model:show="phoneShow">
-      <div class="dialog-content">请填写手机号</div>
-    </van-dialog>
-    <van-dialog v-model:show="showDATA">
-      <div v-if="dataCode.length > 0" class="dialog-content">UID:{{dataCode}}</div>
-      <div v-else class="dialog-content">验证码错误</div>
-    </van-dialog >
   </div>
 </template>
 
@@ -162,15 +180,31 @@ const show = ref(false);
       border-radius: 999px;
     }
   }
-  .handlee{
+
+  .handlee {
     margin-top: 25px;
     text-align: center;
   }
 
   .dialog-content {
-    padding: 20px 20px;
-    text-align: center;
+    padding: 1rem 1rem;
     color: black;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    &>div:nth-child(1) {
+
+      text-overflow: ellipsis;
+      overflow: hidden;
+      word-break: break-all;
+      white-space: nowrap;
+
+      &>span:nth-child(2) {
+        font-size: 15px;
+        color: grey;
+      }
+    }
   }
 }
 </style>

@@ -10,7 +10,7 @@ export const useOrderStore = defineStore({
     // 修改默认值之后，需清除 localStorage 数据
     state: (): OrderState => ({
         oderInfo: {},
-        placeInfo: {}
+        placeInfo: []
     }),
     getters: {
         getPlaceInfo: state => state.placeInfo

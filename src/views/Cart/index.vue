@@ -130,7 +130,7 @@ const isSubmit = () => {
 		}).catch(() => { });
 	} else {
 		if (checked.value.length === 0) return showToast('选择商品');
-		// if (allCartPrice.value > global.limitPriceGet) return showToast('超出用卷价格');
+		if (allCartPrice.value > global.limitPriceGet) return showToast('超出用卷价格');
 		preOrderCreated()
 	}
 };
@@ -157,8 +157,8 @@ onMounted(() => {
 					<div class="info">
 						<div class="top">
 							<div class="name-cn">
-								{{ item.productName }} <span v-show="item.showAttrNames">({{ item.showAttrNames
-									}})</span>
+								{{ item.productName }} 
+								<span v-show="item.showAttrNames">({{ item.showAttrNames}})</span>
 							</div>
 						</div>
 						<div class="name-us">
