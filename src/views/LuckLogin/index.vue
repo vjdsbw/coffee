@@ -4,6 +4,7 @@ import copy from '@/assets/icons/copy.svg'
 import copySuccess from '@/assets/icons/copy-success.svg'
 import { sendCodeApi, rxLoginApi } from '@/api/user';
 import Clipboard from 'clipboard';
+import axios from 'axios';
 
 const loginForm = ref<{ phone: string; code: string }>({
   phone: "",
@@ -63,6 +64,17 @@ const onCopy = () => {
   clipboard.on('error', () => showToast('复制失败'))
 }
 
+const resData = ref<any>(window.location.href)
+onMounted(() => {
+  const appid = 'wx6f51316af1fa4760'; // 微信公众平台的 AppID
+  const redirectUri = encodeURIComponent('http://122.51.67.196:5173/home'); // 回调 URL，需要 URL 编码
+  const scope = 'snsapi_base'; // 使用 snsapi_base 或者 snsapi_userinfo
+  const state = '123'; // 自定义状态
+  const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&state=${state}#wechat_redirect`;
+  window.location.href = url;
+
+})
+
 
 
 </script>
@@ -85,7 +97,7 @@ const onCopy = () => {
       </div>
     </div>
     <div class="handle">
-      <van-button type="primary" @click="submitLogin">确定</van-button>
+      <van-button type="primary" @click="submitLogin">确定{{ resData }}</van-button>
     </div>
 
     <van-dialog v-model:show="showDialog">
