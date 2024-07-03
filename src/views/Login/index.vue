@@ -12,7 +12,7 @@ interface loginForm {
 }
 
 
-const loginForm = ref<loginForm>({accountId: "18940995107", enPwd: "123456",});
+const loginForm = ref<loginForm>({accountId: "18734008908", enPwd: "123456",});
 let publicKey = ref('')
 
 

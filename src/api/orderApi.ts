@@ -37,4 +37,4 @@ export const orderDetailApi = (params: Order.Detail) => http.get("/api/order/ord
 export const orderListApi = (params: Order.Detail) => http.get("/api/order/orderList", params);
 
 // 预创建订单 
-export const preCreateOrderApi = (params: Order.Create) => http.post("/api/order/preCreateOrder", params);
+export const preCreateOrderApi = (params: Order.Create) => http.post("/api/order/orderPreview", params);

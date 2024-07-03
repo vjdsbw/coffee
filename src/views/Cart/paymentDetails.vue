@@ -1,5 +1,6 @@
 <script setup lang="ts" name="Payment-Details">
-import { Store } from "@/store";
+import {Store} from "@/store";
+import {orderDetailApi} from "@/api/orderApi.ts";
 
 const { order, global } = Store();
 const shop = global.shopGet
@@ -9,6 +10,7 @@ const show = ref(false);
 const lookCode = () => {
 	show.value = true
 }
+const orderDetail = ref()
 
 const total = computed(() => {
 	let price = 0;
@@ -23,24 +25,32 @@ const total = computed(() => {
 	};
 })
 
+onMounted(() => {
+  orderDetailApi({code: '', orderId: String(shop?.storeId)}).then(res => {
+    orderDetail.value = res.data
+    console.log(res, '获取订单详情')
+  })
+})
+
 </script>
 
 <template>
 	<div class="payment-box">
 		<van-nav-bar left-arrow left-text="返回" title="下单成功" @click-left="onClickLeft" />
 		<div class="pre-time">
-			<div>预计 <span>13:38</span> 可制作完成，请前往自提点取餐。</div>
+      <!--			<div>预计 <span>13:38</span> 可制作完成，请前往自提点取餐。</div>-->
+      <div>{{ orderDetail?.orderStatusDesc }}</div>
 			<div class="pre-time-btn">
-				<van-button plain round color="#949494">取消订单</van-button>
+        <van-button color="#949494" plain round>取消订单</van-button>
 				<van-button plain round color="#0c0e97" @click="lookCode">取餐码</van-button>
 			</div>
 		</div>
 		<div class="pre address">
-			<div>{{ shop.name }}({{ shop.number }})</div>
-			<div>{{ shop.address }}</div>
+      <div>{{ shop.name ?? orderDetail?.shopName }}({{ shop.number }})</div>
+      <div>{{ shop.address ?? orderDetail?.shopAddress }}</div>
 		</div>
 		<div class="pre order-info">
-			<p>自提订单:*****************784</p>
+      <p>自提订单:{{ orderDetail?.orderNo }}</p>
 			<div class="driver">
 				<van-card v-for="item in placeInfo" :key="item.id" :num="item.amount" :price="item.price"
 					:desc="item.saleAttrNames" :title="item.productName + item.showAttrNames"
@@ -48,12 +58,12 @@ const total = computed(() => {
 			</div>
 			<div class="driver">
 				<div class="preferential reduction">
-					<div>优惠减免合计</div>
-					<div>-¥0</div>
+          <div>{{ orderDetail?.discountTotal }}</div>
+          <div>-¥{{ orderDetail?.discount }}</div>
 				</div>
-				<div class="preferential exemption">
-					<div>咖啡钱包</div>
-					<div>-¥0</div>
+        <div v-for="item in orderDetail?.disconuntDetailList" class="preferential exemption">
+          <div>{{ item?.name }}</div>
+          <div>-¥ {{ item?.amount }}</div>
 				</div>
 			</div>
 			<div class="order-total">
@@ -62,7 +72,7 @@ const total = computed(() => {
 			</div>
 		</div>
 		<div class="pre order-time">
-			<div>下单时间:2024-06-3013:35</div>
+      <div>下单时间:{{ orderDetail?.orderTime }}</div>
 		</div>
 		<van-dialog v-model:show="show" :show-confirm-button="false">
 			<template #title>

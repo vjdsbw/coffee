@@ -3,6 +3,9 @@
 import {generateShortCodeApi} from "@/api/user.ts";
 
 const myInfo = ref<any>({})
+const url = ref<any>('')
+const totalNum = ref<any>('')
+const type = ref<any>('')
 const router = useRouter()
 const list = [
   {title: "我的订单信息", path: "/me/orderInfo"},
@@ -19,7 +22,7 @@ const toMyDetail = (str: string) => {
 }
 
 const getShortUrl = () => {
-  generateShortCodeApi({couponId: '', uid: ''}).then(res => {
+  generateShortCodeApi({couponId: '', uid: '', couponPrice: 0}).then(res => {
     console.log(res)
   })
 
@@ -57,6 +60,50 @@ onMounted(() => {
         <van-cell-group>
           <van-cell v-for="item in list" :title="item.title" icon="newspaper-o" is-link @click="toMyDetail(item.path)"/>
         </van-cell-group>
+      </div>
+      <div class="short-url">
+        <van-cell-group inset>
+          <van-field
+              v-model="url"
+              :autosize='{ maxHeight: 100}'
+              clearable
+              placeholder="请输入链接"
+              rows="1"
+              type="textarea"
+          />
+
+          <van-field
+              v-model="totalNum"
+              clearable
+              placeholder="请输入条数"
+              type="text"
+          />
+          <van-field
+              v-model="type"
+              clearable
+              placeholder="请输入支付类型"
+              type="text"
+          />
+
+          <van-field
+              v-model="type"
+              clearable
+              placeholder="请选择优惠券"
+              type="text"
+          />
+
+          <div class="edit-btn">
+            <van-button color="#7585BE" round>复制编辑</van-button>
+            <van-button color="#7585BE" round>清空编辑</van-button>
+            <van-button color="#7585BE" round @click="getShortUrl">生成短链</van-button>
+            <van-button color="#7585BE" round>查询状态</van-button>
+            <van-button color="#7585BE" round>删除链接</van-button>
+            <van-button color="#7585BE" round>券型删除</van-button>
+          </div>
+
+
+        </van-cell-group>
+
       </div>
     </div>
   </div>
@@ -180,6 +227,18 @@ onMounted(() => {
       }
 
 
+    }
+
+    .edit-btn {
+      margin: .5rem 0;
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+
+      & > button {
+        margin: .5rem 1rem;
+        width: 25%;
+      }
     }
   }
 }

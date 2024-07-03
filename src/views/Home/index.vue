@@ -1,9 +1,9 @@
 <script setup lang="ts" name="Home">
 import categoryTop from "@/assets/category/category-top.png";
-import { nearestApi, productMenuApi } from '@/api/storeApi'
-import { purchasablePriceApi } from '@/api/productApi'
-import { Store } from "@/store";
-import axios from 'axios'
+import {nearestApi, productMenuApi} from '@/api/storeApi'
+import {purchasablePriceApi} from '@/api/productApi'
+import {Store} from "@/store";
+
 const router = useRouter();
 
 const { global } = Store();
@@ -153,8 +153,13 @@ onUnmounted(() => {
 				<div class="content-section" v-for="(item, index) in menuList" :key="item.id"
 					:id="'sidebarSelct' + index">
 					<div class="content-section-header">
-						<strong>{{ item.name }}</strong>
-						<div>{{ item.desc }}</div>
+            <div class="content-section-title">
+              <van-image height="30%" src="./src/assets/menuItemTitleBg.png" width="100%"/>
+            </div>
+            <div class="content-section-title">
+              <strong>{{ item.name }}</strong>
+              <div>{{ item.desc }}</div>
+            </div>
 					</div>
 					<van-card v-for="product in item.productList" :key="product.productId" :price="product.price"
 						:desc="product.enName" :title="product.name" :thumb="product.picUrl"
@@ -323,16 +328,24 @@ onUnmounted(() => {
 					z-index: 1;
 					font-size: 10px;
 					background-color: #fff;
+          color: #1a1a1a;
+          //background: url("@/assets/menuItemTitleBg.png") no-repeat ;
+          background-size: 100% 20%;
 
-					strong {
-						font-size: 1rem;
-					}
+          .content-section-title {
+            //background: rgba(122, 122, 122, 0.5);
 
-					div {
-						color: #999;
-						font-size: .7rem;
-						white-space: pre-wrap;
-					}
+            strong {
+              font-size: 1rem;
+            }
+
+            div {
+              color: #999;
+              font-size: .7rem;
+              white-space: pre-wrap;
+            }
+          }
+
 				}
 
 				.van-card {

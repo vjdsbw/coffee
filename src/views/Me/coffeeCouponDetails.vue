@@ -1,6 +1,6 @@
 <script lang="ts" name="coffeecoupondetails" setup>
 const router = useRouter()
-const show = ref(false)
+const show = ref<boolean>(false)
 
 const onClickLeft = () => history.back()
 const coffeeDetailsInfo = ref<any>(null)

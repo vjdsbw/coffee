@@ -1,8 +1,8 @@
 <script setup lang="ts" name="Cart">
 import shopbagBg from "@/assets/icons/shopbag_bg.png";
-import { cartListApi, removeProductApi, updateProductAmountApi } from "@/api/productApi";
-import { preCreateOrderApi } from "@/api/orderApi";
-import { Store } from "@/store";
+import {cartListApi, removeProductApi, updateProductAmountApi} from "@/api/productApi";
+import {preCreateOrderApi} from "@/api/orderApi";
+import {Store} from "@/store";
 
 const { global, order } = Store();
 
@@ -24,6 +24,7 @@ const isIndeterminate = ref(true);
 
 const getFindAllShop = async () => {
 	const shop = global.shopGet
+  console.log(shop)
 	if (shop.storeId) {
 		const { data } = await cartListApi({ storeId: shop.storeId });
 		cartList.value = data
