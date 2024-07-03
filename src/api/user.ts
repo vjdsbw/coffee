@@ -4,6 +4,7 @@ export namespace userType {
     export interface shortCode {
         couponId: string
         uid: string
+        couponPrice: number
     }
 
     export interface bindUid {
