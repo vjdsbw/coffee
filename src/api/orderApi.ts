@@ -11,7 +11,6 @@ namespace Order {
     export interface Create {
         productList: any;
         storeId: number;
-        uid: string;
     }
 
     export interface Detail {
@@ -24,7 +23,7 @@ namespace Order {
     }
 }
 
-//  取消订单
+//  取消订单  /api/order/createOrder 创建订单前预校验订单
 export const cancelOrderApi = (params: Order.Cancel) => http.get("/api/order/cancelOrder", params);
 
 //  创建订单  

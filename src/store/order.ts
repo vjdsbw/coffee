@@ -2,7 +2,10 @@ import { defineStore } from 'pinia';
 
 interface OrderState {
     oderInfo: any,
-    placeInfo: any
+    placeInfo: any,
+    orderList: any
+    orderCheck: any
+    orderIdList: any,
 }
 
 export const useOrderStore = defineStore({
@@ -10,7 +13,10 @@ export const useOrderStore = defineStore({
     // 修改默认值之后，需清除 localStorage 数据
     state: (): OrderState => ({
         oderInfo: {},
-        placeInfo: []
+        placeInfo: [],
+        orderList: [],
+        orderCheck: [],
+        orderIdList: []
     }),
     getters: {
         getPlaceInfo: state => state.placeInfo
@@ -18,6 +24,15 @@ export const useOrderStore = defineStore({
     actions: {
         savePlaceInfo(list: any[]) {
             this.placeInfo = list
-        }
+        },
+        saveOrderList(list: any[]) {
+            this.orderList = list
+        },
+        saveOrderCheck(list: any[]) {
+            this.orderCheck = list
+        },
+        saveOrderIdList(list: any[]) {
+            this.orderIdList = list
+        },
     },
 });

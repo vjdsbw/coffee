@@ -71,7 +71,10 @@ onMounted(() => {
   const scope = 'snsapi_base'; // 使用 snsapi_base 或者 snsapi_userinfo
   const state = '123'; // 自定义状态
   const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&state=${state}#wechat_redirect`;
-  window.location.href = url;
+  // window.location.href = url;
+ let a = document.createElement('a')
+ a.href =url
+ a.click();
 
 })
 

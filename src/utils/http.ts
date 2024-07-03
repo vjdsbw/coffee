@@ -15,15 +15,14 @@ enum ResultEnum {
 
 // 请求响应参数
 interface ResultData {
-    token?: any;
     code: number;
     msg: string;
-    data?: any;
+    data: any;
 }
 
 const config = {
     // 默认地址请求地址，可在 .env.** 文件中修改
-    baseURL: (import.meta as any).env.VITE_API_URL,
+    baseURL: import.meta.env.VITE_API_URL,
     // 设置超时时间Property 'env' does not exist on type 'ImportMe
     timeout: ResultEnum.TIMEOUT as number,
     // 跨域时候允许携带凭证
@@ -72,31 +71,9 @@ class RequestHttp {
             (response: AxiosResponse) => {
                 const { data } = response;
                 checkCode(data.code, data.msg)
-                // const { user } = Store();
-                // // 登陆失效
-                // if (data.code === ResultEnum.OVERDUE) {
-                //     user.setToken('');
-                //     router.replace('/login');
-                //     Message(data.msg, { type: 'error' });
-                //     return data;
-                // }
-                // // 全局错误信息拦截（防止下载文件的时候返回数据流，没有 code 直接报错）
-                // if (data.code && data.code !== ResultEnum.SUCCESS) {
-                //     Message(data.msg, { type: 'error' });
-                //     return data;
-                // }
-                // 成功请求（在页面上除非特殊情况，否则不用处理失败逻辑）
                 return data;
             },
             async (error: AxiosError) => {
-                // const { response } = error;
-                // // 请求超时 && 网络错误单独判断，没有 response
-                // if (error.message.indexOf('timeout') !== -1) Message('请求超时！请您稍后重试', { type: 'error' });
-                // if (error.message.indexOf('Network Error') !== -1) Message('网络错误！请您稍后重试', { type: 'error' });
-                // // 根据服务器响应的错误状态码，做不同的处理
-                // if (response) checkStatus(response.status);
-                // // 服务器结果都没有返回(可能服务器错误可能客户端断网)，断网处理:可以跳转到断网页面
-                // if (!window.navigator.onLine) router.replace('/500');
                 return Promise.reject(error);
             }
         );

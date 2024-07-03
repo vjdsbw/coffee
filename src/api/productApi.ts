@@ -3,7 +3,7 @@ import http from "@/utils/http";
 namespace Product {
 
   export interface proId {
-    productId: number;
+    productId: string;
   }
 
   export interface priceCal {
@@ -53,3 +53,6 @@ export const updateProductAmountApi = (params: Product.updateAmount) => http.pos
 
 //可购买的最高价格 
 export const purchasablePriceApi = () => http.get("/api/product/purchasablePrice");
+
+//清空购物车
+export const cleareCartApi = () => http.post("/api/product/shoppingCart/clear");
