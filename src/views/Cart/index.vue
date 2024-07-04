@@ -114,7 +114,10 @@ const preOrderCreated = async () => {
 		storeId: shop.storeId!,
 		uid: 'string',
 	}
-	const { data } = await preCreateOrderApi(params);
+  const {code, data, msg} = await preCreateOrderApi(params);
+  if (code !== 200) {
+
+  }
 	console.log(data, "preCreateOrderApi")
 	order.savePlaceInfo(list)
 	router.push('/cart/confirm')
@@ -138,7 +141,7 @@ const isSubmit = () => {
 
 onMounted(() => {
 	getFindAllShop();
-	
+
 });
 </script>
 
@@ -158,7 +161,7 @@ onMounted(() => {
 					<div class="info">
 						<div class="top">
 							<div class="name-cn">
-								{{ item.productName }} 
+                {{ item.productName }}
 								<span v-show="item.showAttrNames">({{ item.showAttrNames}})</span>
 							</div>
 						</div>

@@ -24,7 +24,7 @@ export namespace userType {
 }
 
 // 生成短链
-export const generateShortCodeApi = (params: userType.shortCode) => http.get("/console/shortCode/generate", params);
+export const generateShortCodeApi = (params: userType.shortCode) => http.post("/console/shortCode/generate", params);
 // 获取卡券列表
 export const getCouponListApi = () => http.get("/console/coupon/getCouponList");
 

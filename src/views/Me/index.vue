@@ -1,17 +1,31 @@
 <script setup lang="ts" name="Me">
 
-import {generateShortCodeApi} from "@/api/user.ts";
+import {generateShortCodeApi, getCouponListApi} from "@/api/user.ts";
 
 const myInfo = ref<any>({})
-const url = ref<any>('')
+const url = ref<any>()
+const httpUrl = ref<any>()
 const totalNum = ref<any>('')
 const type = ref<any>('')
 const router = useRouter()
+
 const list = [
   {title: "我的订单信息", path: "/me/orderInfo"},
   {title: "我的咖啡信息", path: "/me/coffeeInfo"},
   {title: "咖啡卡卷", path: "/me/cardRollBinding"},
 ]
+
+const couponList = ref<{ text: string, value: string }[]>([]) //卡券列表
+// const columns = [
+//   {text: '杭州', value: 'Hangzhou'},
+//   {text: '宁波', value: 'Ningbo'},
+//   {text: '温州', value: 'Wenzhou'},
+//   {text: '绍兴', value: 'Shaoxing'},
+//   {text: '湖州', value: 'Huzhou'},
+// ];
+
+const fieldValue = ref();
+const showPicker = ref(false);
 
 const getUserInfo = async () => {
   console.log(myInfo)
@@ -21,14 +35,74 @@ const toMyDetail = (str: string) => {
   router.push(str)
 }
 
+function getRandomInt(min: number, max: number): number {
+  // 确保min小于max
+  if (min > max) {
+    [min, max] = [max, min];
+  }
+  // 生成min和max之间的随机整数
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
 const getShortUrl = () => {
-  generateShortCodeApi({couponId: '', uid: '', couponPrice: 0}).then(res => {
+  console.log({
+    couponId: fieldValue.value ?? getRandomInt(100, 100000),
+    uid: url.value ?? 'b93c995d-d6b9-469d-9bec-0cd167e3bfc41720102820651',
+    couponPrice: getRandomInt(100, 1000)
+  })
+  generateShortCodeApi({
+    couponId: fieldValue.value ?? getRandomInt(100, 100000),
+    uid: url.value ?? 'b93c995d-d6b9-469d-9bec-0cd167e3bfc41720102820651',
+    couponPrice: getRandomInt(100, 1000)
+  }).then(res => {
+    // generateShortCodeApi({couponId: fieldValue.value, uid:url.value, couponPrice: 1000}).then(res => {
+    httpUrl.value = res.data
     console.log(res)
   })
 
 }
+
+
+const onConfirm = ({selectedOptions}: any) => {
+  showPicker.value = false;
+  fieldValue.value = selectedOptions[0].text;
+};
+
+const showSelectCoupon = () => {
+  if (couponList.value.length !== 0) {
+    showPicker.value = true
+  } else {
+    showToast('没有咖啡券')
+  }
+}
+
+const copyUrl = async () => {
+  console.log(httpUrl.value, '短链')
+  try {
+    await navigator.clipboard.writeText(httpUrl.value);
+    showToast('复制链接成功')
+  } catch (err) {
+    showToast('复制链接失败')
+    console.error('Failed to copy text: ', err);
+  }
+}
 onMounted(() => {
   getUserInfo()
+
+  // 获取咖啡卡券
+  getCouponListApi().then(res => {
+    console.log('获取卡券', res)
+    if (res.code === 0) {
+      res.data?.map((v: any) => {
+        couponList.value.push({text: v?.coffeeStockTitle, value: v?.couponId},)
+      })
+    }
+
+    if (res.code === 500) {
+      showToast(res.msg);
+    }
+  })
+
 })
 </script>
 
@@ -63,45 +137,26 @@ onMounted(() => {
       </div>
       <div class="short-url">
         <van-cell-group inset>
-          <van-field
-              v-model="url"
-              :autosize='{ maxHeight: 100}'
-              clearable
-              placeholder="请输入链接"
-              rows="1"
-              type="textarea"
-          />
+          <van-field v-model="fieldValue" is-link label="选择咖啡券" readonly @click="showSelectCoupon"/>
+          <van-popup v-model:show="showPicker" position="bottom" round>
+            <van-picker :columns="couponList" @cancel="showPicker = false" @confirm="onConfirm"/>
+          </van-popup>
 
-          <van-field
-              v-model="totalNum"
-              clearable
-              placeholder="请输入条数"
-              type="text"
-          />
-          <van-field
-              v-model="type"
-              clearable
-              placeholder="请输入支付类型"
-              type="text"
-          />
-
-          <van-field
-              v-model="type"
-              clearable
-              placeholder="请选择优惠券"
-              type="text"
-          />
+          <van-field v-model="url" :autosize='{ maxHeight: 100}' clearable placeholder="请输入链接/uid" rows="1"
+                     type="textarea"/>
+          <van-field v-model="totalNum" clearable placeholder="请输入条数" type="text"/>
+          <van-field v-model="type" clearable placeholder="请输入支付类型" type="text"/>
+          <van-field v-model="type" clearable placeholder="请选择优惠券" type="text"/>
+          <van-field v-model="httpUrl" clearable clickable placeholder="短链" type="text"/>
 
           <div class="edit-btn">
-            <van-button color="#7585BE" round>复制编辑</van-button>
-            <van-button color="#7585BE" round>清空编辑</van-button>
+            <van-button color="#7585BE" round @click="copyUrl">复制链接</van-button>
+            <van-button color="#7585BE" round @click="httpUrl=''">清空链接</van-button>
             <van-button color="#7585BE" round @click="getShortUrl">生成短链</van-button>
             <van-button color="#7585BE" round>查询状态</van-button>
             <van-button color="#7585BE" round>删除链接</van-button>
             <van-button color="#7585BE" round>券型删除</van-button>
           </div>
-
-
         </van-cell-group>
 
       </div>
