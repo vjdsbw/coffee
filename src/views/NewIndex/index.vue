@@ -1,5 +1,5 @@
 <script setup lang="ts" name="new-index">
-import categoryTop from "@/assets/category/category-top.png";
+import lookStore from "@/assets/lookStore.png";
 import { nearestApi, productMenuApi } from '@/api/storeApi'
 import { purchasablePriceApi } from '@/api/productApi'
 import { productDetailApi, cartListApi } from "@/api/productApi";
@@ -203,12 +203,12 @@ const selectedProduct = computed(() => {
 <template>
   <div class="new-index">
     <div class="top">
-      <van-image round src="../src/assets/me/userPic.png"></van-image>
+      <van-image  :src="lookStore"></van-image>
       <div class="top-right">
-        <div>上海浦东曹路恒越荣欣店(N0.A4188) <van-icon name="arrow" /> </div>
+        <div>{{ global.shop.name }}{{ global.shop.number }} <van-icon name="arrow" v-show="global.shop.name"/> </div>
         <div>
-          <van-icon name="location-o" />
-          <span>距您0.18km </span> 上海市浦东新区金钻路828弄恒越荣欣广场6号楼111室商铺(全家隔壁、链家对面)
+          <van-icon name="location-o" v-show="global.shop.distance"/>
+          <span v-show="global.shop.distance">距您{{ global.shop.distance }} </span> {{ global.shop.address }}
         </div>
       </div>
     </div>
@@ -222,24 +222,31 @@ const selectedProduct = computed(() => {
       <div class="content" ref="contentRef">
         <div class="content-section" v-for="(item, index) in menuList" :key="item.id" :id="'sidebarSelct' + index">
           <div class="content-section-header">
-            <strong>{{ item.name }}</strong>
-            <div>{{ item.desc }}</div>
+            <div class="heiader-image">
+              <!-- <van-image height="30%" src="./src/assets/menuItemTitleBg.png" width="100%" /> -->
+            </div>
+            <div class="heiader-text">
+              <strong>{{ item.name }}</strong>
+              <div>{{ item.desc }}</div>
+            </div>
           </div>
-          <van-card v-for="product in item.productList" :key="product.productId" :price="product.price"
-            :desc="product.enName" :title="product.name" :thumb="product.picUrl" :origin-price="product.price">
-            <template #footer>
-              <van-icon v-if="product.price < limitPrice" name="add" size="1.5rem" color="#6d86c4"
-                @click="productDetail(product.productId)" />
-              <van-icon v-else name="add" size="1.5rem" color="#bdbec3" />
-            </template>
-          </van-card>
+          <div class="content-section-card">
+            <van-card v-for="product in item.productList" :key="product.productId" :price="product.price"
+              :desc="product.enName" :title="product.name" :thumb="product.picUrl" :origin-price="product.price">
+              <template #footer>
+                <van-icon v-if="product.price < limitPrice" name="add" size="1.5rem" color="#041ba7"
+                  @click="productDetail(product.productId)" />
+                <van-icon v-else name="add" size="1.5rem" color="#bdbec3" />
+              </template>
+            </van-card>
+          </div>
         </div>
       </div>
     </div>
     <div class="new-index-bottom">
       <div class="trade">
         <div class="left">
-          <van-icon name="shop" size="1.8rem" color="#0458b2" @click="cartChange" />
+          <van-icon name="shop" size="1.8rem" color="#041ba7" @click="cartChange" />
           <div class="des">本次交易可选购1商品已选购{{ selectedProduct.selectNum }}商品</div>
         </div>
         <div class='right noactive' v-show="selectedProduct.selectNum === 0"> 不可结算</div>
@@ -321,6 +328,7 @@ const selectedProduct = computed(() => {
       width: 7rem;
       height: calc(90vh - 1rem);
       overflow: scroll;
+      background-color: #f6f6f6;
 
       :deep(.van-sidebar-item) {
         padding: .5rem .7rem;
@@ -330,6 +338,7 @@ const selectedProduct = computed(() => {
         .van-badge__wrapper {
           height: 1rem;
           line-height: 1rem;
+
         }
       }
 
@@ -341,7 +350,7 @@ const selectedProduct = computed(() => {
           width: 0.7rem;
           border-radius: 50%;
           left: -0.2rem;
-          background-color: #0714f6;
+          background-color: #041ba7;
         }
       }
 
@@ -352,37 +361,61 @@ const selectedProduct = computed(() => {
       height: calc(90vh - 1rem);
       overflow: scroll;
       flex: 1;
+      padding-bottom: 3rem;
 
       .content-section {
         margin: 0px 0px 10px 0px;
-        padding: 1rem;
         background-color: #fff;
         border-radius: 1rem;
 
         .content-section-header {
           position: sticky;
           top: 0;
-          padding: 1rem 0rem;
+          padding: 0rem 0rem;
           z-index: 1;
           font-size: 10px;
           background-color: #fff;
-
-          strong {
-            font-size: 1rem;
+          color: #1a1a1a;
+          border-radius: 1rem 1rem 0rem 0rem;
+          .heiader-image{
+            border-radius: 1rem 1rem 0rem 0rem;
+            height: 50px;
+            background-image: url("@/assets/menuItemTitleBg.png");
+            background-size: 100% 100%;
           }
 
-          div {
-            color: #999;
-            font-size: .7rem;
-            white-space: pre-wrap;
+          .heiader-text {
+            padding: 0rem .5rem;
+
+            strong {
+              font-size: 1rem;
+            }
+
+            div {
+              color: #999;
+              font-size: .7rem;
+              white-space: pre-wrap;
+            }
+          }
+
+        }
+
+        .content-section-card {
+          padding: .3rem .2rem;
+
+          :deep(.van-card) {
+            background-color: #fff;
+            padding: .5rem .7rem;
+            margin: 0rem;
+            .van-card__footer {
+              position: absolute;
+              right: 8px;
+              bottom: 8px;
+            }
           }
         }
 
-        .van-card {
-          background-color: #fff;
-          padding: .5rem .3rem;
-          border-bottom: .01rem solid #e5e5e5;
-        }
+
       }
     }
   }
@@ -404,10 +437,10 @@ const selectedProduct = computed(() => {
 
       .left {
         display: flex;
-        padding: .25rem 1rem;
+        padding: .01rem 1rem;
         align-items: center;
         background-color: #ffff;
-        width: 80%;
+        width: 75%;
         font-size: 14px;
         border-radius: 2rem 0rem 0rem 2rem;
         color: grey;
@@ -423,12 +456,12 @@ const selectedProduct = computed(() => {
       }
 
       .right {
-        width: 20%;
+        width: 25%;
         padding: .35rem;
         text-align: center;
         border-radius: 0rem 2rem 2rem 0rem;
         color: #ffff;
-        background-color: #3a30ef;
+        background-color: #041ba7;
       }
 
       .noactive {
