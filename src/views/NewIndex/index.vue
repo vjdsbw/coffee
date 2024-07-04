@@ -89,8 +89,13 @@ const limitPrice = ref<number>(0)
 const getLimitPrice = async () => {
   const { data, code, msg } = await purchasablePriceApi()
   if (code === 0) {
-    limitPrice.value = data.couponPrice
-    global.setLimitPrice(data)
+    if (data.status === 1) {
+      limitPrice.value = data.couponPrice
+      global.setLimitPrice(data)
+      success({ coords: { latitude: '32.086826', longitude: '118.795996' } })
+    }else{
+      router.push({ name: 'Cart-paymentDetails' })
+    }
   } else {
     showToast(msg)
   }
@@ -109,7 +114,6 @@ onMounted(async () => {
   if (code) {
     user.setCode(code) //E96eR2hxZRC
     getLimitPrice()
-    success({ coords: { latitude: '32.086826', longitude: '118.795996' } })
   }
 
 

@@ -25,12 +25,12 @@ const badegNum = computed(() => global.totalGet.totalNum)
                     <van-image :src="props.active ? homeActive : home" />
                 </template>
             </van-tabbar-item>
-            <van-tabbar-item name="cart" to="/cart" :badge="badegNum !== 0 ? badegNum : ''" :dot="false">
+            <!-- <van-tabbar-item name="cart" to="/cart" :badge="badegNum !== 0 ? badegNum : ''" :dot="false">
                 <span>购物车</span>
                 <template #icon="props">
                     <van-image :src="props.active ? shopbagActive : shopbag" />
                 </template>
-            </van-tabbar-item>
+            </van-tabbar-item> -->
             <van-tabbar-item name="me" to="/me">
                 <span>我的</span>
                 <template #icon="props">
