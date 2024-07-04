@@ -37,3 +37,6 @@ export const orderListApi = (params: Order.Detail) => http.get("/api/order/order
 
 // 预创建订单 
 export const preCreateOrderApi = (params: Order.Create) => http.post("/api/order/orderPreview", params);
+
+//取消订单 
+export const orderCancelApi = () => http.post("/api/order/orderCancel");

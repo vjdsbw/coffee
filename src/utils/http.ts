@@ -58,7 +58,9 @@ class RequestHttp {
                 if (config.headers && typeof config.headers.set === 'function' && user.token) {
                     config.headers.set('access_token', user.token);
                 }
-                config.headers.set('code', 'E96eR2hxZRC');
+                if (user.code) {
+                    config.headers.set('code', user.code);
+                }
                 return config;
             },
             (error: AxiosError) => {

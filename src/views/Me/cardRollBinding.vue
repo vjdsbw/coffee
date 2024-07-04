@@ -16,7 +16,7 @@ const CoffeeCouponDetails = (item: any) => {
   router.push({path: '/me/coffeecoupondetails', state: item})
 }
 onMounted(() => {
-    bindUidApi({uidList:['9b939cc0-a78d-495f-a988-c35ca3521b401719940144771']}).then(res => {
+    bindUidApi({uidList:['b93c995d-d6b9-469d-9bec-0cd167e3bfc41720102820651']}).then(res => {
     console.log('获取卡券', res)
     if (res.code === 0) {
       list.value = res.data

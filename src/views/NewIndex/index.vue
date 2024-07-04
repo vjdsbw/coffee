@@ -9,7 +9,7 @@ import Cart from './components/cart.vue'
 import Product from './components/product.vue'
 const router = useRouter();
 
-const { global, order } = Store();
+const { global, order, user } = Store();
 
 const activeSection = ref(0);
 const contentRef = ref<HTMLElement | null>(null);
@@ -87,21 +87,32 @@ const error = (err: any) => {
 const limitPrice = ref<number>(0)
 
 const getLimitPrice = async () => {
-  const { data } = await purchasablePriceApi()
-  limitPrice.value = data.couponPrice
-  global.setLimitPrice(data)
+  const { data, code, msg } = await purchasablePriceApi()
+  if (code === 0) {
+    limitPrice.value = data.couponPrice
+    global.setLimitPrice(data)
+  } else {
+    showToast(msg)
+  }
+
 }
 
 
 onMounted(async () => {
-
   const contentElement = contentRef.value;
   if (contentElement) {
     contentElement.addEventListener("scroll", onScroll);
     contentElement.addEventListener("scrollend", scrollend);
   }
-  getLimitPrice()
-  success({ coords: { latitude: '32.086826', longitude: '118.795996' } })
+  const searchParams = new URL(location.href).searchParams
+  let code = searchParams.get('code')
+  if (code) {
+    user.setCode(code) //E96eR2hxZRC
+    getLimitPrice()
+    success({ coords: { latitude: '32.086826', longitude: '118.795996' } })
+  }
+
+
   // if (navigator.geolocation) {
   // 	navigator.geolocation.getCurrentPosition(success, error, {
   // 		enableHighAccuracy: true,
@@ -162,7 +173,6 @@ const toBuy = async () => {
 }
 
 const cartChange = async () => {
-
   const shop = global.shopGet
   if (shop.storeId) {
     const { data } = await cartListApi({ storeId: shop.storeId });
@@ -216,9 +226,12 @@ const selectedProduct = computed(() => {
         <van-sidebar-item v-for="(item, index) in menuList" :key="item.id" :id="'sidebar' + index"
           @click="scrollToSection(index)">
           <template #title>
-            <van-icon v-show="activeSection === index" :name="item.icon" size="1.5rem" />
-            <div v-show="activeSection !== index && item.tagName && item.tagBgColor" class="sidebar-tagName"
-              :style="{ backgroundColor: item.tagBgColor, color: '#fff' }">{{ item.tagName }}</div>
+            <div>
+              <van-icon v-show="activeSection === index" :name="item.icon" size="1.5rem" />
+            </div>
+            <div v-show="activeSection !== index && item.tagName && item.tagBgColor" class="sidebar-tagName">
+              <span :style="{ backgroundColor: item.tagBgColor, color: '#fff' }">{{ item.tagName }}</span>
+            </div>
             <div>{{ item.name }}</div>
           </template>
         </van-sidebar-item>
@@ -337,20 +350,32 @@ const selectedProduct = computed(() => {
       background-color: #f6f6f6;
 
       :deep(.van-sidebar-item) {
-        padding: .5rem .7rem;
+        padding: .5rem 0rem;
         // border-radius: 0rem 1rem 1rem 0rem;
         // margin-right: .5rem;
         text-align: center;
 
-        .van-badge__wrapper {
+        .van-sidebar-item__text {
           height: 1rem;
-
           // line-height: 1rem;
+          width: 100%;
           text-align: center;
-          .sidebar-tagName{
 
+          .sidebar-tagName {
+            width: 100%;
+            text-align: right;
             font-size: 12px;
             border-radius: 1rem 1rem 1rem 0rem;
+
+            span {
+              display: inline-block;
+              background-color: rgb(194, 163, 121);
+              color: rgb(255, 255, 255);
+              width: 3rem;
+              text-align: center;
+              margin-right: .5rem;
+              border-radius: .6rem .7rem .7rem 0rem;
+            }
           }
 
         }
