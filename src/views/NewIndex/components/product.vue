@@ -1,24 +1,18 @@
-<script setup lang="ts" name="ProductDetail">
-import { productDetailApi, productPriceCalApi, addCartApi } from "@/api/productApi";
+<script setup lang="ts" name="Product">
+import { productPriceCalApi, addCartApi } from "@/api/productApi";
+import { preCreateOrderApi, createOrderApi } from "@/api/orderApi";
 import { Store } from "@/store";
-
-const props = defineProps({
-    info: {
-        type: Object,
-        required: true,
-        default: () => { },
-    },
-});
-const { info } = props
 
 const emits = defineEmits(['closeClick'])
 
 const { global, order } = Store();
 
+const router = useRouter();
+
 const priceDes = ref<{ price: string, skuCode: string, totalPriceDes: string }>({
-    price: info.price,
-    skuCode: info.defaultSkuCode,
-    totalPriceDes: info.totalPriceDes
+    price: order.orderProduct.price,
+    skuCode: order.orderProduct.defaultSkuCode,
+    totalPriceDes: order.orderProduct.totalPriceDes
 })
 
 const productNumber = ref<number>(1)
@@ -29,14 +23,14 @@ const priceCal = ref<{
     selectedAttrList: { attrCode: string, itemCode: string }[]
 }>({
     storeId: global.shop.storeId!,
-    productId: info.productId,
+    productId: order.orderProduct.productId,
     selectedAttrList: []
 })
 
 
 const selectSub = (typeItem: any, attrItem: any) => {
     //设置选择的商品
-    info.saleAttrGroupValue.forEach((item: any) => {
+    detailInfo.value.saleAttrGroupValue.forEach((item: any) => {
         if (item.attrCode === typeItem.attrCode) {
             item.subAttrList.forEach((itm: any) => {
                 itm.isDefault = false;
@@ -46,7 +40,6 @@ const selectSub = (typeItem: any, attrItem: any) => {
             })
         }
     })
-    console.log(info.saleAttrGroupValue, "xxxxxxxxxxxxxx")
     //修改priceCal值
     const idx = priceCal.value.selectedAttrList.findIndex(element => element.attrCode === typeItem.attrCode);
     if (idx !== -1) priceCal.value.selectedAttrList[idx].itemCode = attrItem.itemCode;
@@ -62,7 +55,7 @@ const addCateGory = async () => {
     const { code, data } = await addCartApi({ ...priceCal.value, price: priceDes.value.price, amount: productNumber.value })
     if (code === 0) {
         global.setTotal(data)
-        order.saveOrderIdList([...order.orderIdList, { id: data.id, productId: info.productId, skuCode: priceDes.value.skuCode }])
+        order.saveOrderIdList([...order.orderIdList, { id: data.id, productId: detailInfo.value.productId, skuCode: priceDes.value.skuCode }])
         showToast({
             message: '商品添加成功',
             icon: 'success',
@@ -73,9 +66,30 @@ const addCateGory = async () => {
 
 const back = () => emits('closeClick')
 
-watchEffect(() => {
+const buy = async () => {
+    const shop = global.shopGet
+    let params = {
+        productList: [{
+            skuCode: priceDes.value.skuCode,
+            amount: productNumber.value,
+            productId: order.orderProduct.productId
+        }],
+        storeId: shop.storeId!
+    }
+    const { code } = await preCreateOrderApi(params);
+    if (code === 0) {
+        const res = await createOrderApi(params);
+        if (res.code === 0) {
+            router.push({ name: 'Cart-paymentDetails' })
+        }
+    }
+}
+
+const detailInfo = computed(() => {
+    priceCal.value.storeId = global.shop.storeId!;
+    priceCal.value.productId = order.orderProduct.productId;
     priceCal.value.selectedAttrList = [];
-    info.saleAttrGroupValue.forEach((item: any) => {
+    order.orderProduct.saleAttrGroupValue.forEach((item: any) => {
         let obj = { attrCode: item.attrCode, itemCode: '' }
         item.subAttrList.forEach((itm: any) => {
             if (itm.isDefault) {
@@ -84,14 +98,17 @@ watchEffect(() => {
         })
         priceCal.value.selectedAttrList.push(obj)
     })
+    return order.orderProduct
 })
+
+
 
 </script>
 
 <template>
     <div class="Category-box">
         <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-            <van-swipe-item v-for="url in info.pictureUrlList" :key="url">
+            <van-swipe-item v-for="url in detailInfo.pictureUrlList" :key="url">
                 <van-image :src="url" />
             </van-swipe-item>
             <template #indicator="{ active, total }">
@@ -103,11 +120,17 @@ watchEffect(() => {
             <div @click="back"></div>
         </div>
         <div class="detail name">
-            <p>{{ info.name }} </p>
-            <p>{{ info.enName }} </p>
+            <p>{{ detailInfo.name }} </p>
+            <p>{{ detailInfo.enName }} </p>
         </div>
         <div class="detail select">
-            <div class="choose" v-for="item in info.saleAttrGroupValue" :key="item.attrCode">
+            <div class="choose" v-for="item in detailInfo.showAttrGroupValues" :key="item.attrCode">
+                <div class="choose-analogy">{{ item.attrName }}</div>
+                <div class="choose-gener">
+                    <span class="selected">{{ item.attrValue}}</span>
+                </div>
+            </div>
+            <div class="choose" v-for="item in detailInfo.saleAttrGroupValue" :key="item.attrCode">
                 <div class="choose-analogy">{{ item.attrName }}</div>
                 <div class="choose-gener">
                     <span v-for="itm in item.subAttrList" :key="itm.itemCode"
@@ -119,11 +142,11 @@ watchEffect(() => {
         </div>
         <div class="detail-desc-container">
             <div class="desc-label">商品描述</div>
-            <div class="desc-container" v-html="info.htmlDesc"></div>
+            <div class="desc-container" v-html="detailInfo.htmlDesc"></div>
         </div>
         <div class="detail-desc-container price-contant">
             <div class="desc-label">价格说明</div>
-            <div class="desc-explain">{{ info.priceDesc }}</div>
+            <div class="desc-explain">{{ detailInfo.priceDesc }}</div>
         </div>
         <div class="footer-container">
             <div class="price-number">
@@ -132,7 +155,7 @@ watchEffect(() => {
             </div>
             <div class="total-des">{{ priceDes.totalPriceDes }}</div>
             <div class="footer-btn">
-                <van-button round plain type="success" color="#6d86c4">立即购买</van-button>
+                <van-button round plain type="success" color="#6d86c4" @click="buy">立即购买</van-button>
                 <van-button round type="success" color="#6d86c4" @click="addCateGory">加入购物车</van-button>
             </div>
         </div>

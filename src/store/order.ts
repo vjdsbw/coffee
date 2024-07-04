@@ -6,6 +6,7 @@ interface OrderState {
     orderList: any
     orderCheck: any
     orderIdList: any,
+    orderProduct: any
 }
 
 export const useOrderStore = defineStore({
@@ -16,7 +17,8 @@ export const useOrderStore = defineStore({
         placeInfo: [],
         orderList: [],
         orderCheck: [],
-        orderIdList: []
+        orderIdList: [],
+        orderProduct: {}
     }),
     getters: {
         getPlaceInfo: state => state.placeInfo
@@ -34,5 +36,8 @@ export const useOrderStore = defineStore({
         saveOrderIdList(list: any[]) {
             this.orderIdList = list
         },
+        saveOrderProduct(obj: any) {
+            this.orderProduct = obj
+        }
     },
 });

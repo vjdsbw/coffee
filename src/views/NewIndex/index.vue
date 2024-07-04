@@ -5,8 +5,8 @@ import { purchasablePriceApi } from '@/api/productApi'
 import { productDetailApi, cartListApi } from "@/api/productApi";
 import { preCreateOrderApi, createOrderApi } from "@/api/orderApi";
 import { Store } from "@/store";
-import ProductDetail from './components/productDetail.vue'
 import Cart from './components/cart.vue'
+import Product from './components/product.vue'
 const router = useRouter();
 
 const { global, order } = Store();
@@ -124,11 +124,10 @@ onUnmounted(() => {
 
 
 const showBottom = ref<boolean>(false)
-const detailInfo = ref<any>({})
 const closePopUp = () => showBottom.value = false;
 const productDetail = async (productId: string) => {
   const { data } = await productDetailApi({ productId: productId });
-  detailInfo.value = data;
+  order.saveOrderProduct(data)
   showBottom.value = true;
 }
 
@@ -203,19 +202,26 @@ const selectedProduct = computed(() => {
 <template>
   <div class="new-index">
     <div class="top">
-      <van-image  :src="lookStore"></van-image>
+      <van-image :src="lookStore"></van-image>
       <div class="top-right">
-        <div>{{ global.shop.name }}{{ global.shop.number }} <van-icon name="arrow" v-show="global.shop.name"/> </div>
+        <div>{{ global.shop.name }}{{ global.shop.number }} <van-icon name="arrow" v-show="global.shop.name" /> </div>
         <div>
-          <van-icon name="location-o" v-show="global.shop.distance"/>
+          <van-icon name="location-o" v-show="global.shop.distance" />
           <span v-show="global.shop.distance">距您{{ global.shop.distance }} </span> {{ global.shop.address }}
         </div>
       </div>
     </div>
     <div class="sider-product">
       <van-sidebar v-model="activeSection">
-        <van-sidebar-item v-for="(item, index) in menuList" :key="item.id" :title="item.name" :id="'sidebar' + index"
-          @click="scrollToSection(index)"></van-sidebar-item>
+        <van-sidebar-item v-for="(item, index) in menuList" :key="item.id" :id="'sidebar' + index"
+          @click="scrollToSection(index)">
+          <template #title>
+            <van-icon v-show="activeSection === index" :name="item.icon" size="1.5rem" />
+            <div v-show="activeSection !== index && item.tagName && item.tagBgColor" class="sidebar-tagName"
+              :style="{ backgroundColor: item.tagBgColor, color: '#fff' }">{{ item.tagName }}</div>
+            <div>{{ item.name }}</div>
+          </template>
+        </van-sidebar-item>
       </van-sidebar>
 
       <!-- 右侧 Content -->
@@ -223,7 +229,7 @@ const selectedProduct = computed(() => {
         <div class="content-section" v-for="(item, index) in menuList" :key="item.id" :id="'sidebarSelct' + index">
           <div class="content-section-header">
             <div class="heiader-image">
-              <!-- <van-image height="30%" src="./src/assets/menuItemTitleBg.png" width="100%" /> -->
+              <van-image height="100%" :src="item.sourceUrl" width="100%" v-show="item.sourceUrl" />
             </div>
             <div class="heiader-text">
               <strong>{{ item.name }}</strong>
@@ -254,7 +260,7 @@ const selectedProduct = computed(() => {
       </div>
     </div>
     <van-popup v-model:show="showBottom" position="bottom" :style="{ height: '100%' }">
-      <ProductDetail :info="detailInfo" @closeClick="closePopUp"></ProductDetail>
+      <Product @closeClick="closePopUp"></Product>
     </van-popup>
     <van-popup v-model:show="showCarBottom" position="bottom" z-index="3" style="border-radius: 1rem 1rem 0px 0px;">
       <Cart></Cart>
@@ -332,12 +338,20 @@ const selectedProduct = computed(() => {
 
       :deep(.van-sidebar-item) {
         padding: .5rem .7rem;
-        border-radius: 0rem 1rem 1rem 0rem;
-        margin-right: .5rem;
+        // border-radius: 0rem 1rem 1rem 0rem;
+        // margin-right: .5rem;
+        text-align: center;
 
         .van-badge__wrapper {
           height: 1rem;
-          line-height: 1rem;
+
+          // line-height: 1rem;
+          text-align: center;
+          .sidebar-tagName{
+
+            font-size: 12px;
+            border-radius: 1rem 1rem 1rem 0rem;
+          }
 
         }
       }
@@ -346,9 +360,9 @@ const selectedProduct = computed(() => {
         background-color: #e3e3e3;
 
         &::before {
-          height: 25%;
-          width: 0.7rem;
-          border-radius: 50%;
+          height: 80%;
+          width: 0.4rem;
+          // border-radius: 50%;
           left: -0.2rem;
           background-color: #041ba7;
         }
@@ -377,10 +391,11 @@ const selectedProduct = computed(() => {
           background-color: #fff;
           color: #1a1a1a;
           border-radius: 1rem 1rem 0rem 0rem;
-          .heiader-image{
+
+          .heiader-image {
             border-radius: 1rem 1rem 0rem 0rem;
             height: 50px;
-            background-image: url("@/assets/menuItemTitleBg.png");
+            // background-image: url("@/assets/menuItemTitleBg.png");
             background-size: 100% 100%;
           }
 
@@ -407,6 +422,7 @@ const selectedProduct = computed(() => {
             background-color: #fff;
             padding: .5rem .7rem;
             margin: 0rem;
+
             .van-card__footer {
               position: absolute;
               right: 8px;
