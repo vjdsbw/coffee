@@ -33,8 +33,15 @@ function getRandomInt(min: number, max: number): number {
 const getShortUrl = () => {
   if (fieldValue.value && uid.value) {
     // generateShortCodeApi({couponId: fieldValue.value ?? getRandomInt(100, 100000), uid: uid.value ?? 'b93c995d-d6b9-469d-9bec-0cd167e3bfc41720102820651', couponPrice: getRandomInt(100, 1000)}).then(res => {
-    generateShortCodeApi({couponId: fieldValue.value, uid: uid.value, couponPrice: 1000}).then(res => {
+    const price: any = couponList.value?.filter((v: any) => v?.couponId === fieldValue.value)
+    console.log(price?.discountDegree)
+    generateShortCodeApi({
+      couponId: fieldValue.value,
+      uid: uid.value,
+      couponPrice: price?.discountDegree ?? 100
+    }).then(res => {
       httpUrl.value = res.data
+      showToast('短链生成成功，点击复制链接')
       console.log(res)
     })
   } else {
@@ -59,8 +66,16 @@ const showSelectCoupon = () => {
 const copyUrl = async () => {
   console.log(httpUrl.value, '短链')
   try {
-    await navigator.clipboard.writeText(httpUrl.value);
-    showToast('复制链接成功')
+    if (httpUrl.value) {
+      await navigator.clipboard.writeText(httpUrl.value);
+      showToast('复制链接成功,3秒后跳转')
+      setTimeout(() => {
+        window.open(httpUrl.value)
+      }, 3000)
+    } else {
+      showToast('暂无链接，请先生成短链')
+
+    }
   } catch (err) {
     showToast('复制链接失败')
     console.error('Failed to copy text: ', err);
@@ -90,6 +105,7 @@ const bindUid = () => {
 const getCoupon = () => {
   getCouponListApi().then(res => {
     if (res.code === 0) {
+      uid.value = ''
       res.data?.map((v: any) => {
         couponList.value.push({text: v?.coffeeStockTitle, value: v?.couponId},)
       })
@@ -141,6 +157,7 @@ const getCoupon = () => {
 
           <van-field v-model="fieldValue" is-link label="选择咖啡券" readonly @click="showSelectCoupon"/>
           <van-popup v-model:show="showPicker" position="bottom" round>
+
             <van-picker :columns="couponList" @cancel="showPicker = false" @confirm="onConfirm"/>
           </van-popup>
 
@@ -150,7 +167,7 @@ const getCoupon = () => {
           <div class="edit-btn">
             <van-button color="#7585BE" round size="small" @click="bindUid">绑定咖啡券</van-button>
             <van-button color="#7585BE" round size="small" @click="getShortUrl">生成短链</van-button>
-            <van-button color="#7585BE" round size="small" @click="copyUrl">复制链接</van-button>
+            <van-button color="#7585BE" round size="small" @click="copyUrl">跳转链接</van-button>
             <!--            <van-button color="#7585BE" round>查询状态</van-button>-->
             <!--            <van-button color="#7585BE" round>删除链接</van-button>-->
             <!--            <van-button color="#7585BE" round>券型删除</van-button>-->
