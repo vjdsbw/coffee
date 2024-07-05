@@ -1,13 +1,12 @@
 <script setup lang="ts" name="Me">
 
-import {generateShortCodeApi, getCouponListApi} from "@/api/user.ts";
+import {bindUidApi, generateShortCodeApi, getCouponListApi} from "@/api/user.ts";
 
-const myInfo = ref<any>({})
-const url = ref<any>()
-const httpUrl = ref<any>()
-const totalNum = ref<any>('')
-const type = ref<any>('')
 const router = useRouter()
+
+const uid = ref<any>()
+const httpUrl = ref<any>()
+
 
 const list = [
   {title: "我的订单信息", path: "/me/orderInfo"},
@@ -16,24 +15,10 @@ const list = [
 ]
 
 const couponList = ref<{ text: string, value: string }[]>([]) //卡券列表
-// const columns = [
-//   {text: '杭州', value: 'Hangzhou'},
-//   {text: '宁波', value: 'Ningbo'},
-//   {text: '温州', value: 'Wenzhou'},
-//   {text: '绍兴', value: 'Shaoxing'},
-//   {text: '湖州', value: 'Huzhou'},
-// ];
 
 const fieldValue = ref();
 const showPicker = ref(false);
 
-const getUserInfo = async () => {
-  console.log(myInfo)
-}
-
-const toMyDetail = (str: string) => {
-  router.push(str)
-}
 
 function getRandomInt(min: number, max: number): number {
   // 确保min小于max
@@ -44,38 +29,33 @@ function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+// 生成短链
 const getShortUrl = () => {
-  console.log({
-    couponId: fieldValue.value ?? getRandomInt(100, 100000),
-    uid: url.value ?? 'b93c995d-d6b9-469d-9bec-0cd167e3bfc41720102820651',
-    couponPrice: getRandomInt(100, 1000)
-  })
-  generateShortCodeApi({
-    couponId: fieldValue.value ?? getRandomInt(100, 100000),
-    uid: url.value ?? 'b93c995d-d6b9-469d-9bec-0cd167e3bfc41720102820651',
-    couponPrice: getRandomInt(100, 1000)
-  }).then(res => {
-    // generateShortCodeApi({couponId: fieldValue.value, uid:url.value, couponPrice: 1000}).then(res => {
-    httpUrl.value = res.data
-    console.log(res)
-  })
-
+  if (fieldValue.value && uid.value) {
+    // generateShortCodeApi({couponId: fieldValue.value ?? getRandomInt(100, 100000), uid: uid.value ?? 'b93c995d-d6b9-469d-9bec-0cd167e3bfc41720102820651', couponPrice: getRandomInt(100, 1000)}).then(res => {
+    generateShortCodeApi({couponId: fieldValue.value, uid: uid.value, couponPrice: 1000}).then(res => {
+      httpUrl.value = res.data
+      console.log(res)
+    })
+  } else {
+    showToast('请输入uid或者选择咖啡券')
+  }
 }
-
 
 const onConfirm = ({selectedOptions}: any) => {
   showPicker.value = false;
-  fieldValue.value = selectedOptions[0].text;
+  fieldValue.value = selectedOptions[0].value;
 };
 
 const showSelectCoupon = () => {
   if (couponList.value.length !== 0) {
     showPicker.value = true
   } else {
-    showToast('没有咖啡券')
+    showToast('请先输入uid加载咖啡券')
   }
 }
 
+// 复制生成的短链
 const copyUrl = async () => {
   console.log(httpUrl.value, '短链')
   try {
@@ -86,12 +66,29 @@ const copyUrl = async () => {
     console.error('Failed to copy text: ', err);
   }
 }
-onMounted(() => {
-  getUserInfo()
 
-  // 获取咖啡卡券
+// 根据输入的uid绑定咖啡券
+const bindUid = () => {
+  // bindUidApi({uidList: ['b93c995d-d6b9-469d-9bec-0cd167e3bfc41720102820651']}).then(res => {
+  if (uid.value) {
+    bindUidApi({uidList: [uid.value]}).then(res => {
+      console.log('获取卡券', res)
+      if (res.code === 0) {
+        getCoupon()
+      }
+
+      if (res.code === 500) {
+        showToast(res.msg);
+      }
+    })
+  } else {
+    showToast('请输入uid')
+  }
+}
+
+// 获取咖啡卡券
+const getCoupon = () => {
   getCouponListApi().then(res => {
-    console.log('获取卡券', res)
     if (res.code === 0) {
       res.data?.map((v: any) => {
         couponList.value.push({text: v?.coffeeStockTitle, value: v?.couponId},)
@@ -102,8 +99,9 @@ onMounted(() => {
       showToast(res.msg);
     }
   })
+}
 
-})
+
 </script>
 
 <template>
@@ -132,30 +130,30 @@ onMounted(() => {
     <div class="container">
       <div class="info">
         <van-cell-group>
-          <van-cell v-for="item in list" :title="item.title" icon="newspaper-o" is-link @click="toMyDetail(item.path)"/>
+          <van-cell v-for="item in list" :title="item.title" icon="newspaper-o" is-link
+                    @click="router.push(item.path)"/>
         </van-cell-group>
       </div>
       <div class="short-url">
         <van-cell-group inset>
+          <van-field v-model="uid" :autosize='{ maxHeight: 100}' clearable placeholder="请输入链接/uid" rows="1"
+                     type="textarea"/>
+
           <van-field v-model="fieldValue" is-link label="选择咖啡券" readonly @click="showSelectCoupon"/>
           <van-popup v-model:show="showPicker" position="bottom" round>
             <van-picker :columns="couponList" @cancel="showPicker = false" @confirm="onConfirm"/>
           </van-popup>
 
-          <van-field v-model="url" :autosize='{ maxHeight: 100}' clearable placeholder="请输入链接/uid" rows="1"
-                     type="textarea"/>
-          <van-field v-model="totalNum" clearable placeholder="请输入条数" type="text"/>
-          <van-field v-model="type" clearable placeholder="请输入支付类型" type="text"/>
-          <van-field v-model="type" clearable placeholder="请选择优惠券" type="text"/>
-          <van-field v-model="httpUrl" clearable clickable placeholder="短链" type="text"/>
+
+          <!--  <van-field v-model="httpUrl" clearable clickable placeholder="短链" type="text"/>-->
 
           <div class="edit-btn">
-            <van-button color="#7585BE" round @click="copyUrl">复制链接</van-button>
-            <van-button color="#7585BE" round @click="httpUrl=''">清空链接</van-button>
-            <van-button color="#7585BE" round @click="getShortUrl">生成短链</van-button>
-            <van-button color="#7585BE" round>查询状态</van-button>
-            <van-button color="#7585BE" round>删除链接</van-button>
-            <van-button color="#7585BE" round>券型删除</van-button>
+            <van-button color="#7585BE" round size="small" @click="bindUid">绑定咖啡券</van-button>
+            <van-button color="#7585BE" round size="small" @click="getShortUrl">生成短链</van-button>
+            <van-button color="#7585BE" round size="small" @click="copyUrl">复制链接</van-button>
+            <!--            <van-button color="#7585BE" round>查询状态</van-button>-->
+            <!--            <van-button color="#7585BE" round>删除链接</van-button>-->
+            <!--            <van-button color="#7585BE" round>券型删除</van-button>-->
           </div>
         </van-cell-group>
 
@@ -287,7 +285,7 @@ onMounted(() => {
     .edit-btn {
       margin: .5rem 0;
       display: flex;
-      justify-content: space-around;
+      justify-content: flex-start;
       flex-wrap: wrap;
 
       & > button {

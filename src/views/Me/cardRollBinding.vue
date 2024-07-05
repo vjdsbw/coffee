@@ -7,7 +7,6 @@ const list = ref<any>([])
 const onClickLeft = () => history.back()
 
 
-
 const titleClick = () => {
   show.value = !show.value
 }
@@ -15,8 +14,9 @@ const titleClick = () => {
 const CoffeeCouponDetails = (item: any) => {
   router.push({path: '/me/coffeecoupondetails', state: item})
 }
+
 onMounted(() => {
-    bindUidApi({uidList:['b93c995d-d6b9-469d-9bec-0cd167e3bfc41720102820651']}).then(res => {
+  bindUidApi({uidList: ['b93c995d-d6b9-469d-9bec-0cd167e3bfc41720102820651']}).then(res => {
     console.log('获取卡券', res)
     if (res.code === 0) {
       list.value = res.data
@@ -48,7 +48,7 @@ onMounted(() => {
         <div class="wallet-item-top"> {{ item?.coffeeStockTitle }}</div>
         <div class="wallet-item-bottom">
           <div class="wallet-item-text">
-            <div>¥{{ item?.discountDegree }} </div>
+            <div>¥{{ item?.discountDegree }}</div>
             <div>尚余{{ item?.discountDegree }} 杯</div>
           </div>
           <div class="wallet-item-img">

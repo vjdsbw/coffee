@@ -104,7 +104,7 @@ onMounted(() => {
   .wallet-content {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-evenly;
+    justify-content: flex-start;
 
     .wallet-item {
       width: 50%;
