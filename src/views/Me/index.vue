@@ -105,7 +105,6 @@ const bindUid = () => {
 const getCoupon = () => {
   getCouponListApi().then(res => {
     if (res.code === 0) {
-      uid.value = ''
       res.data?.map((v: any) => {
         couponList.value.push({text: v?.coffeeStockTitle, value: v?.couponId},)
       })
