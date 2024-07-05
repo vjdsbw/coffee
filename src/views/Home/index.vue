@@ -1,8 +1,8 @@
 <script setup lang="ts" name="Home">
 import categoryTop from "@/assets/category/category-top.png";
-import { nearestApi, productMenuApi } from '@/api/storeApi'
-import { purchasablePriceApi } from '@/api/productApi'
-import { Store } from "@/store";
+import {nearestApi, productMenuApi} from '@/api/storeApi'
+import {purchasablePriceApi} from '@/api/productApi'
+import {Store} from "@/store";
 
 const router = useRouter();
 
@@ -100,17 +100,17 @@ onMounted(async () => {
 		contentElement.addEventListener("scroll", onScroll);
 		contentElement.addEventListener("scrollend", scrollend);
 	}
-	getLimitPrice()
-	success({ coords: { latitude: '32.086826', longitude: '118.795996' } })
-	// if (navigator.geolocation) {
-	// 	navigator.geolocation.getCurrentPosition(success, error, {
-	// 		enableHighAccuracy: true,
-	// 		timeout: 5000,
-	// 		maximumAge: 0
-	// 	});
-	// } else {
-	// 	console.log("Geolocation is not supported by this browser.");
-	// }
+  await getLimitPrice()
+  // success({ coords: { latitude: '32.086826', longitude: '118.795996' } })
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(success, error, {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0
+    });
+  } else {
+    console.log("Geolocation is not supported by this browser.");
+  }
 
 });
 
