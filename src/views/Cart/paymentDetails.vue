@@ -2,9 +2,6 @@
 import { Store } from "@/store";
 import { orderDetailApi, orderCancelApi } from "@/api/orderApi.ts";
 
-const { order, global } = Store();
-const shop = global.shopGet
-const placeInfo = order.getPlaceInfo
 const onClickLeft = () => history.back()
 const show = ref(false);
 const lookCode = () => {
@@ -15,10 +12,12 @@ const orderDetail = ref()
 const total = computed(() => {
 	let price = 0;
 	let number = 0;
-	placeInfo.forEach((item: any) => {
-		number += Number(item.amount)
-		price += Number(item.amount) * Number(item.price)
-	});
+	if (orderDetail.value) {
+		orderDetail.value.productList.forEach((item: any) => {
+			number += Number(item.amount)
+			price += Number(item.amount) * Number(item.initialPrice)
+		});
+	}
 	return {
 		price: price,
 		number: number
@@ -33,7 +32,7 @@ const cancelOrder = async () => {
 }
 
 onMounted(() => {
-	orderDetailApi({ code: '', orderId: String(shop?.storeId) }).then(res => {
+	orderDetailApi().then(res => {
 		orderDetail.value = res.data
 		console.log(res, '获取订单详情')
 	})
@@ -53,15 +52,15 @@ onMounted(() => {
 			</div>
 		</div>
 		<div class="pre address">
-			<div>{{ shop.name ?? orderDetail?.shopName }}({{ shop.number }})</div>
-			<div>{{ shop.address ?? orderDetail?.shopAddress }}</div>
+			<div>{{ orderDetail?.shopName }}()</div>
+			<div>{{  orderDetail?.shopAddress }}</div>
 		</div>
 		<div class="pre order-info">
 			<p>自提订单:{{ orderDetail?.orderNo }}</p>
 			<div class="driver">
-				<van-card v-for="item in placeInfo" :key="item.id" :num="item.amount" :price="item.price"
-					:desc="item.saleAttrNames" :title="item.productName + item.showAttrNames"
-					:thumb="item.productPicUrl" />
+				<van-card v-for="item in orderDetail?.productList" :key="item.productId" :num="item.amount"
+					:price="item.initialPrice" :desc="item.saleAttrNames" :title="item.name + item.additionDesc"
+					:thumb="item.bigPicUrl" />
 			</div>
 			<div class="driver">
 				<div class="preferential reduction">
@@ -74,8 +73,8 @@ onMounted(() => {
 				</div>
 			</div>
 			<div class="order-total">
-				<div>共{{ total.number }}件商品</div>
-				<div>实付 <span>¥{{ total.price }}</span></div>
+				<div>共{{ orderDetail?.productAmount }}件商品</div>
+				<div>实付 <span>¥{{ orderDetail?.orderPayAmount }}</span></div>
 			</div>
 		</div>
 		<div class="pre order-time">

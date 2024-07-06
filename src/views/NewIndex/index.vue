@@ -1,9 +1,9 @@
 <script setup lang="ts" name="new-index">
 import lookStore from "@/assets/lookStore.png";
-import {nearestApi, productMenuApi} from '@/api/storeApi'
-import {cartListApi, productDetailApi, purchasablePriceApi} from '@/api/productApi'
-import {createOrderApi, preCreateOrderApi} from "@/api/orderApi";
-import {Store} from "@/store";
+import { nearestApi, productMenuApi } from '@/api/storeApi'
+import { cartListApi, productDetailApi, purchasablePriceApi } from '@/api/productApi'
+import { createOrderApi, preCreateOrderApi } from "@/api/orderApi";
+import { Store } from "@/store";
 import Cart from './components/cart.vue'
 import Product from './components/product.vue'
 
@@ -66,6 +66,18 @@ const chooseShop = () => {
   router.push({ name: "Home-chooseShop" })
 }
 
+const getLocation = () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(success, error, {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0
+    });
+  } else {
+    console.log("Geolocation is not supported by this browser.");
+  }
+}
+
 const success = async (pos: any) => {
   const { latitude, longitude } = pos.coords;
   global.setLatAndLon({ lat: latitude, lon: longitude })
@@ -79,10 +91,7 @@ const success = async (pos: any) => {
   }
 }
 
-const error = (err: any) => {
-  console.warn(`ERROR(${err.code}): ${err.message}`, 'xxxxxxxxxxxxxx');
-}
-
+const error = (err: any) => showToast(`ERROR(${err.code}): ${err.message}`)
 
 const limitPrice = ref<number>(0)
 
@@ -92,14 +101,13 @@ const getLimitPrice = async () => {
     if (data.status === 1) {
       limitPrice.value = data.couponPrice
       global.setLimitPrice(data)
-      // success({ coords: { latitude: '32.086826', longitude: '118.795996' } })
-    }else{
+      getLocation()
+    } else {
       router.push({ name: 'Cart-paymentDetails' })
     }
   } else {
     showToast(msg)
   }
-
 }
 
 
@@ -115,18 +123,6 @@ onMounted(async () => {
     user.setCode(code) //E96eR2hxZRC
     getLimitPrice()
   }
-
-
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(success, error, {
-      enableHighAccuracy: true,
-      timeout: 5000,
-      maximumAge: 0
-    });
-  } else {
-    console.log("Geolocation is not supported by this browser.");
-  }
-
 });
 
 onUnmounted(() => {

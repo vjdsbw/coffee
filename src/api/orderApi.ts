@@ -30,7 +30,7 @@ export const cancelOrderApi = (params: Order.Cancel) => http.get("/api/order/can
 export const createOrderApi = (params: Order.Create) => http.post("/api/order/createOrder", params);
 
 // 查询取餐码 
-export const orderDetailApi = (params: Order.Detail) => http.get("/api/order/orderDetail", params);
+export const orderDetailApi = () => http.get("/api/order/orderDetail");
 
 // 查询我的订单列表 
 export const orderListApi = (params: Order.Detail) => http.get("/api/order/orderList", params);
