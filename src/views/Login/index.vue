@@ -1,9 +1,9 @@
 <script lang="ts" name="Login" setup>
 import homeActive from '@/assets/icons/home_active.png';
-import {Store} from '@/store';
-import {getPublicKeyApi, loginApi} from "@/api/storeApi.ts";
+import { Store } from '@/store';
+import { getPublicKeyApi, loginApi } from "@/api/storeApi.ts";
 
-const {user} = Store();
+const { user } = Store();
 const router = useRouter()
 
 interface loginForm {
@@ -11,7 +11,7 @@ interface loginForm {
   enPwd: string,
 }
 
-const loginForm = ref<loginForm>({accountId: "", enPwd: "123456",});
+const loginForm = ref<loginForm>({ accountId: "", enPwd: "123456", });
 let publicKey = ref('')
 
 
@@ -28,7 +28,7 @@ const submitLogin = async () => {
   console.log(loginForm.value, "加密后")
   let res = await loginApi(loginForm.value)
   user.setToken(res.data)
-  await router.push('/')
+  await router.push('/me')
   if (res.code === 200) {
 
   } else {
@@ -43,13 +43,16 @@ const onSubmit = (values: any) => {
   submitLogin()
 };
 
+// 获取公钥
+const getPublicKey = async () => {
+  const { code, data } = await getPublicKeyApi();
+  if(code === 0){
+    publicKey.value = data;
+  }
+}
+
 onMounted(() => {
-  // 获取公钥
-  getPublicKeyApi().then(res => {
-    publicKey.value = res.msg
-    if (res.code === 200) {
-    }
-  })
+  getPublicKey()
 })
 
 </script>
@@ -58,7 +61,7 @@ onMounted(() => {
   <div class="login-box">
     <div class="top">
       <div class="left">
-        <van-image :src="homeActive"/>
+        <van-image :src="homeActive" />
         <div>Lucking Coffee</div>
       </div>
       <div class="right" @click="toBack">先逛一逛</div>
@@ -67,21 +70,10 @@ onMounted(() => {
       <div class="welcome">欢迎回来！</div>
       <van-form @submit="onSubmit">
         <van-cell-group inset>
-          <van-field
-              v-model="loginForm.accountId"
-              :rules="[{ required: false, message: '请填写用户名' }]"
-              label="用户名"
-              name="accountId"
-              placeholder="用户名"
-          />
-          <van-field
-              v-model="loginForm.enPwd"
-              :rules="[{ required: false, message: '请填写密码' }]"
-              label="密码"
-              name="enPwd"
-              placeholder="密码"
-              type="password"
-          />
+          <van-field v-model="loginForm.accountId" :rules="[{ required: false, message: '请填写用户名' }]" label="用户名"
+            name="accountId" placeholder="用户名" />
+          <van-field v-model="loginForm.enPwd" :rules="[{ required: false, message: '请填写密码' }]" label="密码" name="enPwd"
+            placeholder="密码" type="password" />
         </van-cell-group>
         <div style="margin: 16px;">
           <van-button block native-type="submit" round type="primary">
@@ -97,11 +89,10 @@ onMounted(() => {
 </template>
 
 <route lang="json">{
-"meta": {
-"layout": false
-}
-}
-</route>
+  "meta": {
+    "layout": false
+  }
+}</route>
 
 <style scoped lang="scss">
 .login-box {

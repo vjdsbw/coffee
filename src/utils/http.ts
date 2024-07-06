@@ -56,7 +56,7 @@ class RequestHttp {
             (config: CustomAxiosRequestConfig) => {
                 const { user } = Store();
                 if (config.headers && typeof config.headers.set === 'function' && user.token) {
-                    config.headers.set('access_token', user.token);
+                    config.headers.set('token', user.token);
                 }
                 if (user.code) {
                     config.headers.set('code', user.code);

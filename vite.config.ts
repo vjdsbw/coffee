@@ -10,6 +10,7 @@ import VueSetupExtend from 'vite-plugin-vue-setup-extend'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: "/",
   plugins: [
     vue(),
     AutoImport({
@@ -40,7 +41,7 @@ export default defineConfig({
       routeBlockLang: 'json', // 路由块的语言，yaml 或 json
       extendRoute(route) {
         if (route.path === '/') {
-          return { ...route, redirect: '/home' }
+          return { ...route, redirect: '/login' }
         }
       },
       importMode: 'async'

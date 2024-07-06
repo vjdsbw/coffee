@@ -63,7 +63,7 @@ const getMenus = async (id: number) => {
 }
 
 const chooseShop = () => {
-  router.push({ name: "Home-chooseShop" })
+  router.push({ name: "NewIndex-chooseShop" })
 }
 
 const getLocation = () => {
@@ -214,9 +214,9 @@ const selectedProduct = computed(() => {
     <div class="top">
       <van-image :src="lookStore"></van-image>
       <div class="top-right">
-        <div>{{ global.shop.name }}{{ global.shop.number }} <van-icon name="arrow" v-show="global.shop.name" /> </div>
+        <div>{{ global.shop.name }}{{ global.shop.number }} <van-icon name="arrow" v-show="global.shop.name" @click="chooseShop" /> </div>
         <div>
-          <van-icon name="location-o" v-show="global.shop.distance" />
+          <van-icon name="location-o" v-show="global.shop.distance"  />
           <span v-show="global.shop.distance">距您{{ global.shop.distance }} </span> {{ global.shop.address }}
         </div>
       </div>

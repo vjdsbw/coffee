@@ -1,5 +1,5 @@
 <script setup lang="ts" name="Me">
-
+import Avatar from '@/assets/me/default_avatar.png'
 import {bindUidApi, generateShortCodeApi, getCouponListApi} from "@/api/user.ts";
 
 const router = useRouter()
@@ -11,7 +11,7 @@ const httpUrl = ref<any>()
 const list = [
   {title: "我的订单信息", path: "/me/orderInfo"},
   {title: "我的咖啡信息", path: "/me/coffeeInfo"},
-  {title: "咖啡卡卷", path: "/me/cardRollBinding"},
+  // {title: "咖啡卡卷", path: "/me/cardRollBinding"},
 ]
 
 const couponList = ref<{ text: string, value: string }[]>([]) //卡券列表
@@ -115,19 +115,15 @@ const getCoupon = () => {
     }
   })
 }
-
-
 </script>
 
 <template>
   <div class="me-box">
     <div class="back">
       <div class="person">
-        <van-image round src="../src/assets/me/userPic.png"></van-image>
+        <van-image round :src="Avatar"></van-image>
         <div class="right">
-          <div class="content">
-            这家伙很懒，什么都没有留下！
-          </div>
+          <div class="content">你好，管理员</div>
         </div>
       </div>
       <div class="wallet-box">
@@ -180,7 +176,7 @@ const getCoupon = () => {
 
 <route lang="json">{
 "meta": {
-"layout": "index",
+"layout": false,
 "authority":true
 }
 }
@@ -204,7 +200,7 @@ const getCoupon = () => {
 
     .person {
       display: flex;
-
+      align-items: center;
       .van-image {
         width: 3.75rem;
         height: 3.75rem;
@@ -220,14 +216,11 @@ const getCoupon = () => {
         .content {
           //font-size: 0.78rem;
           //margin-top: 0.62rem;
-          height: .6rem;
           font-size: 1.2rem;
           color: #fff;
           font-weight: bolder;
           word-break: break-all;
           word-wrap: break-word;
-          line-height: .6rem;
-
         }
       }
     }
@@ -305,7 +298,7 @@ const getCoupon = () => {
       flex-wrap: wrap;
 
       & > button {
-        margin: .5rem 1rem;
+        margin: .5rem .8rem;
         width: 25%;
       }
     }
