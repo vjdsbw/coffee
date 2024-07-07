@@ -52,7 +52,7 @@ onMounted(() => {
 			</div>
 		</div>
 		<div class="pre address">
-			<div>{{ orderDetail?.shopName }}()</div>
+			<div>{{ orderDetail?.shopName }}</div>
 			<div>{{  orderDetail?.shopAddress }}</div>
 		</div>
 		<div class="pre order-info">
@@ -86,7 +86,7 @@ onMounted(() => {
 			</template>
 			<div>
 				<div class="pickup-code">
-					<h2>{{ orderDetail?.pickUpCode }}</h2>
+					<h2 style="color: black;">{{ orderDetail?.pickUpCode }}</h2>
 					<p>取餐码</p>
 				</div>
 			</div>
