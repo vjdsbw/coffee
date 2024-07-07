@@ -86,7 +86,7 @@ onMounted(() => {
 			</template>
 			<div>
 				<div class="pickup-code">
-					<h2 style="color: black;">{{ orderDetail?.pickUpCode }}</h2>
+					<h2>{{ orderDetail?.pickUpCode }}</h2>
 					<p>取餐码</p>
 				</div>
 			</div>
@@ -232,6 +232,7 @@ onMounted(() => {
 
 			h2 {
 				margin-bottom: 0rem;
+				color: black;
 			}
 
 			p {
