@@ -49,7 +49,7 @@ onMounted(() => {
         <div class="wallet-item-bottom">
           <div class="wallet-item-text">
             <div>¥{{ item?.discountDegree }}</div>
-            <div>尚余{{ item?.discountDegree }} 杯</div>
+            <div>尚余1杯</div>
           </div>
           <div class="wallet-item-img">
             <van-image
