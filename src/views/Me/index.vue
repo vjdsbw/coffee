@@ -1,6 +1,6 @@
 <script setup lang="ts" name="Me">
 import Avatar from '@/assets/me/default_avatar.png'
-import {bindUidApi, generateShortCodeApi, getCouponListApi} from "@/api/user.ts";
+import { bindUidApi, generateShortCodeApi, getCouponListApi } from "@/api/user.ts";
 
 const router = useRouter()
 
@@ -9,8 +9,8 @@ const httpUrl = ref<any>()
 
 
 const list = [
-  {title: "我的订单信息", path: "/me/orderInfo"},
-  {title: "我的咖啡信息", path: "/me/coffeeInfo"},
+  { title: "我的订单信息", path: "/me/orderInfo" },
+  { title: "我的咖啡信息", path: "/me/coffeeInfo" },
   // {title: "咖啡卡卷", path: "/me/cardRollBinding"},
 ]
 
@@ -49,7 +49,7 @@ const getShortUrl = () => {
   }
 }
 
-const onConfirm = ({selectedOptions}: any) => {
+const onConfirm = ({ selectedOptions }: any) => {
   showPicker.value = false;
   fieldValue.value = selectedOptions[0].value;
 };
@@ -86,7 +86,7 @@ const copyUrl = async () => {
 const bindUid = () => {
   // bindUidApi({uidList: ['b93c995d-d6b9-469d-9bec-0cd167e3bfc41720102820651']}).then(res => {
   if (uid.value) {
-    bindUidApi({uidList: [uid.value]}).then(res => {
+    bindUidApi({ uidList: [uid.value] }).then(res => {
       console.log('获取卡券', res)
       if (res.code === 0) {
         getCoupon()
@@ -103,10 +103,11 @@ const bindUid = () => {
 
 // 获取咖啡卡券
 const getCoupon = () => {
+  couponList.value = [];
   getCouponListApi().then(res => {
     if (res.code === 0) {
       res.data?.map((v: any) => {
-        couponList.value.push({text: v?.coffeeStockTitle, value: v?.couponId},)
+        couponList.value.push({ text: v?.coffeeStockTitle, value: v?.couponId },)
       })
     }
 
@@ -131,7 +132,7 @@ const getCoupon = () => {
           <div class="coffee-num">1杯</div>
           <div class="coffee-text ">剩余可下咖啡</div>
         </div>
-        <hr class="line"/>
+        <hr class="line" />
         <div class="wallet-item">
           <div class="coffee-num">1杯</div>
           <div class="coffee-text">累计下单成功</div>
@@ -142,18 +143,18 @@ const getCoupon = () => {
       <div class="info">
         <van-cell-group>
           <van-cell v-for="item in list" :title="item.title" icon="newspaper-o" is-link
-                    @click="router.push(item.path)"/>
+            @click="router.push(item.path)" />
         </van-cell-group>
       </div>
       <div class="short-url">
         <van-cell-group inset>
-          <van-field v-model="uid" :autosize='{ maxHeight: 100}' clearable placeholder="请输入链接/uid" rows="1"
-                     type="textarea"/>
+          <van-field v-model="uid" :autosize='{ maxHeight: 100 }' clearable placeholder="请输入链接/uid" rows="1"
+            type="textarea" />
 
-          <van-field v-model="fieldValue" is-link label="选择咖啡券" readonly @click="showSelectCoupon"/>
+          <van-field v-model="fieldValue" is-link label="选择咖啡券" readonly @click="showSelectCoupon" />
           <van-popup v-model:show="showPicker" position="bottom" round>
 
-            <van-picker :columns="couponList" @cancel="showPicker = false" @confirm="onConfirm"/>
+            <van-picker :columns="couponList" @cancel="showPicker = false" @confirm="onConfirm" />
           </van-popup>
 
 
@@ -175,12 +176,11 @@ const getCoupon = () => {
 </template>
 
 <route lang="json">{
-"meta": {
-"layout": false,
-"authority":true
-}
-}
-</route>
+  "meta": {
+    "layout": false,
+    "authority": true
+  }
+}</route>
 
 <style scoped lang="scss">
 .me-box {
@@ -201,6 +201,7 @@ const getCoupon = () => {
     .person {
       display: flex;
       align-items: center;
+
       .van-image {
         width: 3.75rem;
         height: 3.75rem;
@@ -242,7 +243,8 @@ const getCoupon = () => {
         display: flex;
         flex-direction: column;
 
-        .coffee-num, .coffee-text {
+        .coffee-num,
+        .coffee-text {
           width: 100%;
           height: 45%;
           display: flex;
@@ -297,7 +299,7 @@ const getCoupon = () => {
       justify-content: flex-start;
       flex-wrap: wrap;
 
-      & > button {
+      &>button {
         margin: .5rem .8rem;
         width: 25%;
       }
