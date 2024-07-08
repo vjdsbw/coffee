@@ -22,7 +22,7 @@ onMounted(() => {
     <div class="coffee-details">
       <div class="price">
         <div>{{ coffeeDetailsInfo?.discountDegree }}</div>
-        <div>尚余{{ coffeeDetailsInfo?.discountDegree }}杯</div>
+        <div>尚余1杯</div>
       </div>
       <div class="desc">
         <div>
