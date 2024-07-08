@@ -214,7 +214,7 @@ const selectedProduct = computed(() => {
     <div class="top">
       <van-image :src="lookStore"></van-image>
       <div class="top-right">
-        <div>{{ global.shop.name }}{{ global.shop.number }} <van-icon name="arrow" v-show="global.shop.name" @click="chooseShop" /> </div>
+        <div>{{ global.shop.name }}{{ global.shop.number }} <van-icon color="#000000" name="arrow" v-show="global.shop.name" @click="chooseShop" /> </div>
         <div>
           <van-icon name="location-o" v-show="global.shop.distance"  />
           <span v-show="global.shop.distance">距您{{ global.shop.distance }} </span> {{ global.shop.address }}
@@ -311,7 +311,7 @@ const selectedProduct = computed(() => {
         font-weight: 700;
         margin-bottom: 3px;
         position: relative;
-
+        color: black;
         .van-icon {
           float: right;
         }
