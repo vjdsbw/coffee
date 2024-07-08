@@ -55,7 +55,6 @@ const addCateGory = async () => {
     const { code, data } = await addCartApi({ ...priceCal.value, price: priceDes.value.price, amount: productNumber.value })
     if (code === 0) {
         global.setTotal(data)
-        order.saveOrderIdList([...order.orderIdList, { id: data.id, productId: detailInfo.value.productId, skuCode: priceDes.value.skuCode }])
         showToast({
             message: '商品添加成功',
             icon: 'success',

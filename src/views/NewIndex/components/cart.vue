@@ -74,8 +74,6 @@ const amountChange = async (value: number, detail: { name: string }) => {
             if (code === 0) {
                 showToast('删除成功');
                 getFindAllShop();
-                let list = order.orderIdList.filter((item: any) => item.id !== detail.name)
-                order.saveOrderIdList(list)
             }
         }).catch(() => {
 
@@ -97,7 +95,6 @@ const clearAll = async () => {
         showToast('购物车清空成功');
         order.saveOrderList([])
         order.saveOrderCheck([]);
-        order.saveOrderIdList([])
         checked.value = [];
         isCheckAll.value = false;
     }

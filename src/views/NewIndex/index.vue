@@ -149,10 +149,9 @@ const toBuy = async () => {
   //过滤出选择的商品
   order.orderCheck.forEach((item: any) => {
     const idx = order.orderList.findIndex((itm: any) => itm.id === item)
-    const indx = order.orderIdList.findIndex((itm: any) => itm.id === item)
-    if (idx !== -1 && indx !== -1) {
+    if (idx !== -1 ) {
       list.push({
-        skuCode: order.orderIdList[indx].skuCode,
+        skuCode: order.orderList[idx].skuCode,
         amount: order.orderList[idx].amount,
         productId: order.orderList[idx].productId
       })
@@ -214,7 +213,7 @@ const selectedProduct = computed(() => {
     <div class="top">
       <van-image :src="lookStore"></van-image>
       <div class="top-right">
-        <div>{{ global.shop.name }}{{ global.shop.number }} <van-icon color="#000000" name="arrow" v-show="global.shop.name" @click="chooseShop" /> </div>
+        <div @click="chooseShop" >{{ global.shop.name }}{{ global.shop.number }} <van-icon color="#000000" name="arrow" v-show="global.shop.name" /> </div>
         <div>
           <van-icon name="location-o" v-show="global.shop.distance"  />
           <span v-show="global.shop.distance">距您{{ global.shop.distance }} </span> {{ global.shop.address }}
