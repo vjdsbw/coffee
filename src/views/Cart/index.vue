@@ -147,7 +147,7 @@ onMounted(() => {
 
 <template>
 	<div class="cart-box">
-		<van-nav-bar v-if="cartList.length === 0" left-arrow left-text="返回" title="购物车xxxxxxxx" @click-left="onClickLeft" />
+		<van-nav-bar v-if="cartList.length === 0" left-arrow left-text="返回" title="购物车" @click-left="onClickLeft" />
 		<van-nav-bar v-else :right-text="isDel ? '完成' : '编辑'" left-arrow left-text="返回" title="购物车"
 			@click-left="onClickLeft" @click-right="isDel = !isDel" />
 		<van-image :src="shopbagBg"></van-image>
