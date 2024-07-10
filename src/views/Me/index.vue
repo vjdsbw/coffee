@@ -1,11 +1,11 @@
 <script setup lang="ts" name="Me">
 import Avatar from '@/assets/me/default_avatar.png'
-import {bindUidApi, generateShortCodeApi, getCouponListApi} from "@/api/user.ts";
+import {batchGenerateApi, bindUidApi, getCouponListApi, getCouponPageListApi} from "@/api/user.ts";
 
 const router = useRouter()
 
 const uid = ref<any>()
-const httpUrl = ref<any>()
+const httpUrl = ref<any>([])
 
 
 const list = [
@@ -14,15 +14,16 @@ const list = [
     // {title: "咖啡卡卷", path: "/me/cardRollBinding"},
 ]
 
-const couponList = ref<{ text: string, value: string }[]>([]) //卡券列表
+const couponList = ref<{ text: string, value: string, uid: string, couponPrice: number }[]>([]) //卡券列表
 
 const fieldValue = ref();
 const showPicker = ref(false);
-const inputList = ref<any>(['']);
+const inputList = ref<string[]>(['']);
 
 const checked = ref([]);
 const checkboxRefs = ref<any>([]);
-const toggle = (index: any) => {
+const toggle = (item: any, index: any) => {
+    console.log(checked.value, index)
     checkboxRefs.value?.[index]?.toggle();
 };
 
@@ -41,18 +42,39 @@ function getRandomInt(min: number, max: number): number {
 
 // 生成短链
 const getShortUrl = () => {
-    if (fieldValue.value && uid.value) {
-        // generateShortCodeApi({couponId: fieldValue.value ?? getRandomInt(100, 100000), uid: uid.value ?? 'b93c995d-d6b9-469d-9bec-0cd167e3bfc41720102820651', couponPrice: getRandomInt(100, 1000)}).then(res => {
-        const price: any = couponList.value?.filter((v: any) => v?.couponId === fieldValue.value)
-        console.log(price?.discountDegree)
-        generateShortCodeApi({
-            couponId: fieldValue.value,
-            uid: uid.value,
-            couponPrice: price?.discountDegree ?? 100
-        }).then(res => {
-            httpUrl.value = res.data
-            showToast('短链生成成功，点击复制链接')
-            console.log(res)
+    if (couponList.value.length !== 0) {
+        console.log(couponList.value, checked.value)
+
+        /* generateShortCodeApi({
+             couponId: fieldValue.value,
+             uid: uid.value,
+             couponPrice: price?.discountDegree ?? 100
+         }).then(res => {
+             httpUrl.value = res.data
+             showToast('短链生成成功，点击复制链接')
+             console.log(res)
+         })*/
+
+        let list: any = checked.value?.map(v => {
+            return {
+                couponId: v.value as string,
+                uid: v.uid as string,
+                couponPrice: v.couponPrice as number
+            }
+        })
+
+
+        batchGenerateApi({couponList: list}).then(res => {
+            if (res.code === 0) {
+                httpUrl.value = res.data
+                showToast('短链生成成功，点击复制链接')
+                console.log(res)
+            }
+
+            if (res.code === 1234) {
+                showToast(res.msg)
+            }
+
         })
     } else {
         showToast('请输入uid或者选择咖啡券')
@@ -100,7 +122,9 @@ const bindUid = () => {
             .then(res => {
                 console.log('获取卡券', res)
                 if (res.code === 0) {
-                    getCoupon()
+                    // getCoupon()
+                    getCouponBy()
+
                 }
 
                 if (res.code === 500) {
@@ -118,7 +142,23 @@ const getCoupon = () => {
     getCouponListApi().then(res => {
         if (res.code === 0) {
             res.data?.map((v: any) => {
-                couponList.value.push({text: v?.coffeeStockTitle, value: v?.couponId},)
+                // couponList.value.push({text: v?.coffeeStockTitle, value: v?.couponId},)
+            })
+        }
+
+        if (res.code === 500) {
+            showToast(res.msg);
+        }
+    })
+}
+
+// 分页获取咖啡券
+const getCouponBy = () => {
+    couponList.value = [];
+    getCouponPageListApi({pageNo: 1, pageSize: 20}).then(res => {
+        if (res.code === 0) {
+            res.data?.dataList.map((v: any) => {
+                couponList.value.push({text: v?.coffeeStockTitle, value: v?.couponId, uid: v?.uid, couponPrice: v.discountDegree},)
             })
         }
 
@@ -133,7 +173,9 @@ const addInput = () => {
 }
 
 const copyUrl2 = () => {
-    console.log(inputList.value)
+    if (inputList.value.length > 1) {
+        inputList.value.pop()
+    }
 }
 </script>
 
@@ -174,12 +216,19 @@ const copyUrl2 = () => {
                                             <van-picker :columns="couponList" @cancel="showPicker = false" @confirm="onConfirm"/>
                                         </van-popup>-->
 
-                    <van-button class="addBtn" color="#7585BE" round size="small" @click="addInput">添加uid</van-button>
+                    <div class="edit-btn">
+                        <van-button class="addBtn" color="#7585BE" round size="small" @click="addInput">添加uid</van-button>
+                        <van-button :disabled="!(inputList.length > 1)" class="addBtn" color="#7585BE" round size="small" @click="copyUrl2">删除uid</van-button>
+                    </div>
+
+                    <!--动态添加uid输入框-->
                     <van-field v-for="(item,index) in inputList" :key="index" v-model="inputList[index]" clearable placeholder="请输入链接/uid"/>
 
+
+                    <!-- 咖啡券多选-->
                     <van-checkbox-group v-model="checked">
                         <van-cell-group inset>
-                            <van-cell v-for="(item, index) in couponList" :key="item" :title="`复选框 ${item}`" clickable @click="toggle(index)">
+                            <van-cell v-for="(item, index) in couponList" :key="item" :title="`${item.text}`" clickable @click="toggle(item,index)">
                                 <template #right-icon>
                                     <van-checkbox :ref="(el:any) => checkboxRefs[index] = el" :name="item" @click.stop/>
                                 </template>
@@ -190,8 +239,13 @@ const copyUrl2 = () => {
 
                     <div class="edit-btn">
                         <van-button color="#7585BE" round size="small" @click="bindUid">绑定咖啡券</van-button>
-                        <van-button color="#7585BE" round size="small" @click="getShortUrl">生成短链</van-button>
+                        <van-button color="#7585BE" round size="small" @click="getShortUrl">批量生成短链</van-button>
                         <van-button color="#7585BE" round size="small" @click="copyUrl">复制链接</van-button>
+                    </div>
+
+                    <!--  短链展示-->
+                    <div v-for="(v) in httpUrl" :key="v">
+                        {{ v }}
                     </div>
                 </van-cell-group>
 

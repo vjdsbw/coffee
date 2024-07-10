@@ -12,14 +12,30 @@ export namespace userType {
     }
 
     export interface rxLogin {
-        mobile : string;
+        mobile: string;
         uid: string;
-        validateCode:string;
+        validateCode: string;
     }
 
     export interface rxSend {
-        mobile:string;
-        type:string
+        mobile: string;
+        type: string
+    }
+
+    export interface couponList {
+        pageNo: number;
+        pageSize: number
+    }
+
+    export interface generateUrlList {
+        couponList: [
+            {
+                couponId: string,
+                couponPrice: number,
+                uid: string
+            }
+        ]
+
     }
 }
 
@@ -37,4 +53,10 @@ export const bindUidApi = (data: userType.bindUid) => http.post("/console/coupon
 // 验证码
 export const sendCodeApi = (params: userType.rxSend) => http.get("/api/notify/v1/send_code", params);
 // 瑞幸登录
-export const rxLoginApi = (params: userType.rxLogin) => http.get("/api/notify/v1/rx_login",params);
+export const rxLoginApi = (params: userType.rxLogin) => http.get("/api/notify/v1/rx_login", params);
+
+// 分页获取咖啡券
+export const getCouponPageListApi = (params: userType.couponList) => http.get("/console/coupon/getCouponPageList", params);
+
+// /console/shortCode/batchGenerate 批量生成短链
+export const batchGenerateApi = (params: userType.generateUrlList) => http.post("/console/shortCode/batchGenerate", params);
