@@ -1,23 +1,14 @@
 <script setup lang="ts" name="Me">
-import Avatar from '@/assets/me/default_avatar.png'
-import {batchGenerateApi, bindUidApi, getCouponListApi, getCouponPageListApi} from "@/api/user.ts";
+import Avatar from '@/assets/me/default_avatar.png';
+import copy from '@/assets/icons/copy.svg'
+import copySuccess from '@/assets/icons/copy-success.svg'
+import { batchGenerateApi, bindUidApi, getCouponListApi, getCouponPageListApi } from "@/api/user.ts";
+import Clipboard from 'clipboard';
 
-const router = useRouter()
-
-const uid = ref<any>()
 const httpUrl = ref<any>([])
-
-
-const list = [
-    {title: "我的订单信息", path: "/me/orderInfo"},
-    {title: "我的咖啡信息", path: "/me/coffeeInfo"},
-    // {title: "咖啡卡卷", path: "/me/cardRollBinding"},
-]
 
 const couponList = ref<{ text: string, value: string, uid: string, couponPrice: number }[]>([]) //卡券列表
 
-const fieldValue = ref();
-const showPicker = ref(false);
 const inputList = ref<string[]>(['']);
 
 const checked = ref([]);
@@ -31,66 +22,26 @@ onBeforeUpdate(() => {
     checkboxRefs.value = [];
 });
 
-function getRandomInt(min: number, max: number): number {
-    // 确保min小于max
-    if (min > max) {
-        [min, max] = [max, min];
-    }
-    // 生成min和max之间的随机整数
-    return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
 // 生成短链
-const getShortUrl = () => {
+const getShortUrl = async () => {
     if (couponList.value.length !== 0) {
         console.log(couponList.value, checked.value)
-
-        /* generateShortCodeApi({
-             couponId: fieldValue.value,
-             uid: uid.value,
-             couponPrice: price?.discountDegree ?? 100
-         }).then(res => {
-             httpUrl.value = res.data
-             showToast('短链生成成功，点击复制链接')
-             console.log(res)
-         })*/
-
-        let list: any = checked.value?.map(v => {
+        let list: any = checked.value?.map((v: any) => {
             return {
                 couponId: v.value as string,
                 uid: v.uid as string,
                 couponPrice: v.couponPrice as number
             }
         })
-
-
-        batchGenerateApi({couponList: list}).then(res => {
-            if (res.code === 0) {
-                httpUrl.value = res.data
-                showToast('短链生成成功，点击复制链接')
-                console.log(res)
-            }
-
-            if (res.code === 1234) {
-                showToast(res.msg)
-            }
-
-        })
+        const { code, data, msg } = await batchGenerateApi({ couponList: list });
+        if (code === 0) {
+            httpUrl.value = data.map((item: string) => ({ copyed: false, shortUrl: item }))
+            showToast('短链生成成功，点击复制链接')
+        } else {
+            showToast(msg)
+        }
     } else {
         showToast('请输入uid或者选择咖啡券')
-    }
-}
-
-const onConfirm = ({selectedOptions}: any) => {
-    showPicker.value = false;
-    fieldValue.value = selectedOptions[0].value;
-};
-
-const showSelectCoupon = () => {
-    if (couponList.value.length !== 0) {
-        showPicker.value = true
-    } else {
-        showToast('请先输入uid加载咖啡券')
     }
 }
 
@@ -99,11 +50,8 @@ const copyUrl = async () => {
     console.log(httpUrl.value, '短链')
     try {
         if (httpUrl.value) {
-            await navigator.clipboard.writeText(httpUrl.value);
-            // showToast('复制链接成功,3秒后跳转')
-            // setTimeout(() => {
-            //     window.open(httpUrl.value)
-            // }, 3000)
+            const list = httpUrl.value.map((item: any) => item.shortUrl)
+            await navigator.clipboard.writeText(list);
         } else {
             showToast('暂无链接，请先生成短链')
         }
@@ -114,54 +62,29 @@ const copyUrl = async () => {
 }
 
 // 根据输入的uid绑定咖啡券
-const bindUid = () => {
-    // bindUidApi({uidList: ['b93c995d-d6b9-469d-9bec-0cd167e3bfc41720102820651']}).then(res => {
-    if (inputList.value.length > 0 && inputList.value[0] !== '') {
-        // bindUidApi({uidList: [uid.value]})
-        bindUidApi({uidList: inputList.value})
-            .then(res => {
-                console.log('获取卡券', res)
-                if (res.code === 0) {
-                    // getCoupon()
-                    getCouponBy()
-
-                }
-
-                if (res.code === 500) {
-                    showToast(res.msg);
-                }
-            })
+const bindUid = async () => {
+    if (inputList.value.length > 0) {
+        const { code, msg } = await bindUidApi({ uidList: inputList.value.filter(item => item !== '') })
+        if (code === 0) {
+            // getCoupon()
+            getCouponBy()
+        } else {
+            showToast(msg);
+        }
     } else {
         showToast('请输入uid')
     }
 }
 
-// 获取咖啡卡券
-const getCoupon = () => {
-    couponList.value = [];
-    getCouponListApi().then(res => {
-        if (res.code === 0) {
-            res.data?.map((v: any) => {
-                // couponList.value.push({text: v?.coffeeStockTitle, value: v?.couponId},)
-            })
-        }
-
-        if (res.code === 500) {
-            showToast(res.msg);
-        }
-    })
-}
-
 // 分页获取咖啡券
 const getCouponBy = () => {
     couponList.value = [];
-    getCouponPageListApi({pageNo: 1, pageSize: 20}).then(res => {
+    getCouponPageListApi({ pageNo: 1, pageSize: 20 }).then(res => {
         if (res.code === 0) {
             res.data?.dataList.map((v: any) => {
-                couponList.value.push({text: v?.coffeeStockTitle, value: v?.couponId, uid: v?.uid, couponPrice: v.discountDegree},)
+                couponList.value.push({ text: v?.coffeeStockTitle, value: v?.couponId, uid: v?.uid, couponPrice: v.discountDegree },)
             })
         }
-
         if (res.code === 500) {
             showToast(res.msg);
         }
@@ -172,10 +95,53 @@ const addInput = () => {
     inputList.value.push('')
 }
 
-const copyUrl2 = () => {
+const delUid = () => {
     if (inputList.value.length > 1) {
         inputList.value.pop()
     }
+}
+
+const pageNum = ref<number>(1);
+const showPop = ref<boolean>(false);
+const loading = ref(false);
+const onRefresh = async () => {
+    pageNum.value = 1;
+    couponList.value = [];
+    const { code, data, msg } = await getCouponPageListApi({ pageNo: pageNum.value, pageSize: 20 })
+    loading.value = false
+    if (code === 0) {
+        couponList.value = data?.dataList.map((v: any) => ({ text: v?.coffeeStockTitle, value: v?.couponId, uid: v?.uid, couponPrice: v.discountDegree }))
+    } else {
+        showToast(msg);
+    }
+};
+
+const finishedloading = ref(false);
+const finished = ref(false);
+const onLoad = async () => {
+    pageNum.value++;
+    finished.value = false;
+    const { code, data, msg } = await getCouponPageListApi({ pageNo: pageNum.value, pageSize: 20 })
+    if (code === 0) {
+        const list = data.dataList.map((v: any) => ({ text: v?.coffeeStockTitle, value: v?.couponId, uid: v?.uid, couponPrice: v.discountDegree }));
+        couponList.value = [...couponList.value, ...list];
+        // 加载状态结束
+        finishedloading.value = false;
+        if (couponList.value.length >= data.totalCount) {
+            finished.value = true;
+        }
+    } else {
+        showToast(msg);
+    }
+};
+
+
+const onCopy = (httpItem: any) => {
+    const clipboard = new Clipboard('.copy', {
+        text: () => httpItem.shortUrl
+    })
+    clipboard.on('success', () => httpItem.copyed = true)
+    clipboard.on('error', () => showToast('复制失败'));
 }
 </script>
 
@@ -189,11 +155,11 @@ const copyUrl2 = () => {
                 </div>
             </div>
             <div class="wallet-box">
-                <div class="wallet-item" @click="router.push('/me/coffeeInfo')">
+                <div class="wallet-item">
                     <div class="coffee-num">1杯</div>
                     <div class="coffee-text ">剩余可下咖啡</div>
                 </div>
-                <hr class="line"/>
+                <hr class="line" />
                 <div class="wallet-item">
                     <div class="coffee-num">1杯</div>
                     <div class="coffee-text">累计下单成功</div>
@@ -201,41 +167,20 @@ const copyUrl2 = () => {
             </div>
         </div>
         <div class="container">
-            <div class="info">
-                <van-cell-group>
-                    <van-cell v-for="item in list" :title="item.title" icon="newspaper-o" is-link
-                              @click="router.push(item.path)"/>
-                </van-cell-group>
-            </div>
             <div class="short-url">
                 <van-cell-group inset>
-                    <!--                              <van-field v-model="uid" :autosize='{ maxHeight: 100 }' clearable placeholder="请输入链接/uid" rows="1" type="textarea" />
-                              <van-field v-model="httpUrl"  clearable placeholder="请输入链接/uid"  />-->
-                    <!--                    <van-field v-model="fieldValue" is-link label="选择咖啡券" readonly @click="showSelectCoupon"/>
-                                        <van-popup v-model:show="showPicker" position="bottom" round>
-                                            <van-picker :columns="couponList" @cancel="showPicker = false" @confirm="onConfirm"/>
-                                        </van-popup>-->
-
                     <div class="edit-btn">
-                        <van-button class="addBtn" color="#7585BE" round size="small" @click="addInput">添加uid</van-button>
-                        <van-button :disabled="!(inputList.length > 1)" class="addBtn" color="#7585BE" round size="small" @click="copyUrl2">删除uid</van-button>
+                        <van-button class="addBtn" color="#7585BE" round size="small"
+                            @click="addInput">添加uid</van-button>
+                        <van-button :disabled="!(inputList.length > 1)" class="addBtn" color="#7585BE" round
+                            size="small" @click="delUid">删除uid</van-button>
+                        <van-button :disabled="couponList.length === 0" class="addBtn" color="#7585BE" round
+                            size="small" @click="showPop = true">选择卡卷</van-button>
                     </div>
 
                     <!--动态添加uid输入框-->
-                    <van-field v-for="(item,index) in inputList" :key="index" v-model="inputList[index]" clearable placeholder="请输入链接/uid"/>
-
-
-                    <!-- 咖啡券多选-->
-                    <van-checkbox-group v-model="checked">
-                        <van-cell-group inset>
-                            <van-cell v-for="(item, index) in couponList" :key="item" :title="`${item.text}`" clickable @click="toggle(item,index)">
-                                <template #right-icon>
-                                    <van-checkbox :ref="(el:any) => checkboxRefs[index] = el" :name="item" @click.stop/>
-                                </template>
-                            </van-cell>
-                        </van-cell-group>
-                    </van-checkbox-group>
-
+                    <van-field v-for="(_item, index) in inputList" :key="index" v-model="inputList[index]" clearable
+                        placeholder="请输入链接/uid" />
 
                     <div class="edit-btn">
                         <van-button color="#7585BE" round size="small" @click="bindUid">绑定咖啡券</van-button>
@@ -243,24 +188,43 @@ const copyUrl2 = () => {
                         <van-button color="#7585BE" round size="small" @click="copyUrl">复制链接</van-button>
                     </div>
 
-                    <!--  短链展示-->
-                    <div v-for="(v) in httpUrl" :key="v">
-                        {{ v }}
-                    </div>
                 </van-cell-group>
-
+                <div class="short-url-copy">
+                    <div v-for="(item, index) in httpUrl" :key="index">
+                        <span>{{ item.shortUrl }}</span>
+                        <van-icon class="copy" :name="item.copyed ? copySuccess : copy" @click="onCopy(item)" />
+                    </div>
+                </div>
             </div>
         </div>
+
+        <van-popup v-model:show="showPop" closeable position="bottom" :style="{ height: '50%' }">
+            <van-pull-refresh v-model="loading" @refresh="onRefresh">
+                <van-list v-model:loading="finishedloading" :finished="finished" finished-text="没有更多了" @load="onLoad">
+                    <van-checkbox-group v-model="checked" style="margin-top: 20px;">
+                        <van-cell-group inset>
+                            <van-cell v-for="(item, index) in couponList" :key="index" :title="`${item.text}`" clickable
+                                @click="toggle(item, index)">
+                                <template #right-icon>
+                                    <van-checkbox :ref="(el: any) => checkboxRefs[index] = el" :name="item"
+                                        @click.stop />
+                                </template>
+                            </van-cell>
+                        </van-cell-group>
+                    </van-checkbox-group>
+                </van-list>
+            </van-pull-refresh>
+        </van-popup>
+
     </div>
 </template>
 
 <route lang="json">{
-"meta": {
-"layout": false,
-"authority": true
-}
-}
-</route>
+    "meta": {
+        "layout": false,
+        "authority": true
+    }
+}</route>
 
 <style scoped lang="scss">
 .me-box {
@@ -355,43 +319,61 @@ const copyUrl2 = () => {
     }
 
     .container {
-        .info {
-            background-color: rgba(255, 255, 255, 0.6);
-            width: 95%;
-            margin: 0 auto;
-            //height: 22.65rem;
-            height: 80%;
-            transform: translateY(-2.5rem);
-            border-start-start-radius: 0.78rem;
-            border-start-end-radius: 0.78rem;
+        .short-url {
+            margin-top: 15px;
 
+            .edit-btn {
+                margin: .5rem 0;
+                display: flex;
+                justify-content: flex-start;
+                flex-wrap: wrap;
 
-            .van-cell-group {
-                margin-top: 3.12rem;
-            }
-
-            .short-url {
-                position: relative;
-
-                .addBtn {
-                    position: absolute;
-                    right: 0;
-                    margin-left: 1.5rem;
-                    height: 50px;
+                &>button {
+                    margin: .5rem .8rem;
+                    width: 25%;
                 }
             }
 
+            .short-url-copy {
+                padding: 10px 16px;
+                color: black;
+                background-color: #f5f5f5;
+
+                &>div {
+                    margin: .5rem 0rem;
+                    font-size: 12px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+
+                    span {
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                        -o-text-overflow: ellipsis;
+                    }
+                }
+            }
         }
+    }
 
-        .edit-btn {
-            margin: .5rem 0;
+    .short-url-copy {
+        padding: 10px 16px;
+        color: black;
+        background-color: #f5f5f5;
+
+        &>div {
+            margin: .5rem 0rem;
+            font-size: 12px;
             display: flex;
-            justify-content: flex-start;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
 
-            & > button {
-                margin: .5rem .8rem;
-                width: 25%;
+            span {
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                -o-text-overflow: ellipsis;
             }
         }
     }
