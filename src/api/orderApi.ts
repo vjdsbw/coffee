@@ -11,6 +11,7 @@ namespace Order {
     export interface Create {
         productList: any;
         storeId: number;
+        orderComments: string;
     }
 
     export interface Detail {

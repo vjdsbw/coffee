@@ -1,28 +1,13 @@
 <script setup lang="ts" name="Payment-Details">
-import { Store } from "@/store";
 import { orderDetailApi, orderCancelApi } from "@/api/orderApi.ts";
 
 const onClickLeft = () => history.back()
-const show = ref(false);
-const lookCode = () => {
-	show.value = true
-}
-const orderDetail = ref()
 
-const total = computed(() => {
-	let price = 0;
-	let number = 0;
-	if (orderDetail.value) {
-		orderDetail.value.productList.forEach((item: any) => {
-			number += Number(item.amount)
-			price += Number(item.amount) * Number(item.initialPrice)
-		});
-	}
-	return {
-		price: price,
-		number: number
-	};
-})
+const show = ref(false);
+
+const lookCode = () => show.value = true
+
+const orderDetail = ref()
 
 const cancelOrder = async () => {
 	const { code } = await orderCancelApi();
@@ -31,11 +16,16 @@ const cancelOrder = async () => {
 	}
 }
 
+const getOrderDetail = async () => {
+	const { code, data } = await orderDetailApi();
+	if (code === 0) {
+		orderDetail.value = data;
+		console.log(data, '获取订单详情')
+	}
+}
+
 onMounted(() => {
-	orderDetailApi().then(res => {
-		orderDetail.value = res.data
-		console.log(res, '获取订单详情')
-	})
+	getOrderDetail();
 })
 
 </script>
@@ -44,7 +34,6 @@ onMounted(() => {
 	<div class="payment-box">
 		<van-nav-bar left-arrow left-text="返回" title="下单成功" @click-left="onClickLeft" />
 		<div class="pre-time">
-			<!--			<div>预计 <span>13:38</span> 可制作完成，请前往自提点取餐。</div>-->
 			<div>{{ orderDetail?.orderStatusDesc }}</div>
 			<div class="pre-time-btn">
 				<van-button color="#949494" plain round @click="cancelOrder">取消订单</van-button>
@@ -53,7 +42,7 @@ onMounted(() => {
 		</div>
 		<div class="pre address">
 			<div>{{ orderDetail?.shopName }}</div>
-			<div>{{  orderDetail?.shopAddress }}</div>
+			<div>{{ orderDetail?.shopAddress }}</div>
 		</div>
 		<div class="pre order-info">
 			<p>自提订单:{{ orderDetail?.orderNo }}</p>

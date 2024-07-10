@@ -2,7 +2,7 @@
 import lookStore from "@/assets/lookStore.png";
 import { nearestApi, productMenuApi } from '@/api/storeApi'
 import { cartListApi, productDetailApi, purchasablePriceApi } from '@/api/productApi'
-import { createOrderApi, preCreateOrderApi } from "@/api/orderApi";
+
 import { Store } from "@/store";
 import Cart from './components/cart.vue'
 import Product from './components/product.vue'
@@ -63,7 +63,7 @@ const getMenus = async (id: number) => {
 }
 
 const chooseShop = () => {
-  router.push({ name: "NewIndex-chooseShop" })
+  router.push({ name: "NewIndex-shopList" })
 }
 
 const getLocation = () => {
@@ -103,7 +103,7 @@ const getLimitPrice = async () => {
       global.setLimitPrice(data)
       getLocation()
     } else {
-      router.push({ name: 'Cart-paymentDetails' })
+      router.push({ name: 'Order-details' })
     }
   } else {
     showToast(msg)
@@ -149,26 +149,32 @@ const toBuy = async () => {
   //过滤出选择的商品
   order.orderCheck.forEach((item: any) => {
     const idx = order.orderList.findIndex((itm: any) => itm.id === item)
-    if (idx !== -1 ) {
-      list.push({
-        skuCode: order.orderList[idx].skuCode,
-        amount: order.orderList[idx].amount,
-        productId: order.orderList[idx].productId
-      })
+    if (idx !== -1) {
+      list.push(order.orderList[idx])
     }
   })
-  const shop = global.shopGet
-  let params = {
-    productList: list,
-    storeId: shop.storeId!
-  }
-  const { code } = await preCreateOrderApi(params);
-  if (code === 0) {
-    const res = await createOrderApi(params);
-    if (res.code === 0) {
-      router.push({ name: 'Cart-paymentDetails' })
-    }
-  }
+  showConfirmDialog({
+    title: '再想想',
+    message: '是否确认提交订单',
+  }).then(() => {
+    order.saveOrderSettlement(list);
+    router.push({ name: 'Order' })
+  }).catch(() => {
+
+  });
+
+  // const shop = global.shopGet
+  // let params = {
+  //   productList: list,
+  //   storeId: shop.storeId!
+  // }
+  // const { code } = await preCreateOrderApi(params);
+  // if (code === 0) {
+  //   const res = await createOrderApi(params);
+  //   if (res.code === 0) {
+  //     router.push({ name: 'Order-details' })
+  //   }
+  // }
 }
 
 const cartChange = async () => {
@@ -213,9 +219,10 @@ const selectedProduct = computed(() => {
     <div class="top">
       <van-image :src="lookStore"></van-image>
       <div class="top-right">
-        <div @click="chooseShop" >{{ global.shop.name }}{{ global.shop.number }} <van-icon color="#000000" name="arrow" v-show="global.shop.name" /> </div>
+        <div @click="chooseShop">{{ global.shop.name }}{{ global.shop.number }} <van-icon color="#000000" name="arrow"
+            v-show="global.shop.name" /> </div>
         <div>
-          <van-icon name="location-o" v-show="global.shop.distance"  />
+          <van-icon name="location-o" v-show="global.shop.distance" />
           <span v-show="global.shop.distance">距您{{ global.shop.distance }} </span> {{ global.shop.address }}
         </div>
       </div>
@@ -311,6 +318,7 @@ const selectedProduct = computed(() => {
         margin-bottom: 3px;
         position: relative;
         color: black;
+
         .van-icon {
           float: right;
         }

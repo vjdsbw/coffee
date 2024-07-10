@@ -34,6 +34,10 @@ const choosed = (info: any) => {
     router.push(url)
 }
 
+const chooseCity = async () => {
+    router.push({ name: 'NewIndex-cityList' })
+}
+
 onMounted(() => {
     getShopList()
 })
@@ -48,7 +52,7 @@ onMounted(() => {
         <van-search show-action placeholder="输入地址寻找周边门店" v-model="searchAddress" @search="getShopList"
             @click-left-icon="getShopList">
             <template #label>
-                <div>南京</div>
+                <div @click="chooseCity">{{ global.shop.cityName }}</div>
             </template>
             <template #action>
                 <van-icon name="scan" size="1.5rem" />

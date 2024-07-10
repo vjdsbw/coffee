@@ -38,3 +38,5 @@ export const shopListApi = (params: StoreApi.storeAddressList) => http.get("/api
 //查询菜单
 export const productMenuApi = (params: StoreApi.menuList) => http.get("/api/product/menuList", params)
 
+//查询菜单
+export const cityListApi = () => http.get("/api/store/cityList")

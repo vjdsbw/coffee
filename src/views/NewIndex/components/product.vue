@@ -66,22 +66,24 @@ const addCateGory = async () => {
 const back = () => emits('closeClick')
 
 const buy = async () => {
-    const shop = global.shopGet
-    let params = {
-        productList: [{
-            skuCode: priceDes.value.skuCode,
-            amount: productNumber.value,
-            productId: order.orderProduct.productId
-        }],
-        storeId: shop.storeId!
-    }
-    const { code } = await preCreateOrderApi(params);
-    if (code === 0) {
-        const res = await createOrderApi(params);
-        if (res.code === 0) {
-            router.push({ name: 'Cart-paymentDetails' })
-        }
-    }
+    const obj = { ...order.orderProduct, skuCode: priceDes.value.skuCode, amount: productNumber.value }
+    order.saveOrderSettlement([obj]);
+    router.push({ name: 'Order' })
+    // let params = {
+    //     productList: [{
+    //         skuCode: priceDes.value.skuCode,
+    //         amount: productNumber.value,
+    //         productId: order.orderProduct.productId
+    //     }],
+    //     storeId: shop.storeId!
+    // }
+    // const { code } = await preCreateOrderApi(params);
+    // if (code === 0) {
+    //     const res = await createOrderApi(params);
+    //     if (res.code === 0) {
+    //         router.push({ name: 'Order-details' })
+    //     }
+    // }
 }
 
 const detailInfo = computed(() => {
@@ -126,7 +128,7 @@ const detailInfo = computed(() => {
             <div class="choose" v-for="item in detailInfo.showAttrGroupValues" :key="item.attrCode">
                 <div class="choose-analogy">{{ item.attrName }}</div>
                 <div class="choose-gener">
-                    <span class="selected">{{ item.attrValue}}</span>
+                    <span class="selected">{{ item.attrValue }}</span>
                 </div>
             </div>
             <div class="choose" v-for="item in detailInfo.saleAttrGroupValue" :key="item.attrCode">

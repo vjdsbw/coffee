@@ -9,6 +9,7 @@ interface GlobalState {
         number: string;
         storeId: number | null;
         workTime: string;
+        cityName:string;
     },
     latAndLon: {
         lat: number | null;
@@ -34,6 +35,7 @@ export const useGlobalStore = defineStore({
             number: '',
             storeId: null,
             workTime: '',
+            cityName:"",
         },
         latAndLon: {
             lat: null,
