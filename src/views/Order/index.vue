@@ -8,14 +8,14 @@ const router = useRouter();
 const onClickLeft = () => history.back()
 
 const onSubmit = async () => {
-    if (!remarkForm.value.sure) showToast("提交订单前请先同意")
+    if (!remarkForm.value.sure) return showToast("提交订单前请先同意");
     const shop = global.shopGet;
     let params = {
         productList: order.orderSettlement.map((item: any) => {
             return { skuCode: item.skuCode, amount: item.amount, productId: item.productId }
         }),
         storeId: shop.storeId!,
-        orderComments: remarkForm.value.orderComments
+        orderComments: textComputed.value
     }
     const { code } = await preCreateOrderApi(params);
     if (code === 0) {
@@ -34,12 +34,19 @@ const remarkForm = ref<{
     orderComments: string,
     sure: boolean
 }>({
-    mealPickup: '',
+    mealPickup: '1',
     remark: '',
-    contactlessDelivery: '',
-    tissue: '',
+    contactlessDelivery: '2',
+    tissue: '2',
     orderComments: "",
     sure: false
+})
+
+const textComputed = computed(() => {
+    const str1: string = '取餐方式' + remarkForm.value.mealPickup === '1' ? '店内用餐' : '自提带走;';
+    const str2: string = (remarkForm.value.contactlessDelivery === '1' ? '需要' : '不需要') + '无接触配送;'
+    const str3: string = (remarkForm.value.tissue === '1' ? '需要' : '不需要') + '纸巾;';
+    return remarkForm.value.orderComments ? remarkForm.value.orderComments + ';' + str1 + str2 + str3 : str1 + str2 + str3;
 })
 
 
@@ -85,9 +92,11 @@ const remarkForm = ref<{
         </div>
 
         <div class="remark">
-            <van-cell-group inset>
-                <van-cell clickable is-link title="备注特殊要求" @click="showBottom = true" />
-            </van-cell-group>
+            <div>备注特殊要求</div>
+            <div @click="showBottom = true">
+                <div>{{ textComputed }}</div>
+                <van-icon name="arrow" size="20"/>
+            </div>
         </div>
 
         <div class="confirm-select">
@@ -102,7 +111,7 @@ const remarkForm = ref<{
         <!-- 底部弹出 -->
         <van-popup v-model:show="showBottom" position="bottom" :style="{ height: '45%' }">
             <div class="cart-box-content">
-                <!-- <div class="type">
+                <div class="type">
                     <div class="type-item">
                         <span> 取餐方式:</span>
                         <span>
@@ -130,10 +139,10 @@ const remarkForm = ref<{
                             </van-radio-group>
                         </span>
                     </div>
-                </div> -->
+                </div>
                 <van-cell-group class="text" inset>
                     <van-field v-model="remarkForm.orderComments" autosize class="textarea" maxlength="50"
-                        placeholder="请备注内容" rows="6" show-word-limit type="textarea" />
+                        placeholder="请备注内容" rows="4" show-word-limit type="textarea" />
                 </van-cell-group>
                 <van-button type="primary" style="margin: 1rem 1rem ;width: 95%;"
                     @click="showBottom = false">确定</van-button>
@@ -193,7 +202,6 @@ const remarkForm = ref<{
             align-items: center;
         }
     }
-
 
     .total-num {
         .total-num-total {
@@ -264,6 +272,37 @@ const remarkForm = ref<{
 
         .submit {
             width: 95%;
+        }
+    }
+
+    .remark {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #333;
+        background-color: #fff;
+        margin: 10px 16px;
+        padding: .5rem .5rem;
+        border-radius: .5rem;
+
+        &>div:first-child {
+            font-weight: 600;
+            font-size: 14px;
+            width: 30%;
+        }
+
+        &>div:last-child {
+            font-size: 14px;
+            text-align: right;
+            width: 70%;
+            display: flex;
+            align-items: center;
+            &>div:first-child{
+                width: 90%;
+                overflow: hidden;
+                text-overflow:ellipsis;
+                white-space:nowrap;
+            }
         }
     }
 }

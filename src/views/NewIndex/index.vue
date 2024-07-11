@@ -137,7 +137,7 @@ onUnmounted(() => {
 const showBottom = ref<boolean>(false)
 const closePopUp = () => showBottom.value = false;
 const productDetail = async (productId: string) => {
-  const { data } = await productDetailApi({ productId: productId });
+  const { data } = await productDetailApi({ productId: productId, storeId: global.shop.storeId! });
   order.saveOrderProduct(data)
   showBottom.value = true;
 }

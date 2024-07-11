@@ -7,7 +7,7 @@ import Clipboard from 'clipboard';
 
 const httpUrl = ref<any>([])
 
-const couponList = ref<{ text: string, value: string, uid: string, couponPrice: number }[]>([]) //卡券列表
+const couponList = ref<{ text: string, value: string, uid: string, couponPrice: number, validDate: string }[]>([]) //卡券列表
 
 const inputList = ref<string[]>(['']);
 
@@ -25,7 +25,6 @@ onBeforeUpdate(() => {
 // 生成短链
 const getShortUrl = async () => {
     if (couponList.value.length !== 0) {
-        console.log(couponList.value, checked.value)
         let list: any = checked.value?.map((v: any) => {
             return {
                 couponId: v.value as string,
@@ -82,7 +81,7 @@ const getCouponBy = () => {
     getCouponPageListApi({ pageNo: 1, pageSize: 20 }).then(res => {
         if (res.code === 0) {
             res.data?.dataList.map((v: any) => {
-                couponList.value.push({ text: v?.coffeeStockTitle, value: v?.couponId, uid: v?.uid, couponPrice: v.discountDegree },)
+                couponList.value.push({ text: v?.coffeeStockTitle, value: v?.couponId, uid: v?.uid, couponPrice: v.discountDegree,validDate:v.validDateDesc },)
             })
         }
         if (res.code === 500) {
@@ -110,7 +109,7 @@ const onRefresh = async () => {
     const { code, data, msg } = await getCouponPageListApi({ pageNo: pageNum.value, pageSize: 20 })
     loading.value = false
     if (code === 0) {
-        couponList.value = data?.dataList.map((v: any) => ({ text: v?.coffeeStockTitle, value: v?.couponId, uid: v?.uid, couponPrice: v.discountDegree }))
+        couponList.value = data?.dataList.map((v: any) => ({ text: v?.coffeeStockTitle, value: v?.couponId, uid: v?.uid, couponPrice: v.discountDegree,validDate:v.validDateDesc }))
     } else {
         showToast(msg);
     }
@@ -123,7 +122,7 @@ const onLoad = async () => {
     finished.value = false;
     const { code, data, msg } = await getCouponPageListApi({ pageNo: pageNum.value, pageSize: 20 })
     if (code === 0) {
-        const list = data.dataList.map((v: any) => ({ text: v?.coffeeStockTitle, value: v?.couponId, uid: v?.uid, couponPrice: v.discountDegree }));
+        const list = data.dataList.map((v: any) => ({ text: v?.coffeeStockTitle, value: v?.couponId, uid: v?.uid, couponPrice: v.discountDegree,validDate:v.validDateDesc }));
         couponList.value = [...couponList.value, ...list];
         // 加载状态结束
         finishedloading.value = false;
@@ -208,6 +207,12 @@ const onCopy = (httpItem: any) => {
                                 <template #right-icon>
                                     <van-checkbox :ref="(el: any) => checkboxRefs[index] = el" :name="item"
                                         @click.stop />
+                                </template>
+                                <template #label>
+                                    <div>
+                                        <span>卷值:{{ item.couponPrice }} </span>
+                                        <span style="margin-left: 10px;">有效期:{{ item.validDate }} </span>
+                                    </div>
                                 </template>
                             </van-cell>
                         </van-cell-group>

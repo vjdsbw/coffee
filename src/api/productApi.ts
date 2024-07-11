@@ -4,6 +4,7 @@ namespace Product {
 
   export interface proId {
     productId: string;
+    storeId: number
   }
 
   export interface priceCal {
@@ -26,7 +27,7 @@ namespace Product {
   export interface removeId {
     id: string
   }
-  export interface updateAmount{
+  export interface updateAmount {
     id: string,
     num: number
   }
