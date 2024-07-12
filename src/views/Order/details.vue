@@ -1,6 +1,6 @@
 <script setup lang="ts" name="Payment-Details">
 import { orderDetailApi, orderCancelApi } from "@/api/orderApi.ts";
-// import QrcodeVue from 'qrcode.vue';
+import QrcodeVue from 'qrcode.vue';
 
 const onClickLeft = () => history.back()
 
@@ -85,7 +85,7 @@ onMounted(() => {
 				<div class="pickup-code">
 					<h2>{{ orderDetail?.pickUpCode }}</h2>
 					<p>取餐码</p>
-					<!-- <qrcode-vue v-show="orderDetail?.pickUpCode" :value="'568'" :size="200" level="H"></qrcode-vue> -->
+					<qrcode-vue v-show="orderDetail?.takeOrderId" :value="orderDetail?.takeOrderId" :size="200" level="H"></qrcode-vue>
 				</div>
 			</div>
 		</van-dialog>

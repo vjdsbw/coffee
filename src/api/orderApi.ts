@@ -11,6 +11,13 @@ namespace Order {
     export interface Create {
         productList: any;
         storeId: number;
+        orderComments?: string;
+        remarkList?:any
+    }
+
+    export interface PreCreate {
+        productList: any;
+        storeId: number;
         orderComments: string;
     }
 
@@ -37,7 +44,10 @@ export const orderDetailApi = () => http.get("/api/order/orderDetail");
 export const orderListApi = (params: Order.Detail) => http.get("/api/order/orderList", params);
 
 // 预创建订单 
-export const preCreateOrderApi = (params: Order.Create) => http.post("/api/order/orderPreview", params);
+export const preCreateOrderApi = (params: Order.PreCreate) => http.post("/api/order/orderPreview", params);
 
 //取消订单 
 export const orderCancelApi = () => http.post("/api/order/orderCancel");
+
+//查询订单备注数据 
+export const orderRemarkApi = (params: Order.Create) => http.post("/api/order/orderRemark",params);

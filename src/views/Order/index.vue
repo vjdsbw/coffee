@@ -1,6 +1,6 @@
 <script lang="ts" setup name="Confirm">
 import { Store } from "@/store";
-import { createOrderApi, preCreateOrderApi } from "@/api/orderApi";
+import { createOrderApi, preCreateOrderApi, orderRemarkApi } from "@/api/orderApi";
 const { order, global } = Store();
 const shop = global.shopGet
 const router = useRouter();
@@ -10,46 +10,80 @@ const onClickLeft = () => history.back()
 const onSubmit = async () => {
     if (!remarkForm.value.sure) return showToast("提交订单前请先同意");
     const shop = global.shopGet;
-    let params = {
-        productList: order.orderSettlement.map((item: any) => {
-            return { skuCode: item.skuCode, amount: item.amount, productId: item.productId }
-        }),
+    const params = {
+        productList: order.orderSettlement.map((item: any) => ({ skuCode: item.skuCode, amount: item.amount, productId: item.productId })),
         storeId: shop.storeId!,
-        orderComments: textComputed.value
+        orderComments: textComputed.value.questComments
+    }
+    const obj = {
+        ...params,
+        remarkList: orderNotes.value.map((item) => ({ remarkId: item.remarkId, remarkItemName: item.remarkItemName, remarkName: item.remarkName }))
     }
     const { code } = await preCreateOrderApi(params);
     if (code === 0) {
-        const res = await createOrderApi(params);
+        const res = await createOrderApi(obj);
         if (res.code === 0) {
             router.push({ name: 'Order-details' })
         }
     }
 }
+
 const showBottom = ref<boolean>(false);
+
 const remarkForm = ref<{
     mealPickup: string,
-    remark: string,
-    contactlessDelivery: string,
-    tissue: string,
-    orderComments: string,
+    writeTextarea: string,
     sure: boolean
 }>({
     mealPickup: '1',
-    remark: '',
-    contactlessDelivery: '2',
-    tissue: '2',
-    orderComments: "",
+    writeTextarea: "",
     sure: false
 })
 
 const textComputed = computed(() => {
     const str1: string = '取餐方式' + remarkForm.value.mealPickup === '1' ? '店内用餐' : '自提带走;';
-    const str2: string = (remarkForm.value.contactlessDelivery === '1' ? '需要' : '不需要') + '无接触配送;'
-    const str3: string = (remarkForm.value.tissue === '1' ? '需要' : '不需要') + '纸巾;';
-    return remarkForm.value.orderComments ? remarkForm.value.orderComments + ';' + str1 + str2 + str3 : str1 + str2 + str3;
+    const str = remarkForm.value.writeTextarea ? remarkForm.value.writeTextarea + ';' + str1 : str1
+    let list: any = [];
+    orderNotes.value.forEach((item: any) => {
+        item.itemList.forEach((itm: any) => {
+            if (itm.isDefault) {
+                list.push(itm.itemName + item.remarkName)
+            }
+        })
+    })
+    return {
+        textRemark: list.join(';'),
+        questComments: str
+    }
 })
 
+const orderNotes = ref<any[]>([]);
 
+const remarkShow = async () => {
+    let params = {
+        productList: order.orderSettlement.map((item: any) => ({ skuCode: item.skuCode, amount: item.amount, productId: item.productId })),
+        storeId: shop.storeId!,
+    }
+    const { code, data } = await orderRemarkApi(params);
+    if (code === 0 && data && data.length > 0) {
+        orderNotes.value = data.map((item: any) => {
+            let itmObj = { ...item, remarkItemName: '' }
+            item.itemList.forEach((itm: any) => {
+                if (itm.isDefault === 1) {
+                    itmObj.remarkItemName = itm.itemName
+                }
+            })
+            return itmObj;
+        })
+        showBottom.value = true;
+    }
+}
+
+const notesSelecte = (item: any, itm: any) => {
+    item.itemList.forEach((e: any) => e.isDefault = 0)
+    itm.isDefault = 1;
+    item.remarkItemName = itm.itemName;
+}
 </script>
 
 <template>
@@ -91,11 +125,22 @@ const textComputed = computed(() => {
             </van-cell-group>
         </div>
 
-        <div class="remark">
-            <div>备注特殊要求</div>
-            <div @click="showBottom = true">
-                <div>{{ textComputed }}</div>
-                <van-icon name="arrow" size="20"/>
+        <div class="remark-notes">
+            <div>
+                <div>取餐方式</div>
+                <div>
+                    <van-radio-group v-model="remarkForm.mealPickup" direction="horizontal">
+                        <van-radio name="1">店内用餐</van-radio>
+                        <van-radio name="2">自提带走</van-radio>
+                    </van-radio-group>
+                </div>
+            </div>
+            <div>
+                <div>备注特殊要求</div>
+                <div @click="remarkShow">
+                    <div>{{ textComputed.textRemark }}</div>
+                    <van-icon name="arrow" size="20" />
+                </div>
             </div>
         </div>
 
@@ -112,36 +157,17 @@ const textComputed = computed(() => {
         <van-popup v-model:show="showBottom" position="bottom" :style="{ height: '45%' }">
             <div class="cart-box-content">
                 <div class="type">
-                    <div class="type-item">
-                        <span> 取餐方式:</span>
-                        <span>
-                            <van-radio-group v-model="remarkForm.mealPickup" direction="horizontal">
-                                <van-radio name="1">店内用餐</van-radio>
-                                <van-radio name="2">自提带走</van-radio>
-                            </van-radio-group>
-                        </span>
-                    </div>
-                    <div class="type-item">
-                        <span> 无接触配送：</span>
-                        <span>
-                            <van-radio-group v-model="remarkForm.contactlessDelivery" direction="horizontal">
-                                <van-radio name="1">需要</van-radio>
-                                <van-radio name="2">不需要</van-radio>
-                            </van-radio-group>
-                        </span>
-                    </div>
-                    <div class="type-item">
-                        <span> 纸巾：</span>
-                        <span>
-                            <van-radio-group v-model="remarkForm.tissue" direction="horizontal">
-                                <van-radio name="1">需要</van-radio>
-                                <van-radio name="2">不需要</van-radio>
-                            </van-radio-group>
-                        </span>
+                    <div class="type-item" v-for="item in orderNotes" :key="item.remarkId">
+                        <div>{{ item.remarkName }}：</div>
+                        <div>
+                            <span v-for="itm in item.itemList" :key="itm.itemName"
+                                :class="{ active: itm.isDefault === 1 }" @click="notesSelecte(item, itm)">
+                                {{ itm.itemName }}</span>
+                        </div>
                     </div>
                 </div>
                 <van-cell-group class="text" inset>
-                    <van-field v-model="remarkForm.orderComments" autosize class="textarea" maxlength="50"
+                    <van-field v-model="remarkForm.writeTextarea" autosize class="textarea" maxlength="50"
                         placeholder="请备注内容" rows="4" show-word-limit type="textarea" />
                 </van-cell-group>
                 <van-button type="primary" style="margin: 1rem 1rem ;width: 95%;"
@@ -242,20 +268,41 @@ const textComputed = computed(() => {
 
     .cart-box-content {
         margin-top: .5rem;
-        background: #f6f6f6;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
 
-
         .type {
             width: 95%;
             color: #333;
+            background-color: #fff;
 
             .type-item {
+                margin: .3rem 0rem;
                 display: flex;
-                margin: 5px 0;
+                align-items: center;
+                height: 2rem;
+
+                &>div:first-child {
+                    font-weight: 600;
+                }
+
+                div {
+                    span {
+                        display: inline-block;
+                        margin: 0rem .5rem;
+                        padding: .2rem 1rem;
+                        background-color: #e6e3e3;
+                        border-radius: 1rem;
+                    }
+
+                    .active {
+                        color: #152e93;
+                        border: 1px solid #152e93;
+                        background-color: #f5f5f5;
+                    }
+                }
             }
         }
 
@@ -275,33 +322,44 @@ const textComputed = computed(() => {
         }
     }
 
-    .remark {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: #333;
-        background-color: #fff;
+    .remark-notes {
         margin: 10px 16px;
-        padding: .5rem .5rem;
         border-radius: .5rem;
 
-        &>div:first-child {
-            font-weight: 600;
-            font-size: 14px;
-            width: 30%;
-        }
-
-        &>div:last-child {
-            font-size: 14px;
-            text-align: right;
-            width: 70%;
+        &>div {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            &>div:first-child{
-                width: 90%;
-                overflow: hidden;
-                text-overflow:ellipsis;
-                white-space:nowrap;
+            color: #333;
+            background-color: #fff;
+
+            padding: .5rem .5rem;
+
+
+            &>div:first-child {
+                font-weight: 600;
+                font-size: 14px;
+                width: 30%;
+            }
+
+            &>div:last-child {
+                font-size: 14px;
+                text-align: right;
+                width: 70%;
+                display: flex;
+                align-items: center;
+
+                &>div:first-child {
+                    width: 90%;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                :deep(.van-radio-group) {
+                    width: 100% !important;
+                    justify-content: flex-end;
+                }
             }
         }
     }
