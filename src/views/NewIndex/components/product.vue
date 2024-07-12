@@ -66,24 +66,28 @@ const addCateGory = async () => {
 const back = () => emits('closeClick')
 
 const buy = async () => {
-    const obj = { ...order.orderProduct, skuCode: priceDes.value.skuCode, amount: productNumber.value }
+    const info = order.orderProduct;
+    const obj = {
+        showAttrNames: info.showAttrGroupValues.map((item: any) => item.attrValue).join('/'),
+        saleAttrNames: info.saleAttrGroupValue.map((item: any) => {
+            let str = ''
+            item.subAttrList.forEach((itm: any) => {
+                if (itm.isDefault) {
+                    str = itm.itemName
+                }
+            })
+            return str
+        }).join('/'),
+        productPicUrl:info.pictureUrlList[0],
+        id: 1,
+        productId:info.productId,
+        price: info.price,
+        productName: info.name,
+        skuCode: priceDes.value.skuCode,
+        amount: productNumber.value
+    }
     order.saveOrderSettlement([obj]);
     router.push({ name: 'Order' })
-    // let params = {
-    //     productList: [{
-    //         skuCode: priceDes.value.skuCode,
-    //         amount: productNumber.value,
-    //         productId: order.orderProduct.productId
-    //     }],
-    //     storeId: shop.storeId!
-    // }
-    // const { code } = await preCreateOrderApi(params);
-    // if (code === 0) {
-    //     const res = await createOrderApi(params);
-    //     if (res.code === 0) {
-    //         router.push({ name: 'Order-details' })
-    //     }
-    // }
 }
 
 const detailInfo = computed(() => {

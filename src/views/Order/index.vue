@@ -85,6 +85,9 @@ const notesSelecte = (item: any, itm: any) => {
     item.remarkItemName = itm.itemName;
 }
 
+onMounted(()=>{
+    console.log(order.orderSettlement,"xxxxxxxxxxxxxx")
+})
 </script>
 
 <template>
