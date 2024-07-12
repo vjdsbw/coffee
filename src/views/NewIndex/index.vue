@@ -53,7 +53,7 @@ const getMenus = async (id: number) => {
   const { data } = await productMenuApi({ storeId: id })
   let list: any = []
   data.forEach((item: any) => {
-    const filterProcut = item.productList.filter((itm: any) => itm.price < limitPrice.value)
+    const filterProcut = item.productList.filter((itm: any) => itm.price <= limitPrice.value)
     if (filterProcut.length > 0) {
       list.push({ ...item, productList: filterProcut })
     }
