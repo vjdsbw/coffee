@@ -13,7 +13,7 @@ const onSubmit = async () => {
     const params = {
         productList: order.orderSettlement.map((item: any) => ({ skuCode: item.skuCode, amount: item.amount, productId: item.productId })),
         storeId: shop.storeId!,
-        orderComments: textComputed.value.questComments
+        orderComments: remarkForm.value.writeTextarea
     }
     const obj = {
         ...params,
@@ -41,8 +41,8 @@ const remarkForm = ref<{
 })
 
 const textComputed = computed(() => {
-    const str1: string = '取餐方式' + remarkForm.value.mealPickup === '1' ? '店内用餐' : '自提带走;';
-    const str = remarkForm.value.writeTextarea ? remarkForm.value.writeTextarea + ';' + str1 : str1
+    // const str1: string = '取餐方式' + remarkForm.value.mealPickup === '1' ? '店内用餐' : '自提带走;';
+    // const str = remarkForm.value.writeTextarea ? remarkForm.value.writeTextarea + ';' + str1 : str1
     let list: any = [];
     orderNotes.value.forEach((item: any) => {
         item.itemList.forEach((itm: any) => {
@@ -53,7 +53,7 @@ const textComputed = computed(() => {
     })
     return {
         textRemark: list.join(';'),
-        questComments: str
+        // questComments: str
     }
 })
 
@@ -84,6 +84,7 @@ const notesSelecte = (item: any, itm: any) => {
     itm.isDefault = 1;
     item.remarkItemName = itm.itemName;
 }
+
 </script>
 
 <template>
@@ -126,7 +127,7 @@ const notesSelecte = (item: any, itm: any) => {
         </div>
 
         <div class="remark-notes">
-            <div>
+            <!-- <div>
                 <div>取餐方式</div>
                 <div>
                     <van-radio-group v-model="remarkForm.mealPickup" direction="horizontal">
@@ -134,7 +135,7 @@ const notesSelecte = (item: any, itm: any) => {
                         <van-radio name="2">自提带走</van-radio>
                     </van-radio-group>
                 </div>
-            </div>
+            </div> -->
             <div>
                 <div>备注特殊要求</div>
                 <div @click="remarkShow">
