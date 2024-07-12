@@ -33,11 +33,11 @@ onMounted(() => {
 <template>
 	<div class="payment-box">
 		<van-nav-bar left-arrow left-text="返回" title="订单详情" @click-left="onClickLeft" />
-		<div class="pre-time" v-show="orderDetail.orderStatusCode === 10 || orderDetail.orderStatusCode === 20">
+		<div class="pre-time" v-show="orderDetail.orderStatusCode !== 100">
 			<div>{{ orderDetail.orderStatusDesc }}</div>
 			<div class="pre-time-btn">
 				<van-button color="#949494" plain round @click="cancelOrder">取消订单</van-button>
-				<van-button v-show="orderDetail.orderStatusCode === 20" plain round color="#0c0e97"
+				<van-button v-show="orderDetail.orderStatusCode !== 10" plain round color="#0c0e97"
 					@click="lookCode">取餐码</van-button>
 			</div>
 		</div>

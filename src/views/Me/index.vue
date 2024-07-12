@@ -2,7 +2,7 @@
 import Avatar from '@/assets/me/default_avatar.png';
 import copy from '@/assets/icons/copy.svg'
 import copySuccess from '@/assets/icons/copy-success.svg'
-import { batchGenerateApi, bindUidApi, getCouponListApi, getCouponPageListApi } from "@/api/user.ts";
+import { batchGenerateApi, bindUidApi, getCouponPageListApi } from "@/api/user.ts";
 import Clipboard from 'clipboard';
 
 const httpUrl = ref<any>([])
@@ -210,7 +210,7 @@ const onCopy = (httpItem: any) => {
                                 </template>
                                 <template #label>
                                     <div>
-                                        <span>卷值:{{ item.couponPrice }} </span>
+                                        <span>劵值:{{ item.couponPrice }} </span>
                                         <span style="margin-left: 10px;">有效期:{{ item.validDate }} </span>
                                     </div>
                                 </template>
@@ -239,7 +239,6 @@ const onCopy = (httpItem: any) => {
     .back {
         width: 100%;
         height: 20%;
-        //border: 1px solid rgba(208, 29, 29, 0.86);
         box-sizing: border-box;
         background: url("@/assets/me/headerBg.png") no-repeat top;
         background-size: 100% 70%;
@@ -264,8 +263,6 @@ const onCopy = (httpItem: any) => {
                 align-content: center;
 
                 .content {
-                    //font-size: 0.78rem;
-                    //margin-top: 0.62rem;
                     font-size: 1.2rem;
                     color: #fff;
                     font-weight: bolder;
