@@ -18,6 +18,7 @@
     "node-rsa": "^1.1.1",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.1",
+    "qrcode.vue": "^3.4.1",
     "qs": "^6.12.1",
     "sass": "^1.77.4",
     "unplugin-auto-import": "^0.17.6",
