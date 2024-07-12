@@ -259,7 +259,7 @@ const selectedProduct = computed(() => {
             <van-card v-for="product in item.productList" :key="product.productId" :price="product.price"
               :desc="product.enName" :title="product.name" :thumb="product.picUrl" :origin-price="product.price">
               <template #footer>
-                <van-icon v-if="product.price < limitPrice" name="add" size="1.5rem" color="#041ba7"
+                <van-icon v-if="product.price <= limitPrice" name="add" size="1.5rem" color="#041ba7"
                   @click="productDetail(product.productId)" />
                 <van-icon v-else name="add" size="1.5rem" color="#bdbec3" />
               </template>
