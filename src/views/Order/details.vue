@@ -2,13 +2,13 @@
 import { orderDetailApi, orderCancelApi } from "@/api/orderApi.ts";
 import QrcodeVue from 'qrcode.vue';
 
-const onClickLeft = () => history.back()
 
 const show = ref(false);
 
 const lookCode = () => show.value = true
 
-const orderDetail = ref<any>({})
+const orderDetail = ref<any>({});
+
 
 const cancelOrder = async () => {
 	const { code } = await orderCancelApi();
@@ -21,19 +21,22 @@ const getOrderDetail = async () => {
 	const { code, data } = await orderDetailApi();
 	if (code === 0) {
 		orderDetail.value = data;
-		console.log(data, '获取订单详情')
+		if (data.orderStatusCode === 10) {
+			setTimeout(() => {
+				getOrderDetail()
+			}, 2000)
+		}
 	}
-}
+};
 
 onMounted(() => {
 	getOrderDetail();
 })
-
 </script>
 
 <template>
 	<div class="payment-box">
-		<van-nav-bar left-arrow left-text="返回" title="订单详情" @click-left="onClickLeft" />
+		<van-nav-bar title="订单详情" />
 		<div class="pre-time" v-show="orderDetail?.orderStatusCode !== 100">
 			<div>{{ orderDetail?.orderStatusDesc }}</div>
 			<div class="pre-time-btn">
@@ -85,7 +88,8 @@ onMounted(() => {
 				<div class="pickup-code">
 					<h2>{{ orderDetail?.pickUpCode }}</h2>
 					<p>取餐码</p>
-					<qrcode-vue v-show="orderDetail?.takeOrderId" :value="orderDetail?.takeOrderId" :size="200" level="H"></qrcode-vue>
+					<qrcode-vue v-show="orderDetail?.takeOrderId" :value="orderDetail?.takeOrderId" :size="200"
+						level="H"></qrcode-vue>
 				</div>
 			</div>
 		</van-dialog>

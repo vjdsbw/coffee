@@ -2,10 +2,7 @@
 import lookStore from "@/assets/lookStore.png";
 import { nearestApi, productMenuApi } from '@/api/storeApi'
 import { cartListApi, productDetailApi, purchasablePriceApi } from '@/api/productApi'
-
 import { Store } from "@/store";
-import Cart from './components/cart.vue'
-import Product from './components/product.vue'
 
 const router = useRouter();
 
@@ -14,6 +11,7 @@ const { global, order, user } = Store();
 const activeSection = ref(0);
 const contentRef = ref<HTMLElement | null>(null);
 const scrollSider = ref<string>('left')
+const showLoading = ref<boolean>(false)
 
 const scrollToSection = (index: number) => {
   scrollSider.value = 'left'
@@ -59,7 +57,8 @@ const getMenus = async (id: number) => {
     }
   })
   menuList.value = list;
-  history.state.choosedShop = {};
+  showLoading.value = false;
+
 }
 
 const chooseShop = () => {
@@ -91,7 +90,7 @@ const success = async (pos: any) => {
   }
 }
 
-const error = (err: any) => {
+const error = (_err: any) => {
   const shop = global.shopGet
   shop.storeId ? getMenus(shop.storeId) : router.push({ name: 'NewIndex-cityList' })
 }
@@ -99,6 +98,7 @@ const error = (err: any) => {
 const limitPrice = ref<number>(0)
 
 const getLimitPrice = async () => {
+  showLoading.value = true;
   const { data, code, msg } = await purchasablePriceApi()
   if (code === 0) {
     if (data.status === 1) {
@@ -106,9 +106,11 @@ const getLimitPrice = async () => {
       global.setLimitPrice(data)
       getLocation()
     } else {
+      showLoading.value = false;
       router.push({ name: 'Order-details' })
     }
   } else {
+    showLoading.value = false;
     showToast(msg)
   }
 }
@@ -217,7 +219,7 @@ const selectedProduct = computed(() => {
         </div>
       </div>
     </div>
-    <div class="sider-product">
+    <div class="sider-product" v-show="!showLoading">
       <van-sidebar v-model="activeSection">
         <van-sidebar-item v-for="(item, index) in menuList" :key="item.id" :id="'sidebar' + index"
           @click="scrollToSection(index)">
@@ -258,7 +260,7 @@ const selectedProduct = computed(() => {
         </div>
       </div>
     </div>
-    <div class="new-index-bottom">
+    <div class="new-index-bottom" v-show="!showLoading">
       <div class="trade">
         <div class="left">
           <van-icon name="shop" size="1.8rem" color="#041ba7" @click="cartChange" />
@@ -268,6 +270,12 @@ const selectedProduct = computed(() => {
         <div class='right' v-show="selectedProduct.selectNum > 0" @click="toBuy"> 去结算</div>
       </div>
     </div>
+    <van-loading vertical v-show="showLoading">
+      <template #icon>
+        <van-icon name="star-o" size="30" />
+      </template>
+      加载中...
+    </van-loading>
     <van-popup v-model:show="showBottom" position="bottom" :style="{ height: '100%' }">
       <Product @closeClick="closePopUp"></Product>
     </van-popup>
@@ -506,6 +514,9 @@ const selectedProduct = computed(() => {
         background-color: grey;
       }
     }
+  }
+  .van-loading--vertical{
+    margin-top: 5rem;
   }
 
 }

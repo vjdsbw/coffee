@@ -100,6 +100,10 @@ const clearAll = async () => {
     }
 }
 
+onMounted(() => {
+    checkAllChange(true)
+})
+
 </script>
 
 <template>

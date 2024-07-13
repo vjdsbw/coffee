@@ -163,7 +163,7 @@ onMounted(() => {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-
+                color: #000000;
                 .van-tag {
                     margin-right: 0.5rem;
                 }

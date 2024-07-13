@@ -40,9 +40,11 @@ onMounted(() => {
 
 <template>
     <div class="cityList-box">
-        <van-cell-group title="当前定位城市" v-show="global.shop.cityName">
-            <van-cell :title="global.shop.cityName" icon="location-o" />
-        </van-cell-group>
+        <div v-show="global.shop.cityName">
+            <van-cell-group title="当前定位城市">
+                <van-cell :title="global.shop.cityName" icon="location-o" />
+            </van-cell-group>
+        </div>
         <van-index-bar :sticky="false" class="city-list">
             <van-cell-group v-for="(val, k) in cityList" :key="k">
                 <van-index-anchor :index="k" />
@@ -70,6 +72,9 @@ onMounted(() => {
             &>div:first-child {
                 background-color: #f5f5f5;
             }
+        }
+        :deep(.van-index-bar__sidebar){
+            color: #000000;
         }
     }
 }

@@ -1,11 +1,11 @@
 <script lang="ts" setup name="All">
-const route = useRoute();
+
 
 </script>
 
 <template>
     <div class="box">
-        {{route.path}}
+        <van-empty description="页面丢失啦" />
     </div>
 </template>
 

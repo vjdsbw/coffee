@@ -37,7 +37,7 @@ const remarkForm = ref<{
 }>({
     mealPickup: '1',
     writeTextarea: "",
-    sure: false
+    sure: true
 })
 
 const textComputed = computed(() => {
@@ -119,7 +119,7 @@ const notesSelecte = (item: any, itm: any) => {
                 <van-cell title="" value="不可用">
                     <template #value>
                         <div class="total-num-total">
-                            <span>共优惠¥</span>
+                            <span>共优惠¥0</span>
                             <span>实付¥0</span>
                         </div>
                     </template>
