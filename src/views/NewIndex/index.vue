@@ -91,7 +91,12 @@ const success = async (pos: any) => {
   }
 }
 
-const error = (err: any) => showToast(`ERROR(${err.code}): ${err.message}`)
+const error = (err: any) => {
+  const shop = global.shopGet
+  if (err.code === 1) {
+    shop.storeId ? getMenus(shop.storeId) : router.push({ name: 'NewIndex-cityList' })
+  }
+}
 
 const limitPrice = ref<number>(0)
 
@@ -162,19 +167,6 @@ const toBuy = async () => {
   }).catch(() => {
 
   });
-
-  // const shop = global.shopGet
-  // let params = {
-  //   productList: list,
-  //   storeId: shop.storeId!
-  // }
-  // const { code } = await preCreateOrderApi(params);
-  // if (code === 0) {
-  //   const res = await createOrderApi(params);
-  //   if (res.code === 0) {
-  //     router.push({ name: 'Order-details' })
-  //   }
-  // }
 }
 
 const cartChange = async () => {

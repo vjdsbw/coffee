@@ -40,7 +40,7 @@ onMounted(() => {
 
 <template>
     <div class="cityList-box">
-        <van-cell-group title="当前定位城市">
+        <van-cell-group title="当前定位城市" v-show="global.shop.cityName">
             <van-cell :title="global.shop.cityName" icon="location-o" />
         </van-cell-group>
         <van-index-bar :sticky="false" class="city-list">
