@@ -91,7 +91,7 @@ const success = async (pos: any) => {
   }
 }
 
-const error = (_err: any) => {
+const error = (err: any) => {
   const shop = global.shopGet
   shop.storeId ? getMenus(shop.storeId) : router.push({ name: 'NewIndex-cityList' })
 }

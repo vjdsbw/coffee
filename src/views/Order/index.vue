@@ -43,7 +43,7 @@ const remarkForm = ref<{
 const textComputed = computed(() => {
     // const str1: string = '取餐方式' + remarkForm.value.mealPickup === '1' ? '店内用餐' : '自提带走;';
     // const str = remarkForm.value.writeTextarea ? remarkForm.value.writeTextarea + ';' + str1 : str1
-    let list: any = [];
+    let list: any = [remarkForm.value.writeTextarea];
     orderNotes.value.forEach((item: any) => {
         item.itemList.forEach((itm: any) => {
             if (itm.isDefault) {
@@ -85,9 +85,7 @@ const notesSelecte = (item: any, itm: any) => {
     item.remarkItemName = itm.itemName;
 }
 
-onMounted(()=>{
-    console.log(order.orderSettlement,"xxxxxxxxxxxxxx")
-})
+
 </script>
 
 <template>
@@ -355,8 +353,7 @@ onMounted(()=>{
 
                 &>div:first-child {
                     width: 90%;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
+                    overflow: scroll;
                     white-space: nowrap;
                 }
 
