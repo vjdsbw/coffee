@@ -270,7 +270,7 @@ const selectedProduct = computed(() => {
         <div class='right' v-show="selectedProduct.selectNum > 0" @click="toBuy"> 去结算</div>
       </div>
     </div>
-    <van-loading vertical v-show="showLoading">
+    <van-loading vertical v-show="showLoading" color="#0094ff">
       <template #icon>
         <van-icon name="star-o" size="30" />
       </template>
