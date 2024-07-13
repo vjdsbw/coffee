@@ -91,11 +91,9 @@ const success = async (pos: any) => {
   }
 }
 
-const error = (err: any) => {
+const error = (_err: any) => {
   const shop = global.shopGet
-  if (err.code === 1) {
-    shop.storeId ? getMenus(shop.storeId) : router.push({ name: 'NewIndex-cityList' })
-  }
+  shop.storeId ? getMenus(shop.storeId) : router.push({ name: 'NewIndex-cityList' })
 }
 
 const limitPrice = ref<number>(0)
