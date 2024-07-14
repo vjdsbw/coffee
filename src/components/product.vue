@@ -1,6 +1,5 @@
 <script setup lang="ts" name="Product">
-import { productPriceCalApi, addCartApi } from "@/api/productApi";
-import { preCreateOrderApi, createOrderApi } from "@/api/orderApi";
+import { productPriceCalApi, addCartApi, cartListApi } from "@/api/productApi";
 import { Store } from "@/store";
 
 const emits = defineEmits(['closeClick'])
@@ -63,7 +62,12 @@ const addCateGory = async () => {
     back()
 }
 
-const back = () => emits('closeClick')
+const back = async () => {
+    const res = await cartListApi({ storeId: global.shop.storeId! });
+    order.saveOrderList(res.data)
+    order.saveOrderCheck(res.data.map((item: any) => item.id));
+    emits('closeClick')
+}
 
 const buy = async () => {
     const info = order.orderProduct;
@@ -78,9 +82,9 @@ const buy = async () => {
             })
             return str
         }).join('/'),
-        productPicUrl:info.pictureUrlList[0],
+        productPicUrl: info.pictureUrlList[0],
         id: 1,
-        productId:info.productId,
+        productId: info.productId,
         price: info.price,
         productName: info.name,
         skuCode: priceDes.value.skuCode,

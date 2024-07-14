@@ -160,7 +160,7 @@ const notesSelecte = (item: any, itm: any) => {
             <div class="cart-box-content">
                 <div class="type">
                     <div class="type-item" v-for="item in orderNotes" :key="item.remarkId">
-                        <div>{{ item.remarkName }}：</div>
+                        <div>{{ item.remarkName }}:</div>
                         <div>
                             <span v-for="itm in item.itemList" :key="itm.itemName"
                                 :class="{ active: itm.isDefault === 1 }" @click="notesSelecte(item, itm)">

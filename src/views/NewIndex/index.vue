@@ -123,7 +123,7 @@ onMounted(async () => {
     contentElement.addEventListener("scrollend", scrollend);
   }
   const searchParams = new URL(location.href).searchParams
-  let code = searchParams.get('code')
+  let code = searchParams.get('code') //'tnvvDyjHkRC'
   if (code) {
     user.setCode(code) //E96eR2hxZRC
     getLimitPrice()
@@ -138,9 +138,10 @@ onUnmounted(() => {
   }
 });
 
-
 const showBottom = ref<boolean>(false)
-const closePopUp = () => showBottom.value = false;
+
+const closePopUp = () => showBottom.value = false
+
 const productDetail = async (productId: string) => {
   const { data } = await productDetailApi({ productId: productId, storeId: global.shop.storeId! });
   order.saveOrderProduct(data)
@@ -168,6 +169,7 @@ const toBuy = async () => {
 
   });
 }
+
 
 const cartChange = async () => {
   const shop = global.shopGet
@@ -262,8 +264,8 @@ const selectedProduct = computed(() => {
     </div>
     <div class="new-index-bottom" v-show="!showLoading">
       <div class="trade">
-        <div class="left">
-          <van-icon name="shop" size="1.8rem" color="#041ba7" @click="cartChange" />
+        <div class="left" @click="cartChange">
+          <van-icon name="shop" size="1.8rem" color="#041ba7" />
           <div class="des">本次交易可选购1商品已选购{{ selectedProduct.selectNum }}商品</div>
         </div>
         <div class='right noactive' v-show="selectedProduct.selectNum === 0"> 不可结算</div>
@@ -515,7 +517,8 @@ const selectedProduct = computed(() => {
       }
     }
   }
-  .van-loading--vertical{
+
+  .van-loading--vertical {
     margin-top: 5rem;
   }
 

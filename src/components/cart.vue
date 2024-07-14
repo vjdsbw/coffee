@@ -8,11 +8,9 @@ const { global, order } = Store();
 
 const checkboxGroup = ref(null);
 
-const checked = ref<any[]>([]);
+const isCheckAll = ref(true);
 
-const isCheckAll = ref(false);
-
-const isIndeterminate = ref(true);
+const isIndeterminate = ref(false);
 
 const getFindAllShop = async () => {
     const shop = global.shopGet
@@ -24,24 +22,22 @@ const getFindAllShop = async () => {
 };
 
 const checkAllChange = (val: boolean) => {
-    checked.value = val ? order.orderList.map((item: any) => item.id) : [];
+    const list = val ? order.orderList.map((item: any) => item.id) : [];
     isIndeterminate.value = false;
-    order.saveOrderCheck(checked.value);
+    order.saveOrderCheck(list);
 };
 
 const checkedResultChange = (value: string[]) => {
     const checkedCount = value.length;
     isCheckAll.value = checkedCount === order.orderList.length;
-    isIndeterminate.value =
-        checkedCount > 0 && checkedCount < order.orderList.length;
-    order.saveOrderCheck(checked.value);
+    isIndeterminate.value = checkedCount > 0 && checkedCount < order.orderList.length;
 };
 
 const allCartPrice = computed(() => {
     let price = 0;
     let num = 0;
     order.orderList.map((item: any) => {
-        if (checked.value.includes(item.id)) {
+        if (order.orderCheck.includes(item.id)) {
             price += Number(item.amount) * Number(item.price);
             num += Number(item.amount)
         }
@@ -95,13 +91,12 @@ const clearAll = async () => {
         showToast('购物车清空成功');
         order.saveOrderList([])
         order.saveOrderCheck([]);
-        checked.value = [];
         isCheckAll.value = false;
     }
 }
 
-onMounted(() => {
-    checkAllChange(true)
+defineExpose({
+    checkAllChange
 })
 
 </script>
@@ -122,7 +117,7 @@ onMounted(() => {
         </div>
 
         <div class="cart-box-list">
-            <van-checkbox-group v-model="checked" ref="checkboxGroup" @change="checkedResultChange">
+            <van-checkbox-group v-model="order.orderCheck" ref="checkboxGroup" @change="checkedResultChange">
                 <div class="cart-item" v-for="item in order.orderList" :key="item.id">
                     <van-checkbox :name="item.id"></van-checkbox>
                     <div class="cover">
