@@ -67,7 +67,7 @@ export default defineConfig({
     port:5173,
     proxy: {
       '^/api': {
-        target: 'http://59.110.5.165:8081/coffee',
+        target: 'http://47.100.221.186:8081/coffee',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
