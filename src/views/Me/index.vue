@@ -62,32 +62,21 @@ const copyUrl = async () => {
 
 // 根据输入的uid绑定咖啡券
 const bindUid = async () => {
-    if (inputList.value.length > 0) {
-        const { code, msg } = await bindUidApi({ uidList: inputList.value.filter(item => item !== '') })
-        if (code === 0) {
-            // getCoupon()
-            getCouponBy()
-        } else {
-            showToast(msg);
-        }
+    const list = inputList.value.filter(item => item !== '');
+    if (list.length > 0) {
+        const { msg } = await bindUidApi({ uidList: list })
+        showToast(msg)
     } else {
         showToast('请输入uid')
     }
 }
 
+
+
 // 分页获取咖啡券
-const getCouponBy = () => {
-    couponList.value = [];
-    getCouponPageListApi({ pageNo: 1, pageSize: 20 }).then(res => {
-        if (res.code === 0) {
-            res.data?.dataList.map((v: any) => {
-                couponList.value.push({ text: v?.coffeeStockTitle, value: v?.couponId, uid: v?.uid, couponPrice: v.discountDegree,validDate:v.validDateDesc },)
-            })
-        }
-        if (res.code === 500) {
-            showToast(res.msg);
-        }
-    })
+const getCouponBy = async () => {
+    showPop.value = true
+    onRefresh()
 }
 
 const addInput = () => {
@@ -104,15 +93,9 @@ const pageNum = ref<number>(1);
 const showPop = ref<boolean>(false);
 const loading = ref(false);
 const onRefresh = async () => {
-    pageNum.value = 1;
+    pageNum.value = 0;
     couponList.value = [];
-    const { code, data, msg } = await getCouponPageListApi({ pageNo: pageNum.value, pageSize: 20 })
-    loading.value = false
-    if (code === 0) {
-        couponList.value = data?.dataList.map((v: any) => ({ text: v?.coffeeStockTitle, value: v?.couponId, uid: v?.uid, couponPrice: v.discountDegree,validDate:v.validDateDesc }))
-    } else {
-        showToast(msg);
-    }
+    onLoad()
 };
 
 const finishedloading = ref(false);
@@ -122,10 +105,11 @@ const onLoad = async () => {
     finished.value = false;
     const { code, data, msg } = await getCouponPageListApi({ pageNo: pageNum.value, pageSize: 20 })
     if (code === 0) {
-        const list = data.dataList.map((v: any) => ({ text: v?.coffeeStockTitle, value: v?.couponId, uid: v?.uid, couponPrice: v.discountDegree,validDate:v.validDateDesc }));
+        const list = data.dataList.map((v: any) => ({ text: v?.coffeeStockTitle, value: v?.couponId, uid: v?.uid, couponPrice: v.discountDegree, validDate: v.validDateDesc }));
         couponList.value = [...couponList.value, ...list];
         // 加载状态结束
         finishedloading.value = false;
+        loading.value = false
         if (couponList.value.length >= data.totalCount) {
             finished.value = true;
         }
@@ -173,8 +157,8 @@ const onCopy = (httpItem: any) => {
                             @click="addInput">添加uid</van-button>
                         <van-button :disabled="!(inputList.length > 1)" class="addBtn" color="#7585BE" round
                             size="small" @click="delUid">删除uid</van-button>
-                        <van-button :disabled="couponList.length === 0" class="addBtn" color="#7585BE" round
-                            size="small" @click="showPop = true">选择卡卷</van-button>
+                        <van-button class="addBtn" color="#7585BE" round size="small"
+                            @click="getCouponBy">选择卡卷</van-button>
                     </div>
 
                     <!--动态添加uid输入框-->
@@ -202,7 +186,7 @@ const onCopy = (httpItem: any) => {
                 <van-list v-model:loading="finishedloading" :finished="finished" finished-text="没有更多了" @load="onLoad">
                     <van-checkbox-group v-model="checked" style="margin-top: 20px;">
                         <van-cell-group inset>
-                            <van-cell v-for="(item, index) in couponList" :key="index" :title="`${item.text}`" clickable
+                            <van-cell v-for="(item, index) in couponList" :key="index" :title="item.text" clickable
                                 @click="toggle(item, index)">
                                 <template #right-icon>
                                     <van-checkbox :ref="(el: any) => checkboxRefs[index] = el" :name="item"

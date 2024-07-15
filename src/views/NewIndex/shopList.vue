@@ -192,10 +192,10 @@ onMounted(() => {
                     justify-content: space-between;
                     align-items: center;
 
-                    &>div {
+                    &>div:first-child {
                         display: flex;
                         align-items: center;
-
+                        width: 75%;
                         span {
                             font-size: 0.8rem;
                             color: #666;

@@ -212,8 +212,8 @@ const selectedProduct = computed(() => {
   <div class="new-index">
     <div class="top">
       <van-image :src="lookStore"></van-image>
-      <div class="top-right">
-        <div @click="chooseShop">{{ global.shop.name }}{{ global.shop.number }} <van-icon color="#000000" name="arrow"
+      <div class="top-right" @click="chooseShop">
+        <div>{{ global.shop.name }}{{ global.shop.number }} <van-icon color="#000000" name="arrow"
             v-show="global.shop.name" /> </div>
         <div>
           <van-icon name="location-o" v-show="global.shop.distance" />
