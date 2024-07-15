@@ -7,31 +7,16 @@ import Clipboard from 'clipboard';
 
 const httpUrl = ref<any>([])
 
-const couponList = ref<{ text: string, value: string, uid: string, couponPrice: number, validDate: string }[]>([]) //卡券列表
+const couponList = ref<any[]>([]) //卡券列表
 
 const inputList = ref<string[]>(['']);
 
 const checked = ref([]);
-const checkboxRefs = ref<any>([]);
-const toggle = (item: any, index: any) => {
-    console.log(checked.value, index)
-    checkboxRefs.value?.[index]?.toggle();
-};
-
-onBeforeUpdate(() => {
-    checkboxRefs.value = [];
-});
 
 // 生成短链
 const getShortUrl = async () => {
-    if (couponList.value.length !== 0) {
-        let list: any = checked.value?.map((v: any) => {
-            return {
-                couponId: v.value as string,
-                uid: v.uid as string,
-                couponPrice: v.couponPrice as number
-            }
-        })
+    if (checked.value.length > 0) {
+        let list: any = checked.value.map((v: any) => ({ couponId: v.couponId, uid: v.uid, couponPrice: v.discountDegree }))
         const { code, data, msg } = await batchGenerateApi({ couponList: list });
         if (code === 0) {
             httpUrl.value = data.map((item: string) => ({ copyed: false, shortUrl: item }))
@@ -56,7 +41,6 @@ const copyUrl = async () => {
         }
     } catch (err) {
         showToast('复制链接失败')
-        console.error('Failed to copy text: ', err);
     }
 }
 
@@ -70,8 +54,6 @@ const bindUid = async () => {
         showToast('请输入uid')
     }
 }
-
-
 
 // 分页获取咖啡券
 const getCouponBy = async () => {
@@ -105,8 +87,7 @@ const onLoad = async () => {
     finished.value = false;
     const { code, data, msg } = await getCouponPageListApi({ pageNo: pageNum.value, pageSize: 20 })
     if (code === 0) {
-        const list = data.dataList.map((v: any) => ({ text: v?.coffeeStockTitle, value: v?.couponId, uid: v?.uid, couponPrice: v.discountDegree, validDate: v.validDateDesc }));
-        couponList.value = [...couponList.value, ...list];
+        couponList.value = [...couponList.value, ...data.dataList];
         // 加载状态结束
         finishedloading.value = false;
         loading.value = false
@@ -186,16 +167,15 @@ const onCopy = (httpItem: any) => {
                 <van-list v-model:loading="finishedloading" :finished="finished" finished-text="没有更多了" @load="onLoad">
                     <van-checkbox-group v-model="checked" style="margin-top: 20px;">
                         <van-cell-group inset>
-                            <van-cell v-for="(item, index) in couponList" :key="index" :title="item.text" clickable
-                                @click="toggle(item, index)">
+                            <van-cell v-for="(item, index) in couponList" :key="index" :title="item.coffeeStockTitle"
+                                clickable>
                                 <template #right-icon>
-                                    <van-checkbox :ref="(el: any) => checkboxRefs[index] = el" :name="item"
-                                        @click.stop />
+                                    <van-checkbox :name="item" />
                                 </template>
                                 <template #label>
                                     <div>
-                                        <span>劵值:{{ item.couponPrice }} </span>
-                                        <span style="margin-left: 10px;">有效期:{{ item.validDate }} </span>
+                                        <span>劵值:{{ item.discountDegree }} </span>
+                                        <span style="margin-left: 10px;">有效期:{{ item.validDateDesc }} </span>
                                     </div>
                                 </template>
                             </van-cell>
