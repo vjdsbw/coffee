@@ -81,18 +81,12 @@ const success = async (pos: any) => {
   const { latitude, longitude } = pos.coords;
   global.setLatAndLon({ lat: latitude, lon: longitude })
   const { data } = await nearestApi({ lat: latitude, lon: longitude })
-  const shop = global.shopGet
-  if (shop.storeId) {
-    getMenus(shop.storeId)
-  } else {
-    getMenus(data.storeId)
-    global.setShop(data)
-  }
+  getMenus(data.storeId)
+  global.setShop(data)
 }
 
 const error = (_err: any) => {
-  const shop = global.shopGet
-  shop.storeId ? getMenus(shop.storeId) : router.push({ name: 'NewIndex-cityList' })
+  router.push({ name: 'NewIndex-cityList' })
 }
 
 const limitPrice = ref<number>(0)
@@ -103,8 +97,9 @@ const getLimitPrice = async () => {
   if (code === 0) {
     if (data.status === 1) {
       limitPrice.value = data.couponPrice
-      global.setLimitPrice(data)
-      getLocation()
+      global.setLimitPrice(data);
+      const shop = global.shopGet
+      shop.storeId ? getMenus(shop.storeId) : getLocation()
     } else {
       showLoading.value = false;
       router.push({ name: 'Order-details' })
