@@ -19,11 +19,12 @@ const getShopList = async () => {
     }
 }
 
-const shopDetail = (storeId: number) => {
+const shopDetail = (info: any) => {
+    global.setShop(info);
     router.push({
         name: "NewIndex-shopDetail",
         state: {
-            id: storeId
+            id: info.storeId
         }
     })
 }
@@ -78,7 +79,7 @@ onMounted(() => {
                             <van-icon name="location-o" />
                             <span>{{ item.address }}</span>
                         </div>
-                        <div class="shop-address-detail" @click="shopDetail(item.storeId)">查看详情</div>
+                        <div class="shop-address-detail" @click="shopDetail(item)">查看详情</div>
                     </div>
                 </div>
             </div>
