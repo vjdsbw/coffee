@@ -2,7 +2,7 @@
 import Avatar from '@/assets/me/default_avatar.png';
 import copy from '@/assets/icons/copy.svg'
 import copySuccess from '@/assets/icons/copy-success.svg'
-import { batchGenerateApi, bindUidApi, getCouponPageListApi } from "@/api/user.ts";
+import { batchGenerateApi, bindUidApi, getCouponPageListApi, logoutUidApi, replaceUidApi } from "@/api/user.ts";
 import Clipboard from 'clipboard';
 
 const httpUrl = ref<any>([])
@@ -107,6 +107,26 @@ const onCopy = (httpItem: any) => {
     clipboard.on('success', () => httpItem.copyed = true)
     clipboard.on('error', () => showToast('复制失败'));
 }
+
+const uidOutList = ref<{ phone: string, oldUid: string, newUid: string }[]>([]);
+const uidOutShow = ref<boolean>(false)
+const activeNames = ref();
+const logoutUid = async () => {
+    const { code, data, msg } = await logoutUidApi();
+    if (code === 0) {
+        if (data.length === 0) return showToast('暂无过期uid')
+        uidOutList.value = data.map((item: { phone: string, uid: string }) => ({ phone: item.phone, oldUid: item.uid, newUid: "" }));
+        uidOutShow.value = true;
+    } else {
+        showToast(msg)
+    }
+}
+
+const submitNewUid = async (item: { phone: string, oldUid: string, newUid: string }) => {
+    const { code, msg } = await replaceUidApi({ newUid: item.newUid, oldUid: item.oldUid });
+    code === 0 ? showToast('替换成功') : showToast(msg)
+    uidOutShow.value = false;
+}
 </script>
 
 <template>
@@ -141,7 +161,6 @@ const onCopy = (httpItem: any) => {
                         <van-button class="addBtn" color="#7585BE" round size="small"
                             @click="getCouponBy">选择卡卷</van-button>
                     </div>
-
                     <!--动态添加uid输入框-->
                     <van-field v-for="(_item, index) in inputList" :key="index" v-model="inputList[index]" clearable
                         placeholder="请输入链接/uid" />
@@ -150,8 +169,8 @@ const onCopy = (httpItem: any) => {
                         <van-button color="#7585BE" round size="small" @click="bindUid">绑定咖啡券</van-button>
                         <van-button color="#7585BE" round size="small" @click="getShortUrl">批量生成短链</van-button>
                         <van-button color="#7585BE" round size="small" @click="copyUrl">复制链接</van-button>
+                        <van-button color="#7585BE" round size="small" @click="logoutUid">过期uid</van-button>
                     </div>
-
                 </van-cell-group>
                 <div class="short-url-copy">
                     <div v-for="(item, index) in httpUrl" :key="index">
@@ -183,6 +202,27 @@ const onCopy = (httpItem: any) => {
                     </van-checkbox-group>
                 </van-list>
             </van-pull-refresh>
+        </van-popup>
+
+        <van-popup v-model:show="uidOutShow" closeable position="bottom" :style="{ height: '50%' }">
+            <van-collapse v-model="activeNames" accordion>
+                <van-collapse-item v-for="(item, index) in uidOutList" :key="index" :name="index">
+                    <template #title>
+                        <div class="out-title">
+                            <div><span>uid:</span>{{ item.oldUid }}</div>
+                        </div>
+                    </template>
+                    <div class="out-title">
+                        <div><span>手机号:</span> {{ item.phone }}</div>
+                        <van-field v-model="item.newUid" center clearable label="新uid" placeholder="请输入新的uid">
+                            <template #button>
+                                <van-button :disabled="!item.newUid" size="small" color="#7585BE" type="primary"
+                                    @click="submitNewUid(item)">提交</van-button>
+                            </template>
+                        </van-field>
+                    </div>
+                </van-collapse-item>
+            </van-collapse>
         </van-popup>
 
     </div>
@@ -340,6 +380,31 @@ const onCopy = (httpItem: any) => {
                 white-space: nowrap;
                 text-overflow: ellipsis;
                 -o-text-overflow: ellipsis;
+            }
+        }
+    }
+
+    .van-collapse {
+        margin-top: 2rem;
+
+        .out-title {
+            color: black;
+            font-size: 12px;
+
+            div {
+                width: 95%;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                -o-text-overflow: ellipsis;
+
+                span {
+                    font-weight: 600;
+                }
+            }
+
+            .van-field {
+                padding: 0px;
             }
         }
     }

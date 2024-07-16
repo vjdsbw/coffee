@@ -37,6 +37,11 @@ export namespace userType {
         ]
 
     }
+
+    export interface replaceUid {
+        newUid: string;
+        oldUid: string
+    }
 }
 
 // 生成短链
@@ -60,3 +65,9 @@ export const getCouponPageListApi = (params: userType.couponList) => http.get("/
 
 // /console/shortCode/batchGenerate 批量生成短链
 export const batchGenerateApi = (params: userType.generateUrlList) => http.post("/console/shortCode/batchGenerate", params);
+
+// 查询已过期uid列表    
+export const logoutUidApi = () => http.get("/console/logoutUid/list");
+
+//替换已过期的uid
+export const replaceUidApi = (params: userType.replaceUid) => http.post("/console/logoutUid/replace", params);
