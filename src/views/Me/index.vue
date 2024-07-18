@@ -5,6 +5,12 @@ import copySuccess from '@/assets/icons/copy-success.svg'
 import { batchGenerateApi, bindUidApi, getCouponPageListApi, logoutUidApi, replaceUidApi } from "@/api/user.ts";
 import Clipboard from 'clipboard';
 
+const router = useRouter();
+
+const list = [
+    { title: "查询创建的短链", path: "/me/shortlink" },
+]
+
 const httpUrl = ref<any>([])
 
 const couponList = ref<any[]>([]) //卡券列表
@@ -58,6 +64,7 @@ const bindUid = async () => {
 // 分页获取咖啡券
 const getCouponBy = async () => {
     showPop.value = true
+    checked.value = [];
     onRefresh()
 }
 
@@ -151,6 +158,11 @@ const submitNewUid = async (item: { phone: string, oldUid: string, newUid: strin
             </div>
         </div>
         <div class="container">
+            <!-- <div class="info">
+                <van-cell-group>
+                    <van-cell v-for="item in list" :title="item.title" icon="newspaper-o" is-link @click="router.push(item.path)"/>
+                </van-cell-group>
+            </div> -->
             <div class="short-url">
                 <van-cell-group inset>
                     <div class="edit-btn">
@@ -167,7 +179,7 @@ const submitNewUid = async (item: { phone: string, oldUid: string, newUid: strin
 
                     <div class="edit-btn">
                         <van-button color="#7585BE" round size="small" @click="bindUid">绑定咖啡券</van-button>
-                        <van-button color="#7585BE" round size="small" @click="getShortUrl">批量生成短链</van-button>
+                        <van-button color="#7585BE" round size="small" @click="getShortUrl">批量生成</van-button>
                         <van-button color="#7585BE" round size="small" @click="copyUrl">复制链接</van-button>
                         <van-button color="#7585BE" round size="small" @click="logoutUid">过期uid</van-button>
                     </div>
