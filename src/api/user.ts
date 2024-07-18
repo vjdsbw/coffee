@@ -42,6 +42,12 @@ export namespace userType {
         newUid: string;
         oldUid: string
     }
+
+    export interface CreatedShort {
+        pageNo: number;
+        pageSize: number;
+        status: number;
+    }
 }
 
 // 生成短链
@@ -63,7 +69,7 @@ export const rxLoginApi = (params: userType.rxLogin) => http.get("/api/notify/v1
 // 分页获取咖啡券
 export const getCouponPageListApi = (params: userType.couponList) => http.get("/console/coupon/getCouponPageList", params);
 
-// /console/shortCode/batchGenerate 批量生成短链
+// 批量生成短链
 export const batchGenerateApi = (params: userType.generateUrlList) => http.post("/console/shortCode/batchGenerate", params);
 
 // 查询已过期uid列表    
@@ -71,3 +77,6 @@ export const logoutUidApi = () => http.get("/console/logoutUid/list");
 
 //替换已过期的uid
 export const replaceUidApi = (params: userType.replaceUid) => http.post("/console/logoutUid/replace", params);
+
+//分页查询短链
+export const createdShortApi = (params: userType.CreatedShort) => http.get("/console/shortCode/pageList", params);

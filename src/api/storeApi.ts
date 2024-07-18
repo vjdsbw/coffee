@@ -3,10 +3,12 @@ import http from "@/utils/http";
 export namespace StoreApi {
     // 门店列表
     export interface storeAddressList {
-        lat: number;
-        lon: number;
+        lat: string;
+        lon: string;
         code?: string;
         keyword?: string;
+        userLat?:string;
+        userLon?:string;
     }
 
     // 用户名，密码

@@ -79,7 +79,7 @@ const getLocation = () => {
 
 const success = async (pos: any) => {
   const { latitude, longitude } = pos.coords;
-  global.setLatAndLon({ lat: latitude, lon: longitude })
+  global.setUserLatAndLon({ lat: latitude, lon: longitude })
   const { data } = await nearestApi({ lat: latitude, lon: longitude })
   getMenus(data.storeId)
   global.setShop(data)

@@ -10,13 +10,18 @@ const list = ref<any>()
 const searchAddress = ref<string>('')
 
 const getShopList = async () => {
-    const address = global.latAndLonGet
-    if (address.lat && address.lon) {
-        const { data } = await shopListApi({ lat: address.lat, lon: address.lon, keyword: searchAddress.value })
-        list.value = data
-    } else {
-        showToast('当前定位失败')
+    const address = global.latAndLonGet;
+    const userAddress = global.userLatAndLonGet
+    let params = {
+        lat: address.lat ? address.lat : userAddress.lat,
+        lon: address.lon ? address.lon : userAddress.lon,
+        keyword: searchAddress.value,
+        userLat: userAddress.lat ? userAddress.lat : address.lat,
+        userLon: userAddress.lon ? userAddress.lon : address.lon,
     }
+    const { code, data } = await shopListApi(params)
+    console.log(address, userAddress, data, '当前定位失败')
+    code === 0 ? list.value = data : showToast('当前定位失败');
 }
 
 const shopDetail = (info: any) => {
@@ -165,6 +170,7 @@ onMounted(() => {
                 align-items: center;
                 justify-content: space-between;
                 color: #000000;
+
                 .van-tag {
                     margin-right: 0.5rem;
                 }
@@ -197,6 +203,7 @@ onMounted(() => {
                         display: flex;
                         align-items: center;
                         width: 75%;
+
                         span {
                             font-size: 0.8rem;
                             color: #666;

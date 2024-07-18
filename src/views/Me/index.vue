@@ -158,11 +158,11 @@ const submitNewUid = async (item: { phone: string, oldUid: string, newUid: strin
             </div>
         </div>
         <div class="container">
-            <!-- <div class="info">
+            <div class="info">
                 <van-cell-group>
-                    <van-cell v-for="item in list" :title="item.title" icon="newspaper-o" is-link @click="router.push(item.path)"/>
+                    <van-cell v-for="item in list" :title="item.title" icon="newspaper-o" is-link  @click="router.push(item.path)" />
                 </van-cell-group>
-            </div> -->
+            </div>
             <div class="short-url">
                 <van-cell-group inset>
                     <div class="edit-btn">
@@ -195,7 +195,7 @@ const submitNewUid = async (item: { phone: string, oldUid: string, newUid: strin
 
         <van-popup v-model:show="showPop" closeable position="bottom" :style="{ height: '50%' }">
             <van-pull-refresh v-model="loading" @refresh="onRefresh">
-                <van-list v-model:loading="finishedloading" :finished="finished" finished-text="没有更多了" @load="onLoad">
+                <van-list v-model:loading="finishedloading" :finished="finished" finished-text="没有更多了" @load="onLoad" :immediate-check="false">
                     <van-checkbox-group v-model="checked" style="margin-top: 20px;">
                         <van-cell-group inset>
                             <van-cell v-for="(item, index) in couponList" :key="index" :title="item.coffeeStockTitle"

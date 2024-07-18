@@ -9,11 +9,15 @@ interface GlobalState {
         number: string;
         storeId: number | null;
         workTime: string;
-        cityName:string;
+        cityName: string;
     },
     latAndLon: {
-        lat: number | null;
-        lon: number | null
+        lat: string;
+        lon: string;
+    },
+    userLatAndLon: {
+        lat: string;
+        lon: string;
     },
     limitPrice: number
     total: {
@@ -35,11 +39,15 @@ export const useGlobalStore = defineStore({
             number: '',
             storeId: null,
             workTime: '',
-            cityName:"",
+            cityName: "",
         },
         latAndLon: {
-            lat: null,
-            lon: null
+            lat: '',
+            lon: ''
+        },
+        userLatAndLon: {
+            lat: '',
+            lon: ''
         },
         limitPrice: 0,
         total: {
@@ -52,6 +60,7 @@ export const useGlobalStore = defineStore({
         limitPriceGet: state => state.limitPrice,
         totalGet: state => state.total,
         latAndLonGet: state => state.latAndLon,
+        userLatAndLonGet: state => state.userLatAndLon,
     },
     actions: {
         // Set GlobalState
@@ -66,6 +75,9 @@ export const useGlobalStore = defineStore({
         },
         setLatAndLon(address: GlobalState['latAndLon']) {
             this.latAndLon = address;
+        },
+        setUserLatAndLon(address: GlobalState['userLatAndLon']){
+            this.userLatAndLon = address;
         }
-    },
+    }
 });

@@ -1,5 +1,5 @@
 <script setup lang="ts" name="CityList">
-import { cityListApi, nearestApi } from '@/api/storeApi'
+import { cityListApi, shopListApi } from '@/api/storeApi'
 import { Store } from "@/store";
 
 const router = useRouter();
@@ -24,9 +24,10 @@ const getCityList = async () => {
 
 const citySelected = async (city: any) => {
     global.setLatAndLon({ lat: city.latitude, lon: city.longitude });
-    const { code, data } = await nearestApi({ lat: city.latitude, lon: city.longitude })
-    if (code === 0) {
-        global.setShop(data)
+    const { code, data } = await shopListApi({ lat: city.latitude, lon: city.longitude, keyword: '' })
+    if (code === 0 && data.length > 0) {
+        global.setShop(data[0])
+        console.log(city,data,'citylist')
         router.push({ name: "NewIndex-shopList" })
     } else {
         showToast('当前城市不存在门店')
@@ -73,7 +74,8 @@ onMounted(() => {
                 background-color: #f5f5f5;
             }
         }
-        :deep(.van-index-bar__sidebar){
+
+        :deep(.van-index-bar__sidebar) {
             color: #000000;
         }
     }
