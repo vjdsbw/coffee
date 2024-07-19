@@ -80,3 +80,9 @@ export const replaceUidApi = (params: userType.replaceUid) => http.post("/consol
 
 //分页查询短链
 export const createdShortApi = (params: userType.CreatedShort) => http.get("/console/shortCode/pageList", params);
+
+// 查询可用券数量
+export const availableCountApi = () => http.get("/console/coupon/availableCount");
+
+// 查询已下单数量
+export const usedCountApi = () => http.get("/console/coupon/usedCount");

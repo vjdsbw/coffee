@@ -2,7 +2,7 @@
 import Avatar from '@/assets/me/default_avatar.png';
 import copy from '@/assets/icons/copy.svg'
 import copySuccess from '@/assets/icons/copy-success.svg'
-import { batchGenerateApi, bindUidApi, getCouponPageListApi, logoutUidApi, replaceUidApi } from "@/api/user.ts";
+import { batchGenerateApi, bindUidApi, getCouponPageListApi, logoutUidApi, replaceUidApi, usedCountApi, availableCountApi } from "@/api/user.ts";
 import Clipboard from 'clipboard';
 
 const router = useRouter();
@@ -134,6 +134,32 @@ const submitNewUid = async (item: { phone: string, oldUid: string, newUid: strin
     code === 0 ? showToast('替换成功') : showToast(msg)
     uidOutShow.value = false;
 }
+
+const availabeleAndUsedCount = ref<{
+    availableCount: number,
+    usedCount: number,
+}>({
+    availableCount: 0,
+    usedCount: 0,
+})
+const getAvailableCount = async () => {
+    const { code, data } = await availableCountApi();
+    if (code === 0) {
+        availabeleAndUsedCount.value.availableCount = data;
+    }
+}
+
+const getUsedCount = async () => {
+    const { code, data } = await usedCountApi();
+    if (code === 0) {
+        availabeleAndUsedCount.value.usedCount = data;
+    }
+}
+
+onMounted(() => {
+    getAvailableCount();
+    getUsedCount();
+})
 </script>
 
 <template>
@@ -147,12 +173,12 @@ const submitNewUid = async (item: { phone: string, oldUid: string, newUid: strin
             </div>
             <div class="wallet-box">
                 <div class="wallet-item">
-                    <div class="coffee-num">1杯</div>
+                    <div class="coffee-num">{{availabeleAndUsedCount.availableCount}}杯</div>
                     <div class="coffee-text ">剩余可下咖啡</div>
                 </div>
                 <hr class="line" />
                 <div class="wallet-item">
-                    <div class="coffee-num">1杯</div>
+                    <div class="coffee-num">{{availabeleAndUsedCount.usedCount}}杯</div>
                     <div class="coffee-text">累计下单成功</div>
                 </div>
             </div>
@@ -160,7 +186,8 @@ const submitNewUid = async (item: { phone: string, oldUid: string, newUid: strin
         <div class="container">
             <div class="info">
                 <van-cell-group>
-                    <van-cell v-for="item in list" :title="item.title" icon="newspaper-o" is-link  @click="router.push(item.path)" />
+                    <van-cell v-for="item in list" :title="item.title" icon="newspaper-o" is-link
+                        @click="router.push(item.path)" />
                 </van-cell-group>
             </div>
             <div class="short-url">
@@ -195,7 +222,8 @@ const submitNewUid = async (item: { phone: string, oldUid: string, newUid: strin
 
         <van-popup v-model:show="showPop" closeable position="bottom" :style="{ height: '50%' }">
             <van-pull-refresh v-model="loading" @refresh="onRefresh">
-                <van-list v-model:loading="finishedloading" :finished="finished" finished-text="没有更多了" @load="onLoad" :immediate-check="false">
+                <van-list v-model:loading="finishedloading" :finished="finished" finished-text="没有更多了" @load="onLoad"
+                    :immediate-check="false">
                     <van-checkbox-group v-model="checked" style="margin-top: 20px;">
                         <van-cell-group inset>
                             <van-cell v-for="(item, index) in couponList" :key="index" :title="item.coffeeStockTitle"
