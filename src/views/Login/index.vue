@@ -1,7 +1,7 @@
 <script lang="ts" name="Login" setup>
 import homeActive from '@/assets/icons/home_active.png';
 import { Store } from '@/store';
-import { getPublicKeyApi, loginApi } from "@/api/storeApi.ts";
+import { loginApi } from "@/api/storeApi.ts";
 
 const { user } = Store();
 const router = useRouter()
@@ -12,48 +12,31 @@ interface loginForm {
 }
 
 const loginForm = ref<loginForm>({ accountId: "", enPwd: "123456", });
-let publicKey = ref('')
 
-
-const toBack = () => {
-
-}
 
 
 const submitLogin = async () => {
-  // let pwd = encryptWithRSA(publicKey.value, loginForm.value.enPwd)
-  // if (pwd) {
-  //   loginForm.value.enPwd = pwd
-  // }
-  console.log(loginForm.value, "加密后")
-  let res = await loginApi(loginForm.value)
-  user.setToken(res.data)
-  await router.push('/me')
-  if (res.code === 200) {
-
+  let { code, data, msg } = await loginApi(loginForm.value)
+  if (code === 0) {
+    user.setToken(data)
+    router.push('/me')
   } else {
-    console.log(res, '登录')
-  }
-
-}
-
-
-const onSubmit = (values: any) => {
-  console.log('submit', values);
-  submitLogin()
-};
-
-// 获取公钥
-const getPublicKey = async () => {
-  const { code, data } = await getPublicKeyApi();
-  if(code === 0){
-    publicKey.value = data;
+    showToast(msg)
   }
 }
 
-onMounted(() => {
-  getPublicKey()
-})
+// let publicKey = ref('')
+// // 获取公钥
+// const getPublicKey = async () => {
+//   const { code, data } = await getPublicKeyApi();
+//   if (code === 0) {
+//     publicKey.value = data;
+//   }
+// }
+
+// onMounted(() => {
+//   getPublicKey()
+// })
 
 </script>
 
@@ -64,11 +47,10 @@ onMounted(() => {
         <van-image :src="homeActive" />
         <div>Lucking Coffee</div>
       </div>
-      <div class="right" @click="toBack">先逛一逛</div>
     </div>
     <div class="form">
       <div class="welcome">欢迎回来！</div>
-      <van-form @submit="onSubmit">
+      <van-form @submit="submitLogin">
         <van-cell-group inset>
           <van-field v-model="loginForm.accountId" :rules="[{ required: false, message: '请填写用户名' }]" label="用户名"
             name="accountId" placeholder="用户名" />
