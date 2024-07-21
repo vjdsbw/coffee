@@ -45,9 +45,12 @@ const selectSub = (typeItem: any, attrItem: any) => {
     getProductPrice()
 }
 
+const disable = ref<boolean>(false)
 const getProductPrice = async () => {
+    disable.value = true
     const { data } = await productPriceCalApi(priceCal.value)
-    priceDes.value = data
+    priceDes.value = data;
+    disable.value = false
 }
 
 const addCateGory = async () => {
@@ -164,8 +167,10 @@ const detailInfo = computed(() => {
             </div>
             <div class="total-des">{{ priceDes.totalPriceDes }}</div>
             <div class="footer-btn">
-                <van-button round plain type="success" color="#6d86c4" @click="buy">立即购买</van-button>
-                <van-button round type="success" color="#6d86c4" @click="addCateGory">加入购物车</van-button>
+                <van-button :disabled="disable" round plain type="success" color="#6d86c4"
+                    @click="buy">立即购买</van-button>
+                <van-button :disabled="disable" round type="success" color="#6d86c4"
+                    @click="addCateGory">加入购物车</van-button>
             </div>
         </div>
     </div>

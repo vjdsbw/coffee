@@ -39,7 +39,7 @@ const startCountDown = () => {
   }, 1000);
   return () => clearInterval(inter);
 }
-
+const disable = ref<boolean>(false)
 const submitLogin = async () => {
   if (!loginForm.value.code) return showToast('请填写短信验证码')
   let params = {
@@ -52,6 +52,7 @@ const submitLogin = async () => {
     showDialog.value = true;
     uidCode.value = data.uid;
     copyIcon.value = false;
+    disable.value = true;
   }
 }
 
@@ -87,7 +88,7 @@ const onCopy = () => {
       </div>
     </div>
     <div class="handle">
-      <van-button type="primary" @click="submitLogin">确定</van-button>
+      <van-button type="primary" :disabled="disable" @click="submitLogin">确定</van-button>
     </div>
 
     <van-dialog v-model:show="showDialog">
