@@ -18,24 +18,19 @@ const router = createRouter({
 /**
  * @description 路由拦截 beforeEach
  * */
-router.beforeEach(async (to, _from, next) => {
-
-  const { user } = Store();
+// router.beforeEach(async (to, _from, next) => {
+  // const { user } = Store();
   // 1.NProgress 开始
   // NProgress.start();
-
   // 2.动态设置标题
   // const title = import.meta.env.VITE_GLOB_APP_TITLE;
   // document.title = to.meta.title ? `${to.meta.title} - ${title}` : title;
-
   //判断访问页面是否在路由白名单地址(静态路由)中，如果存在直接放行
-  if (routerWithList.includes(to.path)) return next();
-
+  // if (routerWithList.includes(to.path)) return next();
   //判断是否需要权限，没有重定向到 login 页面
-  if (!user.token && to.meta.authority ) return next({ path: "/login", replace: true });
-
+  // if (!user.token && to.meta.authority ) return next({ path: "/login", replace: true });
   //正常访问页面
-  next();
-});
+  // next();
+// });
 
 export default router;
