@@ -2,7 +2,7 @@
 import Avatar from '@/assets/me/default_avatar.png';
 import copy from '@/assets/icons/copy.svg'
 import copySuccess from '@/assets/icons/copy-success.svg'
-import { batchGenerateApi, bindUidApi, getCouponPageListApi, logoutUidApi, replaceUidApi, usedCountApi, availableCountApi } from "@/api/user.ts";
+import { batchGenerateApi, bindUidApi, couponDataPageListApi, logoutUidApi, replaceUidApi, usedCountApi, availableCountApi, generateByNumApi } from "@/api/user.ts";
 import Clipboard from 'clipboard';
 
 const router = useRouter();
@@ -20,20 +20,30 @@ const inputList = ref<string[]>(['']);
 const checked = ref([]);
 
 // 生成短链
-const getShortUrl = async () => {
-    if (checked.value.length > 0) {
-        let list: any = checked.value.map((v: any) => ({ couponId: v.couponId, uid: v.uid, couponPrice: v.discountDegree }))
-        const { code, data, msg } = await batchGenerateApi({ couponList: list });
-        if (code === 0) {
-            httpUrl.value = data.map((item: string) => ({ copyed: false, shortUrl: item }))
-            showToast('短链生成成功，点击复制链接')
-        } else {
-            showToast(msg)
-        }
-    } else {
-        showToast('请输入uid或者选择咖啡券')
+// const getShortUrl = async () => {
+//     if (checked.value.length > 0) {
+//         let list: any = checked.value.map((v: any) => ({ couponId: v.couponId, uid: v.uid, couponPrice: v.discountDegree }))
+//         const { code, data, msg } = await batchGenerateApi({ couponList: list });
+//         if (code === 0) {
+//             httpUrl.value = data.map((item: string) => ({ copyed: false, shortUrl: item }))
+//             showToast('短链生成成功，点击复制链接')
+//         } else {
+//             showToast(msg)
+//         }
+//     } else {
+//         showToast('请输入uid或者选择咖啡券')
+//     }
+// }
+
+const generateByNum = async (item: any) => {
+    const { code, data, msg } = await generateByNumApi({ dataId: item.dataId, couponNum: item.couponNum });
+    if(code === 0){
+        httpUrl.value = data.map((item: string) => ({ copyed: false, shortUrl: item }))
+    }else{
+        showToast(msg)
     }
 }
+
 
 // 复制生成的短链
 const copyUrl = async () => {
@@ -84,6 +94,7 @@ const loading = ref(false);
 const onRefresh = async () => {
     pageNum.value = 0;
     couponList.value = [];
+    activeNames.value = ''
     onLoad()
 };
 
@@ -92,9 +103,9 @@ const finished = ref(false);
 const onLoad = async () => {
     pageNum.value++;
     finished.value = false;
-    const { code, data, msg } = await getCouponPageListApi({ pageNo: pageNum.value, pageSize: 20 })
+    const { code, data, msg } = await couponDataPageListApi({ pageNo: pageNum.value, pageSize: 20 })
     if (code === 0) {
-        couponList.value = [...couponList.value, ...data.dataList];
+        couponList.value = [...couponList.value, ...data.dataList.map((item: any) => ({ ...item, couponNum: 1 }))];
         // 加载状态结束
         finishedloading.value = false;
         loading.value = false
@@ -173,12 +184,12 @@ onMounted(() => {
             </div>
             <div class="wallet-box">
                 <div class="wallet-item">
-                    <div class="coffee-num">{{availabeleAndUsedCount.availableCount}}杯</div>
+                    <div class="coffee-num">{{ availabeleAndUsedCount.availableCount }}杯</div>
                     <div class="coffee-text ">剩余可下咖啡</div>
                 </div>
                 <hr class="line" />
                 <div class="wallet-item">
-                    <div class="coffee-num">{{availabeleAndUsedCount.usedCount}}杯</div>
+                    <div class="coffee-num">{{ availabeleAndUsedCount.usedCount }}杯</div>
                     <div class="coffee-text">累计下单成功</div>
                 </div>
             </div>
@@ -206,7 +217,7 @@ onMounted(() => {
 
                     <div class="edit-btn">
                         <van-button color="#7585BE" round size="small" @click="bindUid">绑定咖啡券</van-button>
-                        <van-button color="#7585BE" round size="small" @click="getShortUrl">批量生成</van-button>
+                        <!-- <van-button color="#7585BE" round size="small" @click="getShortUrl">批量生成</van-button> -->
                         <van-button color="#7585BE" round size="small" @click="copyUrl">复制链接</van-button>
                         <van-button color="#7585BE" round size="small" @click="logoutUid">过期uid</van-button>
                     </div>
@@ -224,22 +235,28 @@ onMounted(() => {
             <van-pull-refresh v-model="loading" @refresh="onRefresh">
                 <van-list v-model:loading="finishedloading" :finished="finished" finished-text="没有更多了" @load="onLoad"
                     :immediate-check="false">
-                    <van-checkbox-group v-model="checked" style="margin-top: 20px;">
-                        <van-cell-group inset>
-                            <van-cell v-for="(item, index) in couponList" :key="index" :title="item.coffeeStockTitle"
-                                clickable>
-                                <template #right-icon>
-                                    <van-checkbox :name="item" />
-                                </template>
-                                <template #label>
-                                    <div>
-                                        <span>劵值:{{ item.discountDegree }} </span>
-                                        <span style="margin-left: 10px;">有效期:{{ item.validDateDesc }} </span>
-                                    </div>
-                                </template>
-                            </van-cell>
-                        </van-cell-group>
-                    </van-checkbox-group>
+                    <van-collapse v-model="activeNames" accordion>
+                        <van-collapse-item v-for="(item, index) in couponList" :key="item.dataId" :name="index"
+                            :title="item.coffeeStockTitle">
+                            <div style="color: black;">
+                                <div style="display: flex;justify-content: space-between;align-items: center;">
+                                    <div>劵价格:¥{{ item.discountDegree }}</div>
+                                    <div style="text-align: right;"> 可用张数:{{ item.availableCount }}</div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <van-field v-model="item.couponNum" center clearable label="生成链接个数"
+                                        placeholder="生成链接个数" style="padding: 0px;">
+                                        <template #button>
+                                            <van-button
+                                                :disabled="item.couponNum < 1 || item.couponNum > item.availableCount"
+                                                size="small" color="#7585BE" type="primary"
+                                                @click="generateByNum(item)">提交</van-button>
+                                        </template>
+                                    </van-field>
+                                </div>
+                            </div>
+                        </van-collapse-item>
+                    </van-collapse>
                 </van-list>
             </van-pull-refresh>
         </van-popup>

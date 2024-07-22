@@ -48,6 +48,16 @@ export namespace userType {
         pageSize: number;
         status: number;
     }
+
+    export interface CouponDataPage {
+        pageNo: number;
+        pageSize: number;
+    }
+
+    export interface generateByNum{
+        couponNum: number;
+        dataId: string;
+    }
 }
 
 // 生成短链
@@ -86,3 +96,9 @@ export const availableCountApi = () => http.get("/console/coupon/availableCount"
 
 // 查询已下单数量
 export const usedCountApi = () => http.get("/console/coupon/usedCount");
+
+// 分页获取卡券数据列表
+export const couponDataPageListApi = (params: userType.CouponDataPage) => http.get("/console/coupon/getCouponDataPageList",params);
+
+//根据数量生成短链
+export const generateByNumApi = (params: userType.generateByNum) => http.post("/console/shortCode/generateByNum",params);
