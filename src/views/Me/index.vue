@@ -38,7 +38,9 @@ const checked = ref([]);
 const generateByNum = async (item: any) => {
     const { code, data, msg } = await generateByNumApi({ dataId: item.dataId, couponNum: item.couponNum });
     if(code === 0){
+        showToast('创建链接成功');
         httpUrl.value = data.map((item: string) => ({ copyed: false, shortUrl: item }))
+        showPop.value = false;
     }else{
         showToast(msg)
     }
