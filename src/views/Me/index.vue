@@ -37,11 +37,11 @@ const checked = ref([]);
 
 const generateByNum = async (item: any) => {
     const { code, data, msg } = await generateByNumApi({ dataId: item.dataId, couponNum: item.couponNum });
-    if(code === 0){
+    if (code === 0) {
         showToast('创建链接成功');
         httpUrl.value = data.map((item: string) => ({ copyed: false, shortUrl: item }))
         showPop.value = false;
-    }else{
+    } else {
         showToast(msg)
     }
 }
@@ -49,13 +49,21 @@ const generateByNum = async (item: any) => {
 
 // 复制生成的短链
 const copyUrl = async () => {
-    console.log(httpUrl.value, '短链')
+    if (httpUrl.value.length === 0) return showToast('暂无链接，请先生成短链');
+    const list = httpUrl.value.map((item: any) => item.shortUrl).join('\n')
     try {
-        if (httpUrl.value) {
-            const list = httpUrl.value.map((item: any) => item.shortUrl)
-            await navigator.clipboard.writeText(list);
+        if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(list);
         } else {
-            showToast('暂无链接，请先生成短链')
+            // 创建 textarea
+            let textarea = document.createElement("textarea");
+            textarea.value = list;
+            textarea.style.opacity = 0;        // 使 textarea 不在 viewport，同时设置不可见
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            document.execCommand('copy') ? showToast('复制链接成功') : showToast('复制链接失败');
+            textarea.remove();
         }
     } catch (err) {
         showToast('复制链接失败')
