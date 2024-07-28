@@ -30,7 +30,7 @@ const onLoad = async () => {
         if (data.length < 50) {
             finished.value = true;
         }
-    }else{
+    } else {
         showToast(msg)
     }
 };
@@ -48,7 +48,12 @@ const onLoad = async () => {
             <van-list v-model:loading="finishedloading" :finished="finished" finished-text="没有更多了" @load="onLoad"
                 :immediate-check="false">
                 <van-cell-group>
-                    <van-cell v-for="(sc, index) in scList" :key="index" :title="sc" value="" />
+                    <van-cell v-for="(sc, index) in scList" :key="index">
+                        <template #title>
+                            <van-tag type="primary" style="margin-right: 10px;">{{ index + 1 }}</van-tag>
+                            <span>{{ sc }}</span>
+                        </template>
+                    </van-cell>
                 </van-cell-group>
             </van-list>
         </van-pull-refresh>
@@ -68,6 +73,7 @@ const onLoad = async () => {
     background-color: #f5f5f5;
     height: 100vh;
     overflow-y: scroll;
+
     .van-search {
         margin-top: 10px
     }
