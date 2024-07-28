@@ -2,7 +2,7 @@
 import Avatar from '@/assets/me/default_avatar.png';
 import copy from '@/assets/icons/copy.svg'
 import copySuccess from '@/assets/icons/copy-success.svg'
-import { batchGenerateApi, bindUidApi, couponDataPageListApi, logoutUidApi, replaceUidApi, usedCountApi, availableCountApi, generateByNumApi } from "@/api/user.ts";
+import { batchGenerateApi, bindUidApi, couponDataPageListApi, logoutUidApi, replaceUidApi, usedCountApi, availableCountApi, generateByNumApi, deleteUrlApi, queryUrlStatusApi } from "@/api/user.ts";
 import Clipboard from 'clipboard';
 
 const router = useRouter();
@@ -56,7 +56,7 @@ const copyUrl = async () => {
             return navigator.clipboard.writeText(list);
         } else {
             // 创建 textarea
-            let textarea = document.createElement("textarea");
+            let textarea:any = document.createElement("textarea");
             textarea.value = list;
             textarea.style.opacity = 0;        // 使 textarea 不在 viewport，同时设置不可见
             document.body.appendChild(textarea);
@@ -96,6 +96,17 @@ const delUid = () => {
     if (inputList.value.length > 1) {
         inputList.value.pop()
     }
+}
+
+const urlLink = ref<string>()
+const delUrlLink = async () => {
+    const { code, data, msg } = await deleteUrlApi({ url: urlLink.value! })
+    code === 0 ? showToast('删除成功') : showToast(msg);
+}
+
+const checkUrlStatus = async () => {
+    const { code, data, msg } = await queryUrlStatusApi({ url: urlLink.value! })
+    code === 0 ? showToast(data) : showToast(msg);
 }
 
 const pageNum = ref<number>(1);
@@ -177,6 +188,7 @@ const getUsedCount = async () => {
     }
 }
 
+
 onMounted(() => {
     getAvailableCount();
     getUsedCount();
@@ -230,6 +242,16 @@ onMounted(() => {
                         <!-- <van-button color="#7585BE" round size="small" @click="getShortUrl">批量生成</van-button> -->
                         <van-button color="#7585BE" round size="small" @click="copyUrl">复制链接</van-button>
                         <van-button color="#7585BE" round size="small" @click="logoutUid">过期uid</van-button>
+                    </div>
+                </van-cell-group>
+                <van-cell-group inset style="margin-top: 10px;">
+                    <!--动态添加uid输入框-->
+                    <van-field v-model="urlLink" clearable placeholder="请输入链接" />
+                    <div class="edit-btn">
+                        <van-button color="#7585BE" style="width: 100px;" round size="small" :disabled="!urlLink"
+                            @click="checkUrlStatus">查询链接状态</van-button>
+                        <van-button color="#7585BE" round size="small" :disabled="!urlLink"
+                            @click="delUrlLink">删除链接</van-button>
                     </div>
                 </van-cell-group>
                 <div class="short-url-copy">

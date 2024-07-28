@@ -151,8 +151,8 @@ defineExpose({
 
 <route lang="json">{
     "meta": {
-        "layout": "index",
-        "authority": true
+        "layout": false,
+        "authority": false
     }
 }</route>
 
