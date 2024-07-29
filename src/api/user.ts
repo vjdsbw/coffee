@@ -48,6 +48,12 @@ export namespace userType {
         pageSize: number;
         status: number;
     }
+
+    export interface CouponNoPage {
+        pageNo: number;
+        pageSize: number;
+        uid: string;
+    }
 }
 
 // 生成短链
@@ -86,3 +92,6 @@ export const availableCountApi = () => http.get("/console/coupon/availableCount"
 
 // 查询已下单数量
 export const usedCountApi = () => http.get("/console/coupon/usedCount");
+
+//分页获取卡券编号列表 
+export const couponNoPageListApi = (params: userType.CouponNoPage) => http.get("/console/coupon/getCouponNoPageList", params);
