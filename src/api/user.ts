@@ -49,6 +49,15 @@ export namespace userType {
         status: number;
     }
 
+    export interface CouponDataPage {
+        pageNo: number;
+        pageSize: number;
+    }
+
+    export interface generateByNum {
+        couponNum: number;
+        dataId: string;
+    }
     export interface CouponNoPage {
         pageNo: number;
         pageSize: number;
@@ -93,5 +102,17 @@ export const availableCountApi = () => http.get("/console/coupon/availableCount"
 // 查询已下单数量
 export const usedCountApi = () => http.get("/console/coupon/usedCount");
 
+// 分页获取卡券数据列表
+export const couponDataPageListApi = (params: userType.CouponDataPage) => http.get("/console/coupon/getCouponDataPageList", params);
+
+//根据数量生成短链
+export const generateByNumApi = (params: userType.generateByNum) => http.post("/console/shortCode/generateByNum", params);
+
 //分页获取卡券编号列表 
 export const couponNoPageListApi = (params: userType.CouponNoPage) => http.get("/console/coupon/getCouponNoPageList", params);
+
+//删除链接
+export const deleteUrlApi = (params: { url: string }) => http.post("/console/shortCode/deleteUrl", params);
+
+// 查询链接状态
+export const queryUrlStatusApi = (params: { url: string }) => http.get("/console/shortCode/queryUrlStatus", params);
