@@ -2,12 +2,25 @@
 import Avatar from '@/assets/me/default_avatar.png';
 import copy from '@/assets/icons/copy.svg'
 import copySuccess from '@/assets/icons/copy-success.svg'
-import { batchGenerateApi, bindUidApi, couponDataPageListApi, logoutUidApi, replaceUidApi, usedCountApi, availableCountApi, generateByNumApi, deleteUrlApi, queryUrlStatusApi } from "@/api/user.ts";
+import {
+    batchGenerateApi,
+    bindUidApi,
+    couponDataPageListApi,
+    logoutUidApi,
+    replaceUidApi,
+    usedCountApi,
+    availableCountApi,
+    generateByNumApi,
+    deleteUrlApi,
+    queryUrlStatusApi,
+    couponByUidApi
+} from "@/api/user.ts";
 import Clipboard from 'clipboard';
 
 const router = useRouter();
 
 const list = [
+    { title: "获取uid", path: "/me/login" },
     { title: "查询创建的短链", path: "/me/shortlink" },
 ]
 
@@ -56,7 +69,7 @@ const copyUrl = async () => {
             return navigator.clipboard.writeText(list);
         } else {
             // 创建 textarea
-            let textarea:any = document.createElement("textarea");
+            let textarea: any = document.createElement("textarea");
             textarea.value = list;
             textarea.style.opacity = 0;        // 使 textarea 不在 viewport，同时设置不可见
             document.body.appendChild(textarea);
@@ -188,6 +201,11 @@ const getUsedCount = async () => {
     }
 }
 
+const refreshCoupons = async () => {
+    const { data, code, msg } = await couponByUidApi();
+    code === 0 ? showToast('刷新成功') : showToast(msg)
+}
+
 
 onMounted(() => {
     getAvailableCount();
@@ -242,6 +260,7 @@ onMounted(() => {
                         <!-- <van-button color="#7585BE" round size="small" @click="getShortUrl">批量生成</van-button> -->
                         <van-button color="#7585BE" round size="small" @click="copyUrl">复制链接</van-button>
                         <van-button color="#7585BE" round size="small" @click="logoutUid">过期uid</van-button>
+                        <van-button color="#7585BE" round size="small" @click="refreshCoupons">刷新券</van-button>
                     </div>
                 </van-cell-group>
                 <van-cell-group inset style="margin-top: 10px;">

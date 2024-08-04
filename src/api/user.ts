@@ -116,3 +116,6 @@ export const deleteUrlApi = (params: { url: string }) => http.post("/console/sho
 
 // 查询链接状态
 export const queryUrlStatusApi = (params: { url: string }) => http.get("/console/shortCode/queryUrlStatus", params);
+ 
+//刷新链接 
+export const couponByUidApi = () => http.get("/console/coupon/refresh/couponByUid");
