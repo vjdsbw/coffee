@@ -9,6 +9,9 @@ const router = useRouter();
 
 const list = [
     { title: "查询创建的短链", path: "/me/shortlink" },
+    { title: "获取uid", path: "/me/meuid" },
+    { title: "券使用情况", path: "/me/phone" },
+    { title: "sc列表", path: "/me/sc" },
 ]
 
 const httpUrl = ref<any>([])
@@ -192,6 +195,9 @@ const getUsedCount = async () => {
 onMounted(() => {
     getAvailableCount();
     getUsedCount();
+    if (history.state.uid) {
+        inputList.value[0]= history.state.uid
+    }
 })
 </script>
 
