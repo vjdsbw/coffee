@@ -2,7 +2,7 @@
 import Avatar from '@/assets/me/default_avatar.png';
 import copy from '@/assets/icons/copy.svg'
 import copySuccess from '@/assets/icons/copy-success.svg'
-import { batchGenerateApi, bindUidApi, couponDataPageListApi, logoutUidApi, replaceUidApi, usedCountApi, availableCountApi, generateByNumApi, deleteUrlApi, queryUrlStatusApi } from "@/api/user.ts";
+import { batchGenerateApi, bindUidApi, couponDataPageListApi, logoutUidApi, replaceUidApi, usedCountApi, availableCountApi, generateByNumApi, deleteUrlApi, queryUrlStatusApi, couponByUidApi } from "@/api/user.ts";
 import Clipboard from 'clipboard';
 
 const router = useRouter();
@@ -48,6 +48,13 @@ const generateByNum = async (item: any) => {
         showToast(msg)
     }
 }
+
+
+const refreshCoupons = async () => {
+    const { data, code, msg } = await couponByUidApi();
+    code === 0 ? showToast('刷新成功') : showToast(msg)
+}
+
 
 
 // 复制生成的短链
@@ -248,6 +255,7 @@ onMounted(() => {
                         <!-- <van-button color="#7585BE" round size="small" @click="getShortUrl">批量生成</van-button> -->
                         <van-button color="#7585BE" round size="small" @click="copyUrl">复制链接</van-button>
                         <van-button color="#7585BE" round size="small" @click="logoutUid">过期uid</van-button>
+                        <van-button color="#7585BE" round size="small" @click="refreshCoupons">刷新劵</van-button>
                     </div>
                 </van-cell-group>
                 <van-cell-group inset style="margin-top: 10px;">
