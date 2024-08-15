@@ -21,7 +21,7 @@ import Clipboard from 'clipboard';
 const router = useRouter();
 
 const list = [
-    { title: "获取uid", path: "/me/login" },
+    // { title: "获取uid", path: "/me/login" },
     { title: "查询创建的短链", path: "/me/shortlink" },
     { title: "获取uid", path: "/me/meuid" },
     { title: "券使用情况", path: "/me/phone" },
