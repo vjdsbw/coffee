@@ -15,6 +15,7 @@ import {
     queryUrlStatusApi,
     couponByUidApi
 } from "@/api/user.ts";
+
 import Clipboard from 'clipboard';
 
 const router = useRouter();
@@ -22,6 +23,9 @@ const router = useRouter();
 const list = [
     { title: "获取uid", path: "/me/login" },
     { title: "查询创建的短链", path: "/me/shortlink" },
+    { title: "获取uid", path: "/me/meuid" },
+    { title: "券使用情况", path: "/me/phone" },
+    { title: "sc列表", path: "/me/sc" },
 ]
 
 const httpUrl = ref<any>([])
@@ -58,6 +62,13 @@ const generateByNum = async (item: any) => {
         showToast(msg)
     }
 }
+
+
+const refreshCoupons = async () => {
+    const { data, code, msg } = await couponByUidApi();
+    code === 0 ? showToast('刷新成功') : showToast(msg)
+}
+
 
 
 // 复制生成的短链
@@ -201,15 +212,13 @@ const getUsedCount = async () => {
     }
 }
 
-const refreshCoupons = async () => {
-    const { data, code, msg } = await couponByUidApi();
-    code === 0 ? showToast('刷新成功') : showToast(msg)
-}
-
 
 onMounted(() => {
     getAvailableCount();
     getUsedCount();
+    if (history.state.uid) {
+        inputList.value[0]= history.state.uid
+    }
 })
 </script>
 
@@ -260,7 +269,7 @@ onMounted(() => {
                         <!-- <van-button color="#7585BE" round size="small" @click="getShortUrl">批量生成</van-button> -->
                         <van-button color="#7585BE" round size="small" @click="copyUrl">复制链接</van-button>
                         <van-button color="#7585BE" round size="small" @click="logoutUid">过期uid</van-button>
-                        <van-button color="#7585BE" round size="small" @click="refreshCoupons">刷新券</van-button>
+                        <van-button color="#7585BE" round size="small" @click="refreshCoupons">刷新劵</van-button>
                     </div>
                 </van-cell-group>
                 <van-cell-group inset style="margin-top: 10px;">

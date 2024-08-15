@@ -116,6 +116,9 @@ export const deleteUrlApi = (params: { url: string }) => http.post("/console/sho
 
 // 查询链接状态
 export const queryUrlStatusApi = (params: { url: string }) => http.get("/console/shortCode/queryUrlStatus", params);
- 
+
+// 查询手机号关联券使用情况 
+export const couponPhoneDataApi = () => http.get("/console/coupon/couponPhoneData");
+
 //刷新链接 
 export const couponByUidApi = () => http.get("/console/coupon/refresh/couponByUid");
