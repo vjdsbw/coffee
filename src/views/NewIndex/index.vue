@@ -1,5 +1,7 @@
 <script setup lang="ts" name="new-index">
 import lookStore from "@/assets/lookStore.png";
+import luckCoffee from '@/assets/luckCoffee.png'
+import shopbag_bg from '@/assets/icons/shopbag_bg.png'
 import { nearestApi, productMenuApi } from '@/api/storeApi'
 import { cartListApi, productDetailApi, purchasablePriceApi } from '@/api/productApi'
 import { Store } from "@/store";
@@ -221,12 +223,12 @@ const selectedProduct = computed(() => {
         <van-sidebar-item v-for="(item, index) in menuList" :key="item.id" :id="'sidebar' + index"
           @click="scrollToSection(index)">
           <template #title>
-            <div>
+            <!-- <div>
               <van-icon v-show="activeSection === index" :name="item.icon" size="1.5rem" />
             </div>
             <div v-show="activeSection !== index && item.tagName && item.tagBgColor" class="sidebar-tagName">
               <span :style="{ backgroundColor: item.tagBgColor, color: '#fff' }">{{ item.tagName }}</span>
-            </div>
+            </div> -->
             <div>{{ item.name }}</div>
           </template>
         </van-sidebar-item>
@@ -237,7 +239,8 @@ const selectedProduct = computed(() => {
         <div class="content-section" v-for="(item, index) in menuList" :key="item.id" :id="'sidebarSelct' + index">
           <div class="content-section-header">
             <div class="heiader-image">
-              <van-image height="100%" :src="item.sourceUrl" width="100%" v-show="item.sourceUrl" />
+              <!-- <van-image height="100%" :src="item.sourceUrl" width="100%" v-show="item.sourceUrl" /> -->
+               <van-image height="100%" :src="shopbag_bg" width="100%"></van-image>
             </div>
             <div class="heiader-text">
               <strong>{{ item.name }}</strong>
@@ -245,8 +248,16 @@ const selectedProduct = computed(() => {
             </div>
           </div>
           <div class="content-section-card">
-            <van-card v-for="product in item.productList" :key="product.productId" :price="product.price"
+            <!-- <van-card v-for="product in item.productList" :key="product.productId" :price="product.price"
               :desc="product.enName" :title="product.name" :thumb="product.picUrl" :origin-price="product.price"
+              @click="productDetail(product.productId)">
+              <template #footer>
+                <van-icon v-if="product.price <= limitPrice" name="add" size="1.5rem" color="#041ba7" />
+                <van-icon v-else name="add" size="1.5rem" color="#bdbec3" />
+              </template>
+            </van-card>  -->
+            <van-card v-for="product in item.productList" :key="product.productId" :price="product.price"
+              :desc="product.enName" :title="product.name" :thumb="luckCoffee" :origin-price="product.price"
               @click="productDetail(product.productId)">
               <template #footer>
                 <van-icon v-if="product.price <= limitPrice" name="add" size="1.5rem" color="#041ba7" />
