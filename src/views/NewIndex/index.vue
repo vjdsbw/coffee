@@ -120,7 +120,7 @@ onMounted(async () => {
   const searchParams = new URL(location.href).searchParams
   const code = searchParams.get('code') //'tnvvDyjHkRC' sign=1a9fc62207765f7bd00a024fb3d92ab2
   const sign = searchParams.get('sign')
-  if (code) {
+  if (code && sign) {
     user.setCode(code) //E96eR2hxZRC
     user.setSign(sign)
     getLimitPrice()
