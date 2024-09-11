@@ -4,6 +4,7 @@ import piniaPersistConfig from './piniaPersist';
 interface UserState {
     token: string;
     code: string;
+    sign:string
 }
 
 export const useUserStore = defineStore({
@@ -11,7 +12,8 @@ export const useUserStore = defineStore({
     state: (): UserState => {
         return {
             token: "",
-            code: ""
+            code: "",
+            sign:"",
         };
     },
     actions: {
@@ -20,6 +22,9 @@ export const useUserStore = defineStore({
         },
         setCode(Code: UserState['token']) {
             this.code = Code;
+        },
+        setSign(sign: UserState['sign']) {
+            this.sign = sign;
         },
     },
     persist: piniaPersistConfig('user')
