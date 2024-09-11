@@ -58,7 +58,6 @@ export namespace userType {
         couponNum: number;
         dataId: string;
     }
-
     export interface CouponNoPage {
         pageNo: number;
         pageSize: number;

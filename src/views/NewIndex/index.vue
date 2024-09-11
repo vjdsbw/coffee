@@ -120,9 +120,11 @@ onMounted(async () => {
     contentElement.addEventListener("scrollend", scrollend);
   }
   const searchParams = new URL(location.href).searchParams
-  let code = searchParams.get('code') //'tnvvDyjHkRC'
-  if (code) {
+  const code = searchParams.get('code') //'tnvvDyjHkRC' sign=1a9fc62207765f7bd00a024fb3d92ab2
+  const sign = searchParams.get('sign')
+  if (code && sign) {
     user.setCode(code) //E96eR2hxZRC
+    user.setSign(sign)
     getLimitPrice()
   }
 });
@@ -240,7 +242,7 @@ const selectedProduct = computed(() => {
           <div class="content-section-header">
             <div class="heiader-image">
               <!-- <van-image height="100%" :src="item.sourceUrl" width="100%" v-show="item.sourceUrl" /> -->
-               <van-image height="100%" :src="shopbag_bg" width="100%"></van-image>
+              <van-image height="100%" :src="shopbag_bg" width="100%"></van-image>
             </div>
             <div class="heiader-text">
               <strong>{{ item.name }}</strong>

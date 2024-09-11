@@ -2,12 +2,26 @@
 import Avatar from '@/assets/me/default_avatar.png';
 import copy from '@/assets/icons/copy.svg'
 import copySuccess from '@/assets/icons/copy-success.svg'
-import { batchGenerateApi, bindUidApi, couponDataPageListApi, logoutUidApi, replaceUidApi, usedCountApi, availableCountApi, generateByNumApi, deleteUrlApi, queryUrlStatusApi, couponByUidApi } from "@/api/user.ts";
+import {
+    batchGenerateApi,
+    bindUidApi,
+    couponDataPageListApi,
+    logoutUidApi,
+    replaceUidApi,
+    usedCountApi,
+    availableCountApi,
+    generateByNumApi,
+    deleteUrlApi,
+    queryUrlStatusApi,
+    couponByUidApi
+} from "@/api/user.ts";
+
 import Clipboard from 'clipboard';
 
 const router = useRouter();
 
 const list = [
+    // { title: "获取uid", path: "/me/login" },
     { title: "查询创建的短链", path: "/me/shortlink" },
     { title: "获取uid", path: "/me/meuid" },
     { title: "券使用情况", path: "/me/phone" },
@@ -66,7 +80,7 @@ const copyUrl = async () => {
             return navigator.clipboard.writeText(list);
         } else {
             // 创建 textarea
-            let textarea:any = document.createElement("textarea");
+            let textarea: any = document.createElement("textarea");
             textarea.value = list;
             textarea.style.opacity = 0;        // 使 textarea 不在 viewport，同时设置不可见
             document.body.appendChild(textarea);
