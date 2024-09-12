@@ -27,7 +27,6 @@ const citySelected = async (city: any) => {
     const { code, data } = await shopListApi({ lat: city.latitude, lon: city.longitude, keyword: '' })
     if (code === 0 && data.length > 0) {
         global.setShop(data[0])
-        console.log(city,data,'citylist')
         router.push({ name: "NewIndex-shopList" })
     } else {
         showToast('当前城市不存在门店')

@@ -5,14 +5,14 @@ import { shopDetailApi } from '@/api/storeApi'
 
 import { Store } from "@/store";
 
-const {  user } = Store();
+const { user } = Store();
 
 const router = useRouter()
 const info = ref<any>({})
 
 const getShopDetail = async () => {
-    const { data } = await shopDetailApi({ storeId : history.state.id })
-    info.value = {...data,workTime:data.workTime.split(/\r?\n/)}
+    const { data } = await shopDetailApi({ storeId: history.state.id })
+    info.value = { ...data, workTime: data.workTime.split(/\r?\n/) }
 }
 
 onMounted(() => {
@@ -29,7 +29,7 @@ onMounted(() => {
         <div class="shop-detail-content">
             <van-image :src="detail" />
             <div class="info-detail">
-                <div class="name"><span>{{info.name}}{{ info.number }}</span></div>
+                <div class="name"><span>{{ info.name }}{{ info.number }}</span></div>
                 <div class="detail">
                     <div class="title">营业时间：</div>
                     <div class="openTime">
@@ -42,7 +42,8 @@ onMounted(() => {
                 </div>
             </div>
         </div>
-        <van-button type="primary" @click="router.push(`/newindex?code=${user.code}`)">去喝一杯</van-button>
+        <van-button type="primary"
+            @click="router.push(`/newindex?code=${user.code}&sign=${user.sign}`)">去喝一杯</van-button>
     </div>
 </template>
 
@@ -125,7 +126,7 @@ onMounted(() => {
     }
 
     .van-button {
-        width:19rem;
+        width: 19rem;
         height: 2rem;
         margin: .18rem auto;
         line-height: 2rem;

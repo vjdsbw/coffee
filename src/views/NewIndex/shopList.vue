@@ -36,7 +36,7 @@ const shopDetail = (info: any) => {
 
 const choosed = (info: any) => {
     global.setShop(info);
-    let url = '/newindex?code=' + user.code
+    let url = '/newindex?code=' + user.code+'&sign=' + user.sign
     router.push(url)
 }
 
