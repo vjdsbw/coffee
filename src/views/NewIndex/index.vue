@@ -259,7 +259,7 @@ const selectedProduct = computed(() => {
         </div>
       </div>
     </div>
-    <div class="new-index-bottom" v-show="!showLoading">
+    <!-- <div class="new-index-bottom" v-show="!showLoading">
       <div class="trade">
         <div class="left" @click="cartChange">
           <van-icon name="shop" size="1.8rem" color="#041ba7" />
@@ -268,7 +268,7 @@ const selectedProduct = computed(() => {
         <div class='right noactive' v-show="selectedProduct.selectNum === 0"> 不可结算</div>
         <div class='right' v-show="selectedProduct.selectNum > 0" @click="toBuy"> 去结算</div>
       </div>
-    </div>
+    </div> -->
     <van-loading vertical v-show="showLoading" color="#0094ff">
       <template #icon>
         <van-icon name="star-o" size="30" />

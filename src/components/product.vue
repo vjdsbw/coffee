@@ -169,8 +169,8 @@ const detailInfo = computed(() => {
             <div class="footer-btn">
                 <van-button :disabled="disable" round plain type="success" color="#6d86c4"
                     @click="buy">立即购买</van-button>
-                <van-button :disabled="disable" round type="success" color="#6d86c4"
-                    @click="addCateGory">加入购物车</van-button>
+                <!-- <van-button :disabled="disable" round type="success" color="#6d86c4"
+                    @click="addCateGory">加入购物车</van-button> -->
             </div>
         </div>
     </div>

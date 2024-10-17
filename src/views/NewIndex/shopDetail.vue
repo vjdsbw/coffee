@@ -42,8 +42,7 @@ onMounted(() => {
                 </div>
             </div>
         </div>
-        <van-button type="primary"
-            @click="router.push(`/newindex?code=${user.code}&sign=${user.sign}`)">去喝一杯</van-button>
+        <van-button type="primary" @click="router.push(`/newindex?code=${user.code}&sign=${user.sign}`)">去喝一杯</van-button>
     </div>
 </template>
 
